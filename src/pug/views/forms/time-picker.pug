@@ -1,0 +1,87 @@
+extends ../../_layout/default.pug
+
+block canonical
+  link(rel='canonical' href='https://coreui.io/docs/forms/time-picker/')
+
+block breadcrumb
+  +breadcrumb(['Home', 'Components', 'Forms'], 'Time Picker')
+
+block view
+  +callout-custom
+    | This component is part of the CoreUI LAB. If you want to use Time Picker component you have to install 
+    strong next
+    |  version of the 
+    code @coreui/coreui-pro@next
+    |  package. 
+    br
+    | The LAB is the place where we release components that are actively developed and will be included in future releases of 
+    code @coreui/coreui-pro
+    | .
+    br
+    br
+    | For more information please visit our official
+    |
+    a(href='https://coreui.io/docs/forms/time-picker/' target='_blank') documentation
+    | .
+    
+  .row
+    .col-12
+      .card.mb-4
+        .card-header
+          strong Example
+        .card-body
+          +example('https://coreui.io/docs/forms/time-picker/#example')
+            .row
+              .col-lg-3
+                div(data-coreui-locale='en-US' data-coreui-toggle='time-picker')
+              .col-lg-3
+                div(data-coreui-value='02:17:35 PM' data-coreui-locale='en-US' data-coreui-toggle='time-picker')
+    .col-12
+      .card.mb-4
+        .card-header
+          strong Time Picker
+          span.small.ms-1 Sizing
+        .card-body
+          p.text-medium-emphasis.small
+            | Set heights using 
+            code data-coreui-size
+            |  attribute like 
+            code data-coreui-size="lg"
+            |  and 
+            code data-coreui-size="sm"
+            | .
+          +example('https://coreui.io/docs/forms/time-picker/#sizing')
+            .row.mb-4
+              .col-lg-4
+                div(data-coreui-locale='en-US' data-coreui-size='lg' data-coreui-toggle='time-picker')
+            .row
+              .col-lg-3
+                div(data-coreui-locale='en-US' data-coreui-size='sm' data-coreui-toggle='time-picker')
+    .col-12
+      .card.mb-4
+        .card-header
+          strong Time Picker
+          span.small.ms-1 Disabled
+        .card-body
+          p.text-medium-emphasis.small
+            | Add the 
+            code data-coreui-disabled="true"
+            |  attribute on an input to give it a grayed out appearance and remove pointer events.
+          +example('https://coreui.io/docs/forms/time-picker/#disabled')
+            .row
+              .col-lg-4
+                div(data-coreui-disabled='true' data-coreui-locale='en-US' data-coreui-toggle='time-picker')
+    .col-12
+      .card.mb-4
+        .card-header
+          strong Time Picker
+          span.small.ms-1 Readonly
+        .card-body
+          p.text-medium-emphasis.small
+            | Add the 
+            code data-coreui-input-read-only="true"
+            |  boolean attribute to prevent modification of the input’s value.
+          +example('https://coreui.io/docs/forms/time-picker/#readonly')
+            .row
+              .col-lg-4
+                div(data-coreui-input-read-only='true' data-coreui-locale='en-US' data-coreui-toggle='time-picker')

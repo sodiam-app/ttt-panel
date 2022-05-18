@@ -1,0 +1,124 @@
+extends ../../_layout/default.pug
+
+block canonical
+  link(rel='canonical' href='https://coreui.io/docs/forms/date-picker/')
+
+block breadcrumb
+  +breadcrumb(['Home', 'Components', 'Forms'], 'Date Picker')
+
+block view
+  +callout-custom
+    | This component is part of the CoreUI LAB. If you want to use Date Picker component you have to install 
+    strong next
+    |  version of the 
+    code @coreui/coreui-pro@next
+    |  package. 
+    br
+    | The LAB is the place where we release components that are actively developed and will be included in future releases of 
+    code @coreui/coreui-pro
+    | .
+    br
+    br
+    | For more information please visit our official
+    |
+    a(href='https://coreui.io/docs/forms/date-picker/' target='_blank') documentation
+    | .
+      
+  .row
+    .col-12
+      .card.mb-4
+        .card-header
+          strong Date Picker
+        .card-body
+          +example('https://coreui.io/docs/forms/date-picker/#example')
+            .row
+              .col-lg-4
+                div(data-coreui-locale='en-US' data-coreui-toggle='date-picker')
+              .col-lg-4
+                div(data-coreui-date='2023/03/15' data-coreui-locale='en-US' data-coreui-toggle='date-picker')
+    .col-12
+      .card.mb-4
+        .card-header
+          strong Date Picker
+          span.small.ms-1 With timepicker
+        .card-body
+          +example('https://coreui.io/docs/forms/date-picker/#with-timepicker')
+            .row
+              .col-lg-4
+                div(data-coreui-locale='en-US' data-coreui-timepicker='true' data-coreui-toggle='date-picker')
+              .col-lg-4
+                div(data-coreui-date='2023/03/15 02:22:13 PM' data-coreui-locale='en-US' data-coreui-timepicker='true' data-coreui-toggle='date-picker')
+    .col-12
+      .card.mb-4
+        .card-header
+          strong Date Picker
+          span.small.ms-1 Sizing
+        .card-body
+          p.text-medium-emphasis.small
+            | Set heights using 
+            code data-coreui-size
+            |  attribute like 
+            code data-coreui-size="lg"
+            |  and 
+            code data-coreui-size="sm"
+            | .
+          +example('https://coreui.io/docs/forms/date-picker/#sizing')
+            .row.mb-4
+              .col-lg-4
+                div(data-coreui-locale='en-US' data-coreui-size='lg' data-coreui-toggle='date-picker')
+            .row
+              .col-lg-3
+                div(data-coreui-locale='en-US' data-coreui-size='sm' data-coreui-toggle='date-picker')
+    .col-12
+      .card.mb-4
+        .card-header
+          strong Date Picker
+          span.small.ms-1 Disabled
+        .card-body
+          p.text-medium-emphasis.small
+            | Add the 
+            code data-coreui-disabled="true"
+            |  attribute on an input to give it a grayed out appearance and remove pointer events.
+          +example('https://coreui.io/docs/forms/date-picker/#disabled')
+            .row
+              .col-lg-4
+                div(data-coreui-disabled='true' data-coreui-locale='en-US' data-coreui-toggle='date-picker')
+    .col-12
+      .card.mb-4
+        .card-header
+          strong Date Picker
+          span.small.ms-1 Readonly
+        .card-body
+          p.text-medium-emphasis.small
+            | Add the 
+            code data-coreui-input-read-only="true"
+            |  boolean attribute to prevent modification of the input’s value.
+          +example('https://coreui.io/docs/forms/date-picker/#readonly')
+            .row
+              .col-lg-4
+                div(data-coreui-input-read-only='true' data-coreui-locale='en-US' data-coreui-toggle='date-picker')
+    .col-12
+      .card.mb-4
+        .card-header
+          strong Date Picker
+          span.small.ms-1 Disabled dates
+        .card-body
+          +example('https://coreui.io/docs/forms/date-picker/#disabled-dates')
+            .row
+              .col-lg-4
+                #myDatePickerDisabledDates
+
+block js
+  | var options = {
+  | locale: 'en-US',
+  | calendarDate: new Date(2022, 2, 1),
+  | disabledDates: [
+  | [new Date(2022, 2, 4), new Date(2022, 2, 7)],
+  | new Date(2022, 2, 16),
+  | new Date(2022, 3, 16),
+  | [new Date(2022, 4, 2), new Date(2022, 4, 8)]
+  | ],
+  | maxDate: new Date(2022, 5, 0),
+  | minDate: new Date(2022, 1, 1)
+  | }
+  | var myDatePickerDisabledDates = new coreui.DatePicker(document.getElementById('myDatePickerDisabledDates'), options)

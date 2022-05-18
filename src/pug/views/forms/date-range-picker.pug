@@ -1,0 +1,163 @@
+extends ../../_layout/default.pug
+
+block canonical
+  link(rel='canonical' href='https://coreui.io/docs/forms/date-range-picker/')
+
+block breadcrumb
+  +breadcrumb(['Home', 'Components', 'Forms'], 'Date Picker')
+
+block view
+  +callout-custom
+    | This component is part of the CoreUI LAB. If you want to use Date Range Picker component you have to install 
+    strong next
+    |  version of the 
+    code @coreui/coreui-pro@next
+    |  package. 
+    br
+    | The LAB is the place where we release components that are actively developed and will be included in future releases of 
+    code @coreui/coreui-pro
+    | .
+    br
+    br
+    | For more information please visit our official
+    |
+    a(href='https://coreui.io/docs/forms/date-range-picker/' target='_blank') documentation
+    | .
+      
+  .row
+    .col-12
+      .card.mb-4
+        .card-header
+          strong Example
+        .card-body
+          +example('https://coreui.io/docs/forms/date-range-picker/#example')
+            .row
+              .col-lg-5
+                div(data-coreui-locale='en-US' data-coreui-toggle='date-range-picker')
+              .col-lg-5
+                div(data-coreui-start-date='2022/08/03' data-coreui-end-date='2022/08/17' data-coreui-locale='en-US' data-coreui-toggle='date-range-picker')
+    .col-12
+      .card.mb-4
+        .card-header
+          strong With timepicker
+        .card-body
+          +example('https://coreui.io/docs/forms/date-range-picker/#with-timepicker')
+            .row
+              .col-lg-6
+                div(data-coreui-locale='en-US' data-coreui-timepicker='true' data-coreui-toggle='date-range-picker')
+              .col-lg-6
+                div(data-coreui-start-date='2022/08/03 02:34:17 AM' data-coreui-end-date='2022/09/17 11:29:41 PM' data-coreui-locale='en-US' data-coreui-timepicker='true' data-coreui-toggle='date-range-picker')
+    .col-12
+      .card.mb-4
+        .card-header
+          strong Date Range Picker
+          span.small.ms-1 Sizing
+        .card-body
+          p.text-medium-emphasis.small
+            | Set heights using 
+            code data-coreui-size
+            |  attribute like 
+            code data-coreui-size="lg"
+            |  and 
+            code data-coreui-size="sm"
+            | .
+          +example('https://coreui.io/docs/forms/date-range-picker/#sizing')
+            .row.mb-4
+              .col-lg-5
+                div(data-coreui-locale='en-US' data-coreui-size='lg' data-coreui-toggle='date-range-picker')
+            .row
+              .col-lg-3
+                div(data-coreui-locale='en-US' data-coreui-size='sm' data-coreui-toggle='date-range-picker')
+    .col-12
+      .card.mb-4
+        .card-header
+          strong Date Range Picker
+          span.small.ms-1 Disabled
+        .card-body
+          p.text-medium-emphasis.small
+            | Add the 
+            code data-coreui-disabled="true"
+            |  attribute on an input to give it a grayed out appearance and remove pointer events.
+          +example('https://coreui.io/docs/forms/date-range-picker/#disabled')
+            .row
+              .col-lg-5
+                div(data-coreui-disabled='true' data-coreui-locale='en-US' data-coreui-toggle='date-range-picker')
+    .col-12
+      .card.mb-4
+        .card-header
+          strong Date Range Picker
+          span.small.ms-1 Readonly
+        .card-body
+          p.text-medium-emphasis.small
+            | Add the 
+            code data-coreui-input-read-only="true"
+            |  boolean attribute to prevent modification of the input’s value.
+          +example('https://coreui.io/docs/forms/date-range-picker/#readonly')
+            .row
+              .col-lg-5
+                div(data-coreui-input-read-only='true' data-coreui-locale='en-US' data-coreui-toggle='date-range-picker')
+    .col-12
+      .card.mb-4
+        .card-header
+          strong Date Range Picker
+          span.small.ms-1 Disabled dates
+        .card-body
+          +example('https://coreui.io/docs/forms/date-range-picker/#disabled-dates')
+            .row
+              .col-lg-5
+                #myDateRangePickerDisabledDates
+    .col-12
+      .card.mb-4
+        .card-header
+          strong Date Range Picker
+          span.small.ms-1 Custom ranges
+        .card-body
+          +example('https://coreui.io/docs/forms/date-range-picker/#custom-ranges')
+            .row
+              .col-lg-5
+                #myDateRangePickerCustomRanges
+
+block js
+  | var options = {
+  | locale: 'en-US',
+  | calendarDate: new Date(2022, 2, 1),
+  | disabledDates: [
+  | [new Date(2022, 2, 4), new Date(2022, 2, 7)],
+  | new Date(2022, 2, 16),
+  | new Date(2022, 3, 16),
+  | [new Date(2022, 4, 2), new Date(2022, 4, 8)]
+  | ],
+  | maxDate: new Date(2022, 5, 0),
+  | minDate: new Date(2022, 1, 1)
+  | }
+  | var myDateRangePickerDisabledDates = new coreui.DateRangePicker(document.getElementById('myDateRangePickerDisabledDates'), options)
+  |
+  | var optionsCustomRanges = {
+  | locale: 'en-US',
+  | ranges: {
+  | Today: [new Date(), new Date()],
+  | Yesterday: [
+  | new Date(new Date().setDate(new Date().getDate() - 1)),
+  | new Date(new Date().setDate(new Date().getDate() - 1)),
+  | ],
+  | 'Last 7 Days': [
+  | new Date(new Date().setDate(new Date().getDate() - 6)),
+  | new Date(new Date()),
+  | ],
+  | 'Last 30 Days': [
+  | new Date(new Date().setDate(new Date().getDate() - 29)),
+  | new Date(new Date()),
+  | ],
+  | 'This Month': [
+  | new Date(new Date().setDate(1)),
+  | new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+  | ],
+  | 'Last Month': [
+  | new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1),
+  | new Date(new Date().getFullYear(), new Date().getMonth(), 0),
+  | ]
+  | }
+  | }
+  | var myDateRangePickerCustomRanges = new coreui.DateRangePicker(document.getElementById('myDateRangePickerCustomRanges'), optionsCustomRanges)
+
+
