@@ -101,6 +101,8 @@ import {
   cilArrowThickFromLeft,
   cilShareAlt,
   cilTerminal,
+  cilSmilePlus,
+  cilPowerStandby,
 } from '@coreui/icons'
 
 export const iconsSet = Object.assign(
@@ -204,6 +206,8 @@ export const iconsSet = Object.assign(
     cilArrowThickFromLeft,
     cilShareAlt,
     cilTerminal,
+    cilSmilePlus,
+    cilPowerStandby,
   },
   {
     cifUs,

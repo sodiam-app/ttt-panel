@@ -1,5 +1,1024 @@
 <template>
-  <div>
-    <a> Setting - Employee - Employee Page </a>
-  </div>
+  <CCard class="mb-2">
+    <CCardHeader>
+      <CIcon :icon="ic.cilPowerStandby" />
+      กำลังออนไลน์
+    </CCardHeader>
+    <CCardBody class="small">
+      <CContainer fluid>
+        <CRow :xs="{ cols: 'auto' }">
+          <CCol class="text-center">
+            <CAvatar
+              :src="avatar1"
+              color="secondary"
+              status="success"
+              shape="rounded"
+            />
+            <br />
+            <CBadge color="dark" shape="rounded-pill" size="sm">
+              staff-mockup-1
+            </CBadge>
+          </CCol>
+          <CCol class="text-center">
+            <CAvatar
+              :src="avatar2"
+              color="secondary"
+              status="success"
+              shape="rounded"
+            />
+            <br />
+            <CBadge color="dark" shape="rounded-pill" size="sm">
+              staff-mockup-2
+            </CBadge>
+          </CCol>
+          <CCol class="text-center">
+            <CAvatar
+              :src="avatar3"
+              color="secondary"
+              status="success"
+              shape="rounded"
+            />
+            <br />
+            <CBadge color="dark" shape="rounded-pill" size="sm">
+              staff-mockup-3
+            </CBadge>
+          </CCol>
+          <CCol class="text-center">
+            <CAvatar
+              :src="avatar4"
+              color="secondary"
+              status="success"
+              shape="rounded"
+            />
+            <br />
+            <CBadge color="dark" shape="rounded-pill" size="sm">
+              staff-mockup-4
+            </CBadge>
+          </CCol>
+        </CRow>
+      </CContainer>
+    </CCardBody>
+  </CCard>
+  <CCard class="mb-2">
+    <CCardHeader>
+      <CRow class="align-items-center">
+        <CCol>
+          <CIcon :icon="ic.cilBadge" />
+          ผู้ดูแลระบบ
+        </CCol>
+        <CCol class="text-end">
+          <CButton
+            color="dark"
+            class="ms-1"
+            size="sm"
+            @click="mdCreate = !mdCreate"
+          >
+            <CIcon :icon="ic.cilSmilePlus" />
+            เพิ่มแอดมิน
+          </CButton>
+        </CCol>
+      </CRow>
+    </CCardHeader>
+    <CCardBody class="small">
+      <div class="table-responsive">
+        <CTable hover small class="mb-3">
+          <CTableHead color="dark" class="fw-bold">
+            <CTableRow>
+              <CTableHeaderCell scope="col">#</CTableHeaderCell>
+              <CTableHeaderCell scope="col">สถานะ</CTableHeaderCell>
+              <CTableHeaderCell scope="col">ยูสเซอร์</CTableHeaderCell>
+              <CTableHeaderCell scope="col">ชื่อ</CTableHeaderCell>
+              <CTableHeaderCell scope="col">ประเภท</CTableHeaderCell>
+              <CTableHeaderCell scope="col">ออนไลน์ล่าสุด</CTableHeaderCell>
+              <CTableHeaderCell scope="col" class="text-center">
+                จัดการ
+              </CTableHeaderCell>
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
+            <CTableRow
+              color="light"
+              v-for="(emp, index) in employees.listOfEmp"
+              :key="emp._id"
+            >
+              <CTableHeaderCell scope="row">{{ index + 1 }}</CTableHeaderCell>
+              <CTableDataCell>
+                <CBadge
+                  :color="convertStatusColor(emp.status)"
+                  shape="rounded-pill"
+                  >{{ convertStatus(emp.status) }}</CBadge
+                >
+              </CTableDataCell>
+              <CTableDataCell>
+                <div class="d-inline-flex align-items-center">
+                  <CAvatar
+                    :src="getImgAvatar(emp.role, emp.avatar)"
+                    size="sm"
+                    status="success"
+                  />
+                  <span class="ms-1">{{ emp.name }}</span>
+                </div>
+              </CTableDataCell>
+              <CTableDataCell>{{ emp.username }}</CTableDataCell>
+              <CTableDataCell>
+                <strong>{{ emp.role_description }}</strong>
+              </CTableDataCell>
+              <CTableDataCell>
+                <span class="fst-italic text-black-50">ไม่ระบุ</span>
+              </CTableDataCell>
+              <CTableDataCell class="text-end">
+                <CButton
+                  color="warning"
+                  variant="outline"
+                  size="sm"
+                  class="me-1"
+                  @click="editEmpShown(emp._id)"
+                  v-if="compareRole(tmpRoleMyself, emp.role)"
+                >
+                  <CIcon :icon="ic.cilColorBorder" class="small" />
+                  แก้ไข
+                </CButton>
+                <CButton
+                  color="info"
+                  variant="outline"
+                  size="sm"
+                  class="me-1"
+                  @click="mdViewProfile = !mdViewProfile"
+                >
+                  <CIcon :icon="ic.cilUser" class="small" />
+                  <span class="small">โปรไฟล์</span>
+                </CButton>
+                <CButtonGroup role="group" size="sm"> </CButtonGroup>
+              </CTableDataCell>
+            </CTableRow>
+          </CTableBody>
+        </CTable>
+      </div>
+      <div class="text-center">
+        <CSmartPagination
+          :activePage="employees.activePage"
+          :pages="employees.totalPage"
+          size="sm"
+          align="center"
+        />
+      </div>
+    </CCardBody>
+  </CCard>
+
+  <!-- ----- -->
+  <!-- เพิ่มแอดมิน -->
+  <!-- ----- -->
+  <CModal
+    backdrop="static"
+    :visible="mdCreate"
+    @close="
+      () => {
+        mdCreate = false
+      }
+    "
+  >
+    <CModalHeader class="pt-2 pb-1">
+      <CModalTitle class="fw-lighter"> เพิ่มแอดมิน </CModalTitle>
+    </CModalHeader>
+    <CModalBody class="m-0 p-0">
+      <CCard class="border-success m-0 p-0">
+        <CCardBody>
+          <CCardText class="small">
+            <CForm novalidate>
+              <CContainer fluid>
+                <CAlert
+                  color="danger"
+                  variant="solid"
+                  class="py-2"
+                  :visible="addEmp.alertAddEmpVisible"
+                >
+                  <CIcon :icon="ic.cilWarning" />
+
+                  {{ addEmp.apiResult }}
+                </CAlert>
+                <CRow>
+                  <CCol md="6">
+                    <div class="d-inline-flex align-items-center">
+                      <span class="me-2 small fw-semibold"> * เปิดใช้งาน </span>
+                      <CFormSwitch
+                        id="formSwitchCheckChecked"
+                        v-model="addEmp.status"
+                      />
+                    </div>
+                  </CCol>
+                </CRow>
+                <hr class="mt-0 mb-2" />
+                <CRow class="mb-2">
+                  <CCol>
+                    <div>
+                      <label for="cEmpType" class="form-label mb-0">
+                        เว็บไซต์ *
+                      </label>
+                      <CFormSelect size="sm" v-model="addEmp.agent_id" required>
+                        <option value="629e381cb4839cabb5622da1">
+                          banpong888
+                        </option>
+                      </CFormSelect>
+                    </div>
+                  </CCol>
+                </CRow>
+                <CRow class="mb-2">
+                  <CCol>
+                    <div>
+                      <label for="cEmpType" class="form-label mb-0">
+                        ประเภท *
+                      </label>
+                      <CFormSelect size="sm" v-model="addEmp.role" required>
+                        <option
+                          v-for="option in optRole"
+                          :key="option._id"
+                          :value="option.role"
+                        >
+                          {{ option.description }}
+                        </option>
+                      </CFormSelect>
+                    </div>
+                  </CCol>
+                </CRow>
+                <CRow class="mb-2">
+                  <CCol md="6">
+                    <div>
+                      <label for="cUsername" class="form-label mb-0">
+                        Username *
+                      </label>
+                      <CInputGroup size="sm">
+                        <CInputGroupText id="basic-cUsername">
+                          <CIcon :icon="ic.cilUserPlus" />
+                        </CInputGroupText>
+                        <CFormInput
+                          feedbackValid="Looks good!"
+                          feedbackInvalid="Please choose a username."
+                          type="text"
+                          id="cUsername"
+                          v-model="addEmp.username"
+                        />
+                      </CInputGroup>
+                    </div>
+                  </CCol>
+                  <CCol md="6">
+                    <div>
+                      <label for="cPassword" class="form-label mb-0">
+                        Password *
+                      </label>
+                      <CInputGroup size="sm">
+                        <CInputGroupText id="basic-cPassword">
+                          <CIcon :icon="ic.cilLockLocked" />
+                        </CInputGroupText>
+                        <CFormInput
+                          :type="addEmp.pwdType"
+                          id="cPassword"
+                          v-model="addEmp.password"
+                          required
+                        />
+                        <CButton
+                          type="button"
+                          color="secondary"
+                          variant="outline"
+                          @click="showPwd"
+                        >
+                          <CIcon :icon="ic.cilLowVision" />
+                        </CButton>
+                      </CInputGroup>
+                    </div>
+                  </CCol>
+                </CRow>
+                <CRow class="mb-2">
+                  <CCol md="6">
+                    <div>
+                      <label for="cName" class="form-label mb-0"> ชื่อ </label>
+                      <CInputGroup size="sm">
+                        <CFormInput
+                          type="text"
+                          id="cName"
+                          v-model="addEmp.name"
+                          required
+                        />
+                      </CInputGroup>
+                    </div>
+                  </CCol>
+                  <CCol md="6">
+                    <div>
+                      <label for="cPhone" class="form-label mb-0">
+                        เบอร์โทร
+                      </label>
+                      <CInputGroup size="sm">
+                        <CInputGroupText id="basic-cPhone">
+                          <CIcon :icon="ic.cilPhone" />
+                        </CInputGroupText>
+                        <CFormInput
+                          type="text"
+                          id="cPhone"
+                          v-model="addEmp.tel"
+                          required
+                        />
+                      </CInputGroup>
+                    </div>
+                  </CCol>
+                </CRow>
+              </CContainer>
+              <hr />
+              <div class="text-end">
+                <CButton
+                  type="submit"
+                  color="success"
+                  size="sm"
+                  class="ms-1 text-light"
+                  @click="addEmployee"
+                >
+                  <CIcon :icon="ic.cilCheckCircle" size="sm" />
+                  ตกลง
+                </CButton>
+                <CButton
+                  color="danger"
+                  size="sm"
+                  class="text-light ms-1"
+                  @click="
+                    () => {
+                      mdCreate = false
+                    }
+                  "
+                >
+                  <CIcon :icon="ic.cilXCircle" size="sm" />
+                  ปิด
+                </CButton>
+              </div>
+            </CForm>
+          </CCardText>
+        </CCardBody>
+      </CCard>
+    </CModalBody>
+  </CModal>
+
+  <!-- ----- -->
+  <!-- แก้ไข -->
+  <!-- ----- -->
+  <CModal
+    backdrop="static"
+    :visible="mdEdit"
+    @close="
+      () => {
+        mdEdit = false
+      }
+    "
+  >
+    <CModalHeader class="pt-2 pb-1">
+      <CModalTitle class="fw-lighter"> แก้ไขบัญชี </CModalTitle>
+    </CModalHeader>
+    <CModalBody class="m-0 p-0">
+      <CCard class="border-warning m-0 p-0">
+        <CCardBody>
+          <CCardText class="small">
+            <form>
+              <CContainer fluid>
+                <CRow>
+                  <CCol md="6">
+                    <div class="d-inline-flex align-items-center">
+                      <span class="me-2 small fw-semibold"> * เปิดใช้งาน </span>
+                      <CFormSwitch
+                        id="formSwitchCheckChecked"
+                        v-model="editEmp.status"
+                      />
+                    </div>
+                  </CCol>
+                </CRow>
+                <hr class="mt-0 mb-2" />
+                <CRow class="mb-2">
+                  <CCol>
+                    <div>
+                      <label for="cEmpType" class="form-label mb-0">
+                        เว็บไซต์ *
+                      </label>
+                      <CFormSelect
+                        size="sm"
+                        v-model="editEmp.agent_id"
+                        required
+                      >
+                        <option value="629e381cb4839cabb5622da1">
+                          banpong888
+                        </option>
+                      </CFormSelect>
+                    </div>
+                  </CCol>
+                </CRow>
+                <CRow class="mb-2">
+                  <CCol>
+                    <div>
+                      <label for="cEmpType" class="form-label mb-0">
+                        ประเภท *
+                      </label>
+                      <CFormSelect size="sm" v-model="editEmp.role" required>
+                        <option
+                          v-for="option in optRole"
+                          :key="option._id"
+                          :value="option.role"
+                        >
+                          {{ option.description }}
+                        </option>
+                      </CFormSelect>
+                    </div>
+                  </CCol>
+                </CRow>
+                <CRow class="mb-2">
+                  <CCol md="6">
+                    <div>
+                      <label for="cUsername" class="form-label mb-0">
+                        Username *
+                      </label>
+                      <CInputGroup size="sm">
+                        <CInputGroupText id="basic-cUsername">
+                          <CIcon :icon="ic.cilUserPlus" />
+                        </CInputGroupText>
+                        <CFormInput
+                          type="text"
+                          id="cUsername"
+                          disabled
+                          v-model="editEmp.username"
+                        />
+                      </CInputGroup>
+                    </div>
+                  </CCol>
+                  <CCol md="6">
+                    <div>
+                      <label for="cPassword" class="form-label mb-0">
+                        Password *
+                      </label>
+                      <CInputGroup size="sm">
+                        <CInputGroupText id="basic-cPassword">
+                          <CIcon :icon="ic.cilLockLocked" />
+                        </CInputGroupText>
+                        <CFormInput
+                          type="password"
+                          id="cPassword"
+                          v-model="editEmp.password"
+                        />
+                        <CInputGroupText id="basic-cHidden">
+                          <CIcon :icon="ic.cilLowVision" />
+                        </CInputGroupText>
+                      </CInputGroup>
+                    </div>
+                  </CCol>
+                </CRow>
+                <CRow class="mb-2">
+                  <CCol md="6">
+                    <div>
+                      <label for="cName" class="form-label mb-0"> ชื่อ </label>
+                      <CInputGroup size="sm">
+                        <CFormInput
+                          type="text"
+                          id="cName"
+                          v-model="editEmp.name"
+                        />
+                      </CInputGroup>
+                    </div>
+                  </CCol>
+                  <CCol md="6">
+                    <div>
+                      <label for="cPhone" class="form-label mb-0">
+                        เบอร์โทร
+                      </label>
+                      <CInputGroup size="sm">
+                        <CInputGroupText id="basic-cPhone">
+                          <CIcon :icon="ic.cilPhone" />
+                        </CInputGroupText>
+                        <CFormInput
+                          type="text"
+                          id="cPhone"
+                          v-model="editEmp.tel"
+                        />
+                      </CInputGroup>
+                    </div>
+                  </CCol>
+                </CRow>
+              </CContainer>
+              <hr />
+              <div class="text-end">
+                <CButton color="success" size="sm" class="ms-1 text-light">
+                  <CIcon :icon="ic.cilCheckCircle" size="sm" />
+                  ตกลง
+                </CButton>
+                <CButton
+                  color="danger"
+                  size="sm"
+                  class="text-light ms-1"
+                  @click="
+                    () => {
+                      mdEdit = false
+                    }
+                  "
+                >
+                  <CIcon :icon="ic.cilXCircle" size="sm" />
+                  ปิด
+                </CButton>
+              </div>
+            </form>
+          </CCardText>
+        </CCardBody>
+      </CCard>
+    </CModalBody>
+  </CModal>
+
+  <!-- ----- -->
+  <!-- ตรวจสอบ -->
+  <!-- ----- -->
+  <CModal
+    fullscreen
+    backdrop="static"
+    :visible="mdViewProfile"
+    @close="
+      () => {
+        mdViewProfile = false
+      }
+    "
+  >
+    <CModalHeader>
+      <CModalTitle component="h5" class="fw-bolder">
+        <CContainer fluid>
+          <CIcon :icon="ic.cilWc" size="xl" />
+          ข้อมูลโปรไฟล์
+        </CContainer>
+      </CModalTitle>
+    </CModalHeader>
+    <CModalBody>
+      <CContainer fluid>
+        <CCard class="mb-2 border-secondary">
+          <CCardBody>
+            <CRow class="mx-4">
+              <CCol md="2" class="mb-2 align-items-center text-center">
+                <div class="clearfix">
+                  <CImage
+                    align="center"
+                    rounded
+                    thumbnail
+                    :src="avatar"
+                    width="150"
+                    height="150"
+                    class="mb-1"
+                  />
+                  <CButton
+                    color="dark"
+                    variant="outline"
+                    size="sm"
+                    shape="rounded-pill"
+                  >
+                    <CIcon :icon="ic.cilLoopCircular" class="small" />
+                    <span class="small"> เปลี่ยน</span>
+                  </CButton>
+                </div>
+              </CCol>
+              <CCol md="5" class="mb-2 small">
+                <CContainer fluid>
+                  <h4>natkingsize2</h4>
+                  <hr class="mt-1" />
+                  <h5>
+                    <strong>สถานะ: </strong>
+                    <span class="text-success"> เปิดใช้งาน</span>
+                  </h5>
+                  <h5>
+                    <strong>ชื่อ: </strong>
+                    <span class="text-secondary"> natkingsize</span>
+                  </h5>
+                  <span class="small"> สร้างเมื่อ: 3 เดือนที่แล้ว </span>
+                  <br />
+                  <span class="small"> แก้ไขล่าสุด: 6 นาทีที่แล้ว </span>
+                </CContainer>
+              </CCol>
+              <CCol md="5" class="small align-self-end">
+                <CRow class="align-items-end">
+                  <CCol>
+                    <CForm class="row g-1 align-items-end float-end">
+                      <CCol lg="6">
+                        <CInputGroup size="sm">
+                          <CFormInput
+                            id="searchDate"
+                            value="19/02/2022 - 19/02/2022"
+                          />
+                          <CInputGroupText id="i-searchDate">
+                            <CIcon :icon="ic.cilCalendar" />
+                          </CInputGroupText>
+                        </CInputGroup>
+                      </CCol>
+                      <CCol lg="5">
+                        <CInputGroup size="sm">
+                          <CFormInput id="searchTime" value="00:00" />
+                          <CInputGroupText id="i-searchTime">
+                            -
+                          </CInputGroupText>
+                          <CFormInput id="searchTime" value="23:59" />
+                          <CInputGroupText id="i-searchTime">
+                            <CIcon :icon="ic.cilClock" />
+                          </CInputGroupText>
+                        </CInputGroup>
+                      </CCol>
+                      <CCol lg="1">
+                        <CButton color="primary" class="text-light" size="sm">
+                          <CIcon :icon="ic.cilMagnifyingGlass" />
+                        </CButton>
+                      </CCol>
+                    </CForm>
+                  </CCol>
+                </CRow>
+              </CCol>
+            </CRow>
+          </CCardBody>
+        </CCard>
+        <CCard class="border-secondary">
+          <CCardHeader>ประวัติความเคลื่อนไหว</CCardHeader>
+          <CCardBody>
+            <CRow>
+              <CCol class="p-0">
+                <div class="table-responsive">
+                  <CTable hover small class="mb-3 small">
+                    <CTableHead color="dark" class="fw-bold">
+                      <CTableRow>
+                        <CTableHeaderCell scope="col">#</CTableHeaderCell>
+                        <CTableHeaderCell scope="col"
+                          >คำอธิบาย</CTableHeaderCell
+                        >
+                        <CTableHeaderCell scope="col">เมื่อ</CTableHeaderCell>
+                      </CTableRow>
+                    </CTableHead>
+                    <CTableBody>
+                      <CTableRow color="light">
+                        <CTableHeaderCell scope="row">1.</CTableHeaderCell>
+                        <CTableDataCell>
+                          👓 patpubul เข้าสู่ระบบ ด้วย IP:
+                          2001:fb1:5a:e6e6:4c0e:8ce3:7b69:9482
+                        </CTableDataCell>
+                        <CTableDataCell>
+                          2022-05-21 09:09:16 (9 ชั่วโมงที่แล้ว)
+                        </CTableDataCell>
+                      </CTableRow>
+                    </CTableBody>
+                  </CTable>
+                </div>
+              </CCol>
+            </CRow>
+            <div class="text-center">
+              <CSmartPagination
+                :activePage="2"
+                :pages="3"
+                size="sm"
+                align="center"
+              />
+            </div>
+          </CCardBody>
+        </CCard>
+      </CContainer>
+    </CModalBody>
+  </CModal>
 </template>
+
+<script>
+import { imgBankSmoothSet as imgBank } from '@/assets/images/banking/th/smooth-corner'
+import avatar1 from '@/assets/images/avatars/owner/02.png'
+import avatar2 from '@/assets/images/avatars/owner/01.png'
+import avatar3 from '@/assets/images/avatars/owner/04.png'
+import avatar4 from '@/assets/images/avatars/manager/02.png'
+const apiUrl = require('./../../../constants/api-url-list')
+const headers = {
+  Authorization: 'Bearer ' + apiUrl.token,
+}
+
+import { CIcon } from '@coreui/icons-vue'
+import {
+  cilSmilePlus,
+  cilPowerStandby,
+  cilBadge,
+  cilUser,
+  cilColorBorder,
+  cilXCircle,
+  cilCheckCircle,
+  cilUserPlus,
+  cilLockLocked,
+  cilLowVision,
+  cilPhone,
+  cilWc,
+  cilLoopCircular,
+  cilCalendar,
+  cilClock,
+  cilMagnifyingGlass,
+  cilWarning,
+} from '@coreui/icons'
+
+export default {
+  name: 'SettingEmployee',
+  components: {
+    CIcon,
+  },
+  data() {
+    return {
+      // Data
+      tmpRoleMyself: 'manager',
+      employees: {
+        listOfEmp: [],
+        totalPage: 1,
+        activePage: 1,
+      },
+      addEmp: {
+        agent_id: '629e381cb4839cabb5622da1',
+        username: '',
+        password: '',
+        tel: '',
+        avatar: '',
+        name: '',
+        role: 'staff',
+        status: true,
+        apiResult: '',
+        alertAddEmpVisible: false,
+        pwdType: 'password',
+      },
+      editEmp: {
+        agent_id: '629e381cb4839cabb5622da1',
+        _id: '',
+        username: '',
+        password: '',
+        tel: '',
+        avatar: '',
+        name: '',
+        role: '',
+        status: false,
+        apiResult: '',
+        alertAddEmpVisible: false,
+        pwdType: 'password',
+      },
+      optRole: [],
+      // Controls
+      avatar1: avatar1,
+      avatar2: avatar2,
+      avatar3: avatar3,
+      avatar4: avatar4,
+      imgBank,
+      mdCreate: false,
+      mdEdit: false,
+      mdViewProfile: false,
+      ic: {
+        cilSmilePlus,
+        cilPowerStandby,
+        cilBadge,
+        cilUser,
+        cilColorBorder,
+        cilXCircle,
+        cilCheckCircle,
+        cilUserPlus,
+        cilLockLocked,
+        cilLowVision,
+        cilPhone,
+        cilWc,
+        cilLoopCircular,
+        cilCalendar,
+        cilClock,
+        cilMagnifyingGlass,
+        cilWarning,
+      },
+    }
+  },
+  methods: {
+    async getRoleStaff() {
+      // console.log(headers)
+      // console.log(apiUrl.conf.GetRole)
+      await this.$http
+        .post(apiUrl.conf.GetRole, {}, { headers })
+        .then((response) => {
+          // console.log(response)
+          if (response.data.status == 200) {
+            this.optRole = response.data.result
+            // console.log(this.optRole)
+          } else {
+            console.log(
+              'callAPI - ' +
+                apiUrl.conf.GetRole +
+                ' >>> ' +
+                response.data.status +
+                ', ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log(
+            'callAPI (catch) - ' + apiUrl.conf.GetRole + ' >>> ' + error,
+          )
+        })
+    },
+
+    async getAllEmployee() {
+      await this.$http
+        .post(apiUrl.setting.employee.GetAllEmployee, {}, { headers })
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.employees.listOfEmp = response.data.result.emp
+            this.employees.totalPage = Math.ceil(
+              response.data.result.total / 10,
+            )
+            console.log(this.employees.totalPage)
+            console.log(this.employees.listOfEmp)
+          } else {
+            console.log(
+              'callAPI - ' +
+                apiUrl.setting.employee.GetAllEmployee +
+                ' >>> ' +
+                response.data.status +
+                ', ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log(
+            'callAPI (catch) - ' +
+              apiUrl.setting.employee.GetAllEmployee +
+              ' >>> ' +
+              error,
+          )
+        })
+    },
+
+    async addEmployee() {
+      this.addEmp.avatar = await this.getAvatar(this.addEmp.role)
+      console.log(headers)
+      let _status = ''
+      if (this.addEmp.status) {
+        _status = 'Active'
+      } else {
+        _status = 'Inactive'
+      }
+      await this.$http
+        .post(
+          apiUrl.setting.employee.AddEmployee,
+          {
+            agent_id: this.addEmp.agent_id,
+            username: this.addEmp.username,
+            password: this.addEmp.password,
+            tel: this.addEmp.tel,
+            avatar: this.addEmp.avatar,
+            name: this.addEmp.name,
+            role: this.addEmp.role,
+            status: _status,
+          },
+          { headers },
+        )
+        .then((response) => {
+          if (response.data.status == 200) {
+            console.log(response)
+          } else {
+            this.addEmp.apiResult = response.data.message
+            this.addEmp.alertAddEmpVisible = true
+            console.log(
+              'callAPI - ' +
+                apiUrl.setting.employee.AddEmployee +
+                ' >>> ' +
+                response.data.status +
+                ', ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log(
+            'callAPI - ' +
+              apiUrl.setting.employee.AddEmployee +
+              ' >>> ' +
+              error,
+          )
+        })
+    },
+
+    getAvatar(role) {
+      let randomNo = 0
+      if (role === 'admin') {
+        randomNo = this.getRandomArbitrary(1, 5)
+      } else if (role === 'owner') {
+        randomNo = this.getRandomArbitrary(1, 4)
+      } else if (role === 'manager') {
+        randomNo = this.getRandomArbitrary(1, 10)
+      } else if (role === 'staff') {
+        randomNo = this.getRandomArbitrary(1, 24)
+      } else if (role === 'partner') {
+        randomNo = this.getRandomArbitrary(1, 2)
+      }
+      return this.leftPad(randomNo, 2) + '.png'
+    },
+
+    showPwd() {
+      if (this.addEmp.pwdType == 'password') {
+        this.addEmp.pwdType = 'text'
+      } else {
+        this.addEmp.pwdType = 'password'
+      }
+    },
+
+    getRandomArbitrary(min, max) {
+      // return Math.random() * (max - min) + min
+      return Math.floor(Math.random() * (max - min + 1)) + min
+    },
+
+    leftPad(number, targetLength) {
+      var output = number + ''
+      while (output.length < targetLength) {
+        output = '0' + output
+      }
+      return output
+    },
+
+    convertStatus(status) {
+      const _status = status.toString().toLowerCase()
+      if (_status == 'active') {
+        return 'เปิดใช้งาน'
+      } else if (_status == 'suspend') {
+        return 'ปิดใช้งาน'
+      } else {
+        return 'ไม่ระบุ'
+      }
+    },
+
+    convertStatusColor(status) {
+      const _status = status.toString().toLowerCase()
+      if (_status == 'active') {
+        return 'success'
+      } else if (_status == 'inactive') {
+        return 'danger'
+      } else {
+        return 'dark'
+      }
+    },
+
+    compareRole(myself, emp) {
+      const _myself = myself.toString().toLowerCase()
+      const _emp = emp.toString().toLowerCase()
+      if (_myself == 'admin') {
+        return true
+      } else if (_myself == 'owner') {
+        if (
+          _emp == 'owner' ||
+          _emp == 'manager' ||
+          _emp == 'staff' ||
+          _emp == 'system' ||
+          _emp == 'partner'
+        ) {
+          return true
+        } else {
+          return false
+        }
+      } else if (_myself == 'manager') {
+        if (
+          _emp == 'manager' ||
+          _emp == 'staff' ||
+          _emp == 'system' ||
+          _emp == 'partner'
+        ) {
+          return true
+        } else {
+          return false
+        }
+      } else if (_myself == 'staff') {
+        if (_emp == 'staff' || _emp == 'system' || _emp == 'partner') {
+          return true
+        } else {
+          return false
+        }
+      } else if (_myself == 'system') {
+        if (_emp == 'system' || _emp == 'partner') {
+          return true
+        } else {
+          return false
+        }
+      } else {
+        return false
+      }
+    },
+
+    getImgAvatar(role, img) {
+      return require('../../../assets/images/avatars/' + role + '/' + img)
+    },
+
+    editEmpShown(empID) {
+      this.mdEdit = !this.mdEdit
+      this.employees.listOfEmp.forEach((value) => {
+        if (value._id == empID) {
+          this.editEmp.agent_id = '629e381cb4839cabb5622da1'
+          this.editEmp._id = value._id
+          this.editEmp.username = value.username
+          this.editEmp.password = value.password
+          this.editEmp.tel = value.tel
+          this.editEmp.avatar = value.avatar
+          this.editEmp.name = value.name
+          this.editEmp.role = value.role
+          this.editEmp.status = value.status
+          this.editEmp.apiResult = ''
+          this.editEmp.alertAddEmpVisible = false
+          this.editEmp.pwdType = 'password'
+        }
+      })
+    },
+  },
+  mounted() {
+    this.getRoleStaff()
+    this.getAllEmployee()
+  },
+}
+</script>

@@ -34,9 +34,11 @@
     "@coreui/vue-pro": "^4.3.0",
     "axios": "^0.27.2",
     "core-js": "^3.19.0",
+    "moment": "^2.29.3",
     "vue": "^3.2.23",
     "vue-axios": "^3.4.1",
     "vue-router": "^4.0.12",
+    "vue3-clipboard": "^1.0.0",
     "vuex": "^4.0.2"
   },
   "devDependencies": {

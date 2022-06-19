@@ -58,31 +58,53 @@
             </CRow>
           </CCol>
           <CCol md="6">
-            <CForm class="row g-1 align-items-end float-end">
-              <CCol lg="6">
-                <CInputGroup size="sm">
-                  <CFormInput id="searchDate" value="19/02/2022 - 19/02/2022" />
-                  <CInputGroupText id="i-searchDate">
-                    <CIcon :icon="ic.cilCalendar" />
-                  </CInputGroupText>
-                </CInputGroup>
+            <CRow>
+              <CCol>
+                <CForm class="row g-1 align-items-end float-end">
+                  <CCol lg="6">
+                    <CInputGroup size="sm">
+                      <CFormInput
+                        id="searchDate"
+                        value="19/02/2022 - 19/02/2022"
+                      />
+                      <CInputGroupText id="i-searchDate">
+                        <CIcon :icon="ic.cilCalendar" />
+                      </CInputGroupText>
+                    </CInputGroup>
+                  </CCol>
+                  <CCol lg="6">
+                    <CInputGroup size="sm">
+                      <CFormInput id="searchTime" value="00:00" />
+                      <CInputGroupText id="i-searchTime"> - </CInputGroupText>
+                      <CFormInput id="searchTime" value="23:59" />
+                      <CInputGroupText id="i-searchTime">
+                        <CIcon :icon="ic.cilClock" />
+                      </CInputGroupText>
+                    </CInputGroup>
+                  </CCol>
+                  <CCol lg="6">
+                    <CInputGroup size="sm">
+                      <CInputGroupText id="basic-cStatus" class="p-2">
+                        สถานะ
+                      </CInputGroupText>
+                      <CFormSelect id="cStatus">
+                        <option value="All" selected>ทั้งหมด</option>
+                        <option value="Y">โอนแล้ว</option>
+                        <option value="N">รอโอน</option>
+                      </CFormSelect>
+                    </CInputGroup>
+                  </CCol>
+                  <CCol lg="1">
+                    <CButton color="primary" class="text-light">
+                      <CIcon :icon="ic.cilMagnifyingGlass" />
+                    </CButton>
+                  </CCol>
+                </CForm>
               </CCol>
-              <CCol lg="5">
-                <CInputGroup size="sm">
-                  <CFormInput id="searchTime" value="00:00" />
-                  <CInputGroupText id="i-searchTime"> - </CInputGroupText>
-                  <CFormInput id="searchTime" value="23:59" />
-                  <CInputGroupText id="i-searchTime">
-                    <CIcon :icon="ic.cilClock" />
-                  </CInputGroupText>
-                </CInputGroup>
-              </CCol>
-              <CCol lg="1">
-                <CButton color="primary" class="text-light" size="sm">
-                  <CIcon :icon="ic.cilMagnifyingGlass" />
-                </CButton>
-              </CCol>
-            </CForm>
+            </CRow>
+            <CRow>
+              <CCol lg="6" class="g-1"> </CCol>
+            </CRow>
           </CCol>
         </CRow>
       </CCardBody>
@@ -111,8 +133,9 @@
                     ธนาคาร/เลขบัญชี
                   </CTableHeaderCell>
                   <CTableHeaderCell scope="col">วันเปิดยูส</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">ไอพีที่สมัคร</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">เว็บ</CTableHeaderCell>
                   <CTableHeaderCell scope="col">สถานะ</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">ไอพีที่สมัคร</CTableHeaderCell>
                   <CTableHeaderCell scope="col">ช่องทางสมัคร</CTableHeaderCell>
                   <CTableHeaderCell scope="col">พาร์ทเนอร์</CTableHeaderCell>
                 </CTableRow>
@@ -152,13 +175,14 @@
                       <small class="fw-lighter m-0">20:49:41</small>
                     </CRow>
                   </CTableDataCell>
+                  <CTableDataCell>banpong888</CTableDataCell>
+                  <CTableDataCell>
+                    <CBadge color="warning">รอโอน</CBadge>
+                  </CTableDataCell>
                   <CTableDataCell>
                     <small class="fw-lighter m-0 text-wrap">
                       2001:fb1:5b:4f6a:24d4:d4d8:f1a9:97ac
                     </small>
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    <CBadge color="warning">รอโอน</CBadge>
                   </CTableDataCell>
                   <CTableDataCell>Facebook</CTableDataCell>
                   <CTableDataCell>papon</CTableDataCell>

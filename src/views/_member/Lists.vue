@@ -60,21 +60,24 @@
             </CTableHead>
             <CTableBody class="small">
               <CTableRow
-                v-for="member in listOfMember"
+                v-for="(member, index) in listOfMember"
                 :key="member._id"
-                color="success"
+                :color="convertStatusRowColor(member.status)"
               >
                 <CTableDataCell scope="row" class="text-center">
                   <CRow>
-                    <p class="m-0">{{ 1 }}.</p>
+                    <p class="m-0">{{ index + 1 }}.</p>
                   </CRow>
                   <CRow>
                     <small class="fw-lighter m-0"><small>....</small></small>
                   </CRow>
                 </CTableDataCell>
                 <CTableDataCell>
-                  <CBadge color="success" shape="rounded-pill">
-                    {{ member.status }}
+                  <CBadge
+                    :color="convertStatusColor(member.status)"
+                    shape="rounded-pill"
+                  >
+                    {{ convertStatus(member.status) }}
                   </CBadge>
                 </CTableDataCell>
                 <CTableDataCell>{{ member.username }}</CTableDataCell>
@@ -82,7 +85,7 @@
                   {{ member.profile.name + ' ' + member.profile.surename }}
                 </CTableDataCell>
                 <CTableDataCell>{{ member.profile.tel }}</CTableDataCell>
-                <CTableDataCell>----888</CTableDataCell>
+                <CTableDataCell>{{ member.prefix }}</CTableDataCell>
                 <CTableDataCell>
                   <CRow>
                     <p class="m-0">{{ member.create_date }}</p>
@@ -116,14 +119,22 @@
                   {{ member.line_id }}
                 </CTableDataCell>
                 <CTableDataCell class="text-end pe-2">
-                  <CButton color="success" variant="ghost" size="sm">
+                  <CButton
+                    v-if="member.line_id"
+                    color="success"
+                    variant="ghost"
+                    size="sm"
+                    component="a"
+                    :href="'line://ti/p/~' + member.line_id"
+                    target="_blank"
+                  >
                     <CIcon :icon="ic.cibLine" class="small" />
                   </CButton>
                   <CButton
                     color="primary"
                     variant="ghost"
                     size="sm"
-                    @click="navigateTo('/member/list/99dev/100001')"
+                    @click="navigateTo('/member/list/99dev/' + member._id)"
                   >
                     <CIcon :icon="ic.cilExternalLink" class="small" />
                   </CButton>
@@ -184,8 +195,8 @@
                     <CIcon :icon="ic.cilExternalLink" class="small" />
                   </CButton>
                 </CTableDataCell>
-              </CTableRow>
-              <CTableRow color="success">
+              </CTableRow> -->
+              <!-- <CTableRow color="success">
                 <CTableDataCell scope="row" class="text-center">
                   <CRow>
                     <p class="m-0">2.</p>
@@ -602,8 +613,10 @@
 <script>
 import { imgBankSmoothSet as imgBank } from '@/assets/images/banking/th/smooth-corner'
 import { iconsSet as ic } from '@/assets/icons'
-
-const urlGetAllMember = 'http://192.168.1.36:10000/member/getallmember'
+const apiUrl = require('./../../constants/api-url-list')
+const headers = {
+  Authorization: 'Bearer ' + apiUrl.token,
+}
 
 export default {
   name: 'Lists',
@@ -624,18 +637,16 @@ export default {
   },
   methods: {
     navigateTo(route) {
-      this.$router.push(route)
+      // this.$router.push(route)
+      let _route = this.$router.resolve({ path: route })
+      window.open(_route.href)
     },
     async getMemberList() {
-      const headers = {
-        Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0YWZmdXNlcjAxIiwiYWdlbnRfaWQiOiI2MjgyMGZiMTEzNmJjM2QzNzkzMGU0MzkiLCJzdGFmZl9pZCI6IjYyODAxMTgxZTZlNzMyOGE3NjM4MTcxOSJ9.otwXAxcT87jgJ4RJJmPZZy-tmP5xwV_V1OFbAABBNz4',
-      }
       await this.$http
         .post(
-          urlGetAllMember,
+          apiUrl.member.GetAllmember,
           {
-            agent_id: '6281446d5aa7df0156f3b467',
+            agent_id: '629e381cb4839cabb5622da1',
             domain_name: 'https://www.banpong888.com',
           },
           { headers },
@@ -643,13 +654,13 @@ export default {
         .then((response) => {
           if (response.data.status == 200) {
             this.listOfMember = response.data.result.Member
-            this.totalPage = Math.ceil(response.data.result.total / 5)
+            this.totalPage = Math.ceil(response.data.result.total / 10)
             console.log(this.totalPage)
             console.log(this.listOfMember)
           } else {
             console.log(
               'callAPI - ' +
-                urlGetAllMember +
+                apiUrl.member.GetAllmember +
                 ' >>> ' +
                 response.data.status +
                 ', ' +
@@ -658,8 +669,49 @@ export default {
           }
         })
         .catch((error) => {
-          console.log('callAPI - ' + urlGetAllMember + ' >>> ' + error)
+          console.log(
+            'callAPI - ' + apiUrl.member.GetAllmember + ' >>> ' + error,
+          )
         })
+    },
+
+    convertStatus(status) {
+      const _status = status.toString().toLowerCase()
+      if (_status == 'active') {
+        return 'ปกติ'
+      } else if (_status == 'inactive') {
+        return 'ถูกระงับ'
+      } else if (_status == 'blacklist') {
+        return 'แบลคลิส'
+      } else {
+        return 'ไม่ระบุ'
+      }
+    },
+
+    convertStatusColor(status) {
+      const _status = status.toString().toLowerCase()
+      if (_status == 'active') {
+        return 'success'
+      } else if (_status == 'inactive') {
+        return 'danger'
+      } else if (_status == 'blacklist') {
+        return 'dark'
+      } else {
+        return 'secondary'
+      }
+    },
+
+    convertStatusRowColor(status) {
+      const _status = status.toString().toLowerCase()
+      if (_status == 'active') {
+        return 'light'
+      } else if (_status == 'inactive') {
+        return 'warning'
+      } else if (_status == 'blacklist') {
+        return 'dark'
+      } else {
+        return 'secondary'
+      }
     },
   },
   mounted() {

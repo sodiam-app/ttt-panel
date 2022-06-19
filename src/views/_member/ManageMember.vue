@@ -101,7 +101,7 @@
                                 </span>
                                 <CFormSwitch
                                   id="formSwitchCheckChecked"
-                                  checked
+                                  v-model="memberProfile.status"
                                 />
                               </div>
                             </CCol>
@@ -116,35 +116,29 @@
                                   id="cPrefix"
                                   class="form-select"
                                   aria-label="Prefix"
+                                  disabled
+                                  v-model="memberProfile.web_id"
                                 >
                                   <option value="0">กรุณาเลือก</option>
-                                  <option value="Banpong888" selected>
-                                    Banpong888
+                                  <option value="629e381cb4839cabb5622da1">
+                                    banpong888
                                   </option>
-                                  <option value="Inwtrue711">Inwtrue711</option>
                                 </select>
                               </div>
                             </CCol>
                             <CCol md="6">
                               <div>
-                                <label for="cPhone" class="form-label mb-0">
-                                  เบอร์โทร *
-                                  <small>
-                                    <small class="text-muted">
-                                      (สำหรับเข้าสู่ระบบ)
-                                    </small>
-                                  </small>
+                                <label for="cUsername" class="form-label mb-0">
+                                  Username
                                 </label>
                                 <CInputGroup>
-                                  <CInputGroupText id="basic-cPhone">
-                                    <CIcon :icon="ic.cilPhone" />
+                                  <CInputGroupText id="basic-cUsername">
+                                    <CIcon :icon="ic.cilShieldAlt" />
                                   </CInputGroupText>
                                   <CFormInput
-                                    id="cPhone"
-                                    placeholder="06123456xx"
-                                    aria-label="เบอร์โทรลูกค้า"
-                                    aria-describedby="basic-cPhone"
-                                    value="0614496191"
+                                    id="cUsername"
+                                    disabled
+                                    v-model="memberProfile.pd.username"
                                   />
                                 </CInputGroup>
                               </div>
@@ -159,7 +153,7 @@
                                 <CFormInput
                                   type="text"
                                   id="cFName"
-                                  value="นายสมชาย"
+                                  v-model="memberProfile.name"
                                 />
                               </div>
                             </CCol>
@@ -171,7 +165,7 @@
                                 <CFormInput
                                   type="text"
                                   id="cLName"
-                                  value="หลายใจ"
+                                  v-model="memberProfile.surename"
                                 />
                               </div>
                             </CCol>
@@ -191,7 +185,7 @@
                                     id="cBirthday"
                                     aria-label="วันเกิดลูกค้า"
                                     aria-describedby="basic-cBirthday"
-                                    value="1993-02-19"
+                                    v-model="memberProfile.birthday_date"
                                   />
                                 </CInputGroup>
                               </div>
@@ -212,12 +206,17 @@
                                       width="22"
                                     />
                                   </CInputGroupText>
-                                  <CFormSelect id="cStatus">
-                                    <option selected value="ปกติ">ปกติ</option>
-                                    <option value="เฝ้าระวัง">เฝ้าระวัง</option>
-                                    <option value="ระงับ">ระงับ</option>
-                                    <option value="ไม่เคลื่อนไหว">
-                                      ไม่เคลื่อนไหว
+                                  <CFormSelect
+                                    size="sm"
+                                    v-model="memberProfile.status_id"
+                                  >
+                                    <option value="">สามารถเลือกได้</option>
+                                    <option
+                                      v-for="option in optStatus"
+                                      :key="option._id"
+                                      :value="option.status"
+                                    >
+                                      {{ option.status_th }}
                                     </option>
                                   </CFormSelect>
                                 </CInputGroup>
@@ -233,22 +232,19 @@
                                 >
                                   ช่องทางการสมัคร
                                 </label>
-                                <select
-                                  id="cApplyMethod"
-                                  class="form-select text-muted"
-                                  aria-label="ช่องทางการสมัคร"
+                                <CFormSelect
+                                  size="sm"
+                                  v-model="memberProfile.channel"
                                 >
-                                  <option selected>
-                                    <span>สามารถเลือกได้</span>
+                                  <option value="">สามารถเลือกได้</option>
+                                  <option
+                                    v-for="option in optChannel"
+                                    :key="option._id"
+                                    :value="option.channel"
+                                  >
+                                    {{ option.channel }}
                                   </option>
-                                  <option value="0">Google</option>
-                                  <option value="1">Facebook</option>
-                                  <option value="2">Youtube</option>
-                                  <option value="3">Website</option>
-                                  <option value="4" selected>
-                                    เพื่อนแนะนำ
-                                  </option>
-                                </select>
+                                </CFormSelect>
                               </div>
                             </CCol>
                             <CCol md="6">
@@ -256,7 +252,33 @@
                                 <label for="cSpecial" class="form-label mb-0">
                                   สิทธิพิเศษ
                                 </label>
-                                <CFormInput type="text" id="cSpecial" />
+                                <CInputGroup>
+                                  <CInputGroupText
+                                    id="basic-cStatus"
+                                    class="p-2"
+                                  >
+                                    <CImage
+                                      fluid
+                                      :src="
+                                        require('../../assets/images/privilege/vip-card.png')
+                                      "
+                                      width="22"
+                                    />
+                                  </CInputGroupText>
+                                  <CFormSelect
+                                    size="sm"
+                                    v-model="memberProfile.privilege"
+                                  >
+                                    <option value="">สามารถเลือกได้</option>
+                                    <option
+                                      v-for="option in optPrivilege"
+                                      :key="option._id"
+                                      :value="option.privilege_name"
+                                    >
+                                      {{ option.privilege_name }}
+                                    </option>
+                                  </CFormSelect>
+                                </CInputGroup>
                               </div>
                             </CCol>
                           </CRow>
@@ -266,7 +288,11 @@
                                 <label for="cRegisIP" class="form-label mb-0">
                                   ยูสเซอร์แนะนำ
                                 </label>
-                                <CFormInput type="text" id="cRegisIP" />
+                                <CFormInput
+                                  type="text"
+                                  id="cRegisIP"
+                                  v-model="memberProfile.user_reference"
+                                />
                               </div>
                             </CCol>
                             <CCol md="6">
@@ -278,13 +304,9 @@
                                   id="cPartner"
                                   class="form-select text-muted"
                                   aria-label="พาร์ทเนอร์"
+                                  disabled
                                 >
-                                  <option selected>สามารถเลือกได้</option>
-                                  <option value="0">สมหมาย</option>
-                                  <option value="1">สมชาย</option>
-                                  <option value="2">สมปอง</option>
-                                  <option value="3" selected>สมศักดิ์</option>
-                                  <option value="4">รักยิ้ม</option>
+                                  <option selected>ยังไม่พร้อมใช้งาน</option>
                                 </select>
                               </div>
                             </CCol>
@@ -292,14 +314,27 @@
                           <CRow class="mb-2">
                             <CCol md="6">
                               <div>
-                                <label for="cNote" class="form-label mb-0">
-                                  หมายเหตุ
+                                <label for="cPhone" class="form-label mb-0">
+                                  เบอร์โทร *
+                                  <small>
+                                    <small class="text-muted">
+                                      (สำหรับเข้าสู่ระบบ)
+                                    </small>
+                                  </small>
                                 </label>
-                                <CFormInput
-                                  type="text"
-                                  id="cNote"
-                                  placeholder=""
-                                />
+                                <CInputGroup>
+                                  <CInputGroupText id="basic-cPhone">
+                                    <CIcon :icon="ic.cilPhone" />
+                                  </CInputGroupText>
+                                  <CFormInput
+                                    id="cPhone"
+                                    placeholder="06123456xx"
+                                    aria-label="เบอร์โทรลูกค้า"
+                                    aria-describedby="basic-cPhone"
+                                    required
+                                    v-model="memberProfile.tel"
+                                  />
+                                </CInputGroup>
                               </div>
                             </CCol>
                             <CCol md="6">
@@ -311,8 +346,23 @@
                                   type="text"
                                   id="cRegisIP"
                                   placeholder="IP Address"
-                                  value="201.292.220.199"
+                                  v-model="memberProfile.register_ip"
                                 />
+                              </div>
+                            </CCol>
+                          </CRow>
+                          <CRow class="mb-2">
+                            <CCol>
+                              <div>
+                                <label for="cNote" class="form-label mb-0">
+                                  หมายเหตุ
+                                </label>
+                                <CFormTextarea
+                                  id="cNote"
+                                  rows="2"
+                                  text="Must be 8-20 words long."
+                                  v-model="memberProfile.note"
+                                ></CFormTextarea>
                               </div>
                             </CCol>
                           </CRow>
@@ -325,16 +375,21 @@
                                 </label>
                                 <CInputGroup>
                                   <CFormInput
-                                    type="password"
+                                    :type="memberProfile.pinType"
                                     id="cPin"
-                                    placeholder="PIN"
+                                    placeholder="1234"
                                     aria-label="PIN"
                                     aria-describedby="basic-cPin"
-                                    value="1111"
+                                    v-model="memberProfile.pin"
                                   />
-                                  <CInputGroupText id="basic-cPin">
+                                  <CButton
+                                    type="button"
+                                    color="secondary"
+                                    variant="outline"
+                                    @click="showPwd"
+                                  >
                                     <CIcon :icon="ic.cilLockLocked" />
-                                  </CInputGroupText>
+                                  </CButton>
                                 </CInputGroup>
                               </div>
                             </CCol>
@@ -348,6 +403,7 @@
                                   size="lg"
                                   label="เปิด/ปิดโปรฯ"
                                   id="cPromotion"
+                                  disabled
                                 />
                               </div>
                             </CCol>
@@ -367,11 +423,11 @@
                                   <CFormInput
                                     type="text"
                                     id="cUrl"
-                                    placeholder="URL"
+                                    placeholder="http://xxxx.com/login/06123456xx"
                                     aria-label="URL"
                                     aria-describedby="basic-cUrl"
                                     class="text-muted border-secondary"
-                                    value="https://banpong888.com/login?tel=0659162647"
+                                    v-model="memberProfile.web_url"
                                     disabled
                                   />
                                   <CButton
@@ -401,7 +457,7 @@
                                     id="cPhone"
                                     aria-label="เบอร์โทรลูกค้า"
                                     aria-describedby="basic-cPhone"
-                                    value="0659162647"
+                                    v-model="memberProfile.mobile_number"
                                   />
                                 </CInputGroup>
                               </div>
@@ -422,10 +478,10 @@
                                   </CInputGroupText>
                                   <CFormInput
                                     id="cLineID"
-                                    placeholder="customer.xxx"
-                                    aria-label="customer.xxx"
+                                    placeholder="cus.id.xxx"
+                                    aria-label="cus.id.xxx"
                                     aria-describedby="basic-cLineID"
-                                    value="psodiam"
+                                    v-model="memberProfile.line_id"
                                   />
                                   <CInputGroupText id="basic-LinkLineID">
                                     <CIcon :icon="ic.cilLink" />
@@ -449,7 +505,7 @@
                                     placeholder="email@tttAIP.com"
                                     aria-label="อีเมลลูกค้า"
                                     aria-describedby="basic-cEmail"
-                                    value="ss.app@gmail.com"
+                                    v-model="memberProfile.email"
                                   />
                                 </CInputGroup>
                               </div>
@@ -469,6 +525,7 @@
                               color="info"
                               class="ms-1 text-light"
                               size="sm"
+                              @click="getMemberProfile"
                             >
                               <CIcon :icon="ic.cilReload" />
                               รีโหลด
@@ -487,7 +544,7 @@
                                   >
                                     ยอดเสียปัจจุบัน:
                                     <span class="badge bg-warning rounded-pill"
-                                      >0.00 ฿</span
+                                      >-- ฿</span
                                     >
                                   </li>
                                 </ul>
@@ -497,21 +554,22 @@
                             <CRow>
                               <CCol>
                                 <ul class="list-group mb-1">
-                                  <li
+                                  <!-- <li
                                     class="list-group-item d-flex justify-content-between align-items-center"
                                   >
                                     wallet:
                                     <span class="badge bg-success rounded-pill"
                                       >600.29 ฿</span
                                     >
-                                  </li>
+                                  </li> -->
                                   <li
                                     class="list-group-item d-flex justify-content-between align-items-center"
                                   >
                                     เครดิต:
-                                    <span class="badge bg-success rounded-pill"
-                                      >0.0 ฿</span
-                                    >
+                                    <span class="badge bg-success rounded-pill">
+                                      {{ memberProfile.pd.credit }}
+                                      {{ memberProfile.pd.currency }}
+                                    </span>
                                   </li>
                                 </ul>
                               </CCol>
@@ -524,7 +582,7 @@
                                   >
                                     แนะนำเพื่อน:
                                     <span class="badge bg-dark rounded-pill">
-                                      2 ยูส
+                                      -- ยูส
                                     </span>
                                   </li>
                                   <li
@@ -532,7 +590,7 @@
                                   >
                                     ค่าคอมฯ ถอนได้:
                                     <span class="badge bg-dark rounded-pill"
-                                      >5.29 ฿</span
+                                      >-- ฿</span
                                     >
                                   </li>
                                   <li
@@ -540,21 +598,21 @@
                                   >
                                     ถอนรวม:
                                     <span class="badge bg-dark rounded-pill"
-                                      >0.0 ฿</span
+                                      >-- ฿</span
                                     >
                                   </li>
                                   <li
                                     class="list-group-item d-flex justify-content-between align-items-center"
                                   >
                                     ถอนล่าสุดเมื่อ:
-                                    <span> - </span>
+                                    <span> --/--/---- </span>
                                   </li>
                                   <li
                                     class="list-group-item d-flex justify-content-between align-items-center"
                                   >
                                     จำนวน:
                                     <span class="badge bg-dark rounded-pill"
-                                      >0.0 ฿</span
+                                      >-- ฿</span
                                     >
                                   </li>
                                 </ul>
@@ -570,36 +628,56 @@
                                     <span
                                       class="badge bg-secondary rounded-pill"
                                     >
-                                      5.00
+                                      {{
+                                        memberProfile.financial
+                                          .deposit_first_time_amount
+                                      }}
                                     </span>
                                     ฿
                                   </li>
                                   <li class="pb-1">
                                     ฝากรวม:
                                     <span class="badge bg-success rounded-pill">
-                                      15
+                                      {{
+                                        memberProfile.financial.deposit_count
+                                      }}
                                     </span>
                                     ครั้ง,
                                     <span class="badge bg-success rounded-pill">
-                                      440.00
+                                      {{
+                                        memberProfile.financial
+                                          .deposit_total_amount
+                                      }}
                                     </span>
                                     ฿
                                   </li>
                                   <li class="pb-1">
                                     ถอนรวม:
                                     <span class="badge bg-danger rounded-pill">
-                                      8
+                                      {{
+                                        memberProfile.financial.withdraw_count
+                                      }}
                                     </span>
                                     ครั้ง,
                                     <span class="badge bg-danger rounded-pill">
-                                      350.00
+                                      {{
+                                        memberProfile.financial
+                                          .withdraw_total_amount
+                                      }}
                                     </span>
                                     ฿
                                   </li>
                                   <li class="pb-1">
                                     ดุล:
                                     <span class="badge bg-warning rounded-pill">
-                                      31.00
+                                      {{
+                                        (
+                                          memberProfile.financial
+                                            .withdraw_total_amount -
+                                          memberProfile.financial
+                                            .deposit_total_amount
+                                        ).toFixed(2)
+                                      }}
                                     </span>
                                     ฿
                                   </li>
@@ -614,9 +692,11 @@
                                     >สมัครเมื่อ:
                                   </CCol>
                                   <CCol xs="8" class="ps-1">
-                                    <p class="mb-0">08/02/2022 00:32:09</p>
+                                    <p class="mb-0">
+                                      {{ memberProfile.create_date }}
+                                    </p>
                                     <small class="text-muted"
-                                      >(3 เดือนที่แล้ว)</small
+                                      >(-- เดือนที่แล้ว)</small
                                     >
                                   </CCol>
                                 </CRow>
@@ -647,7 +727,10 @@
                                   />
                                 </CInputGroupText>
                                 <CFormSelect id="cBanking">
-                                  <option value="ttb">ทหารไทยธนชาต</option>
+                                  <option value="ttb">
+                                    <img :src="imgBank.kbank" />
+                                    ทหารไทยธนชาต
+                                  </option>
                                   <option value="kbank" selected>
                                     กสิกรไทย
                                   </option>
@@ -674,13 +757,38 @@
                                   id="cBankAcct"
                                   aria-label="บัญชีลูกค้า"
                                   aria-describedby="basic-cBankAcct"
-                                  value="0213832832"
+                                  v-model="
+                                    memberProfile.banking_account.bank_acct
+                                  "
                                 />
                               </CInputGroup>
                             </div>
                           </CCol>
                         </CRow>
                         <CRow class="mb-2">
+                          <CCol>
+                            <div>
+                              <label for="cBankAcct" class="form-label mb-0">
+                                ชื่อบัญชีลูกค้า
+                              </label>
+                              <CInputGroup>
+                                <CInputGroupText id="basic-cBankAcct">
+                                  <CIcon :icon="ic.cilContact" />
+                                </CInputGroupText>
+                                <CFormInput
+                                  id="cBankAcct"
+                                  aria-label="ชื่อบัญชีลูกค้า"
+                                  aria-describedby="basic-cBankAcct"
+                                  v-model="
+                                    memberProfile.banking_account.bank_acct_name
+                                  "
+                                  disabled
+                                />
+                              </CInputGroup>
+                            </div>
+                          </CCol>
+                        </CRow>
+                        <!-- <CRow class="mb-2">
                           <CCol>
                             <div>
                               <label for="cBankAcct" class="form-label mb-0">
@@ -695,7 +803,7 @@
                               />
                             </div>
                           </CCol>
-                        </CRow>
+                        </CRow> -->
                         <hr class="mt-3" />
                         <CRow class="mb-2">
                           <CCol>
@@ -720,6 +828,7 @@
                 </CRow>
               </CCardText>
             </CTabPane>
+            <!-- ประวัติการฝากถอน -->
             <CTabPane
               role="tabpanel"
               aria-labelledby="home-tab"
@@ -945,12 +1054,13 @@
                 </CRow>
               </CCardText>
             </CTabPane>
+            <!-- การเชิญชวน -->
             <CTabPane
               role="tabpanel"
               aria-labelledby="home-tab"
               :visible="tabPaneActiveKey === 3"
             >
-              <CCardText> ยังพร้อมใช้งาน </CCardText>
+              <CCardText> ยังไม่พร้อมใช้งาน </CCardText>
             </CTabPane>
           </CCardBody>
         </CCard>
@@ -970,19 +1080,107 @@
 <script>
 import { imgBankSmoothSet as imgBank } from '@/assets/images/banking/th/smooth-corner'
 import { imgStatus as imgStatus } from '@/assets/images/status'
-import { iconsSet as ic } from '@/assets/icons'
-
 import avatar from '@/assets/images/avatars/owner/02.png'
 
+import moment from 'moment'
+
+const apiUrl = require('./../../constants/api-url-list')
+const headers = {
+  Authorization: 'Bearer ' + apiUrl.token,
+}
+
+import { CIcon } from '@coreui/icons-vue'
+import {
+  cilShieldAlt,
+  cilSave,
+  cilBan,
+  cilPhone,
+  cilBirthdayCake,
+  cilLockLocked,
+  cilCopy,
+  cibLine,
+  cilLink,
+  cilEnvelopeOpen,
+  cilReload,
+  cilCreditCard,
+  cilCalendar,
+  cilClock,
+  cilMagnifyingGlass,
+  cilBank,
+  cilContact,
+} from '@coreui/icons'
+
 export default {
-  name: 'Transection',
-  comments: {},
+  name: 'ManageMember',
+  comments: { CIcon },
   data() {
     return {
       avatar: avatar,
       tabPaneActiveKey: 1,
       webSite: 0,
       memberID: 0,
+      memberProfile: {
+        status: false,
+        status_id: '',
+        username: '',
+        line_id: '',
+        tel: '',
+        web_id: '',
+        web_name: '',
+        web_url: '',
+        name: '',
+        surename: '',
+        birthday_date: '',
+        pin: '',
+        pinType: 'password',
+        register_ip: '',
+        user_reference: '',
+        privilege: '',
+        email: '',
+        mobile_number: '',
+        channel: '',
+        channel_id: '',
+        note: '',
+        banking_account: {
+          bank_id: '',
+          bank_acct: '',
+          bank_acct_name: '',
+          bank_name: '',
+          bank_name_th: '',
+          bank_code: '',
+          bank_status: '',
+        },
+        financial: {
+          deposit_first_time_amount: '',
+          deposit_first_time: '',
+          deposit_count: '',
+          deposit_total_amount: '',
+          withdraw_first_time: '',
+          withdraw_count: '',
+          withdraw_total_amount: '',
+        },
+        pd: {
+          username: '',
+          credit: '',
+          currency: '',
+          hdp: '',
+          mixParlay: '',
+          mixStep: '',
+          casino: '',
+          slot: '',
+          card: '',
+          lotto: '',
+          keno: '',
+          trade: '',
+          poker: '',
+        },
+        create_date: '',
+        update_date: '',
+        update_by: '',
+      },
+      optChannel: [],
+      optPrivilege: [],
+      optStatus: [],
       optShownBankAcct: [
         { value: 0, text: '0213832833 (ttb Auto)', selected: true },
         { value: 1, text: '4732291820 (ttb VIP1)', selected: false },
@@ -991,7 +1189,226 @@ export default {
         { value: 4, text: '6674625517 (scb Auto)', selected: false },
         { value: 5, text: '5894882912 (scb VIP1)', selected: true },
       ],
+      ic: {
+        cilShieldAlt,
+        cilSave,
+        cilBan,
+        cilPhone,
+        cilBirthdayCake,
+        cilLockLocked,
+        cilCopy,
+        cibLine,
+        cilLink,
+        cilEnvelopeOpen,
+        cilReload,
+        cilCreditCard,
+        cilCalendar,
+        cilClock,
+        cilMagnifyingGlass,
+        cilBank,
+        cilContact,
+      },
     }
+  },
+  methods: {
+    async getMemberProfile() {
+      await this.$http
+        .post(
+          apiUrl.member.GetMemberProfile,
+          {
+            agent_id: '629e381cb4839cabb5622da1',
+            user_id: this.memberID,
+          },
+          { headers },
+        )
+        .then((response) => {
+          console.log(response)
+          if (response.data.status == 200) {
+            let mem = response.data.result.profile_mem
+            if (mem.status.toString().toLowerCase() == 'active') {
+              this.memberProfile.status = true
+            } else {
+              this.memberProfile.status = false
+            }
+            this.memberProfile.status_id = mem.status
+            this.memberProfile.username = mem.username
+            this.memberProfile.line_id = mem.line_id
+            this.memberProfile.tel = mem.tel
+            this.memberProfile.web_id = mem.web_id
+            this.memberProfile.web_name = mem.web_name
+            this.memberProfile.web_url = mem.url + '/login/' + mem.tel
+            this.memberProfile.name = mem.name
+            this.memberProfile.surename = mem.surename
+            this.memberProfile.birthday_date = mem.birthday_date
+            this.memberProfile.pin = mem.pin
+            this.memberProfile.register_ip = mem.register_ip
+            this.memberProfile.user_reference = mem.user_reference
+            this.memberProfile.privilege = mem.privilege
+            this.memberProfile.email = mem.email
+            this.memberProfile.mobile_number = mem.mobile_number
+            this.memberProfile.channel = mem.channel
+            this.memberProfile.channel_id = mem.channel_id
+            this.memberProfile.note = mem.note
+            this.memberProfile.banking_account.bank_id =
+              mem.banking_account.bank_id
+            this.memberProfile.banking_account.bank_acct =
+              mem.banking_account.bank_acct
+            this.memberProfile.banking_account.bank_acct_name =
+              mem.banking_account.bank_acct_name
+            this.memberProfile.banking_account.bank_name =
+              mem.banking_account.bank_name
+            this.memberProfile.banking_account.bank_name_th =
+              mem.banking_account.bank_name_th
+            this.memberProfile.banking_account.bank_code =
+              mem.banking_account.bank_code
+            this.memberProfile.banking_account.bank_status =
+              mem.banking_account.bank_status
+            this.memberProfile.financial.deposit_first_time_amount =
+              mem.financial.deposit_first_time_amount.toFixed(2)
+            this.memberProfile.financial.deposit_first_time =
+              mem.financial.deposit_first_time
+            this.memberProfile.financial.deposit_count =
+              mem.financial.deposit_count
+            this.memberProfile.financial.deposit_total_amount =
+              mem.financial.deposit_total_amount.toFixed(2)
+            this.memberProfile.financial.withdraw_first_time =
+              mem.financial.withdraw_first_time
+            this.memberProfile.financial.withdraw_count =
+              mem.financial.withdraw_count
+            this.memberProfile.financial.withdraw_total_amount =
+              mem.financial.withdraw_total_amount.toFixed(2)
+            this.memberProfile.pd.username = mem.pd.username
+            this.memberProfile.pd.credit = mem.pd.credit
+            this.memberProfile.pd.currency = mem.pd.currency
+            this.memberProfile.pd.hdp = mem.pd.hdp
+            this.memberProfile.pd.mixParlay = mem.pd.mixParlay
+            this.memberProfile.pd.mixStep = mem.pd.mixStep
+            this.memberProfile.pd.casino = mem.pd.casino
+            this.memberProfile.pd.slot = mem.pd.slot
+            this.memberProfile.pd.card = mem.pd.card
+            this.memberProfile.pd.lotto = mem.pd.lotto
+            this.memberProfile.pd.keno = mem.pd.keno
+            this.memberProfile.pd.trade = mem.pd.trade
+            this.memberProfile.pd.poker = mem.pd.poker
+            this.memberProfile.create_date = this.dateTime(mem.create_date)
+            this.memberProfile.update_date = mem.update_date
+            this.memberProfile.update_by = mem.update_by
+          } else {
+            console.log(
+              'callAPI - ' +
+                apiUrl.member.GetMemberProfile +
+                ' >>> ' +
+                response.data.status +
+                ', ' +
+                response.data.message,
+            )
+            // this.closeWindow()
+          }
+        })
+        .catch((error) => {
+          console.log(
+            'callAPI (catch) - ' +
+              apiUrl.member.GetMemberProfile +
+              ' >>> ' +
+              error,
+          )
+        })
+    },
+    async getConfChannel() {
+      await this.$http
+        .post(apiUrl.conf.GetChannel, {}, { headers })
+        .then((response) => {
+          console.log(response)
+          if (response.data.status == 200) {
+            this.optChannel = response.data.channel
+            console.log(this.optChannel)
+          } else {
+            console.log(
+              'callAPI - ' +
+                apiUrl.conf.GetChannel +
+                ' >>> ' +
+                response.data.status +
+                ', ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log(
+            'callAPI (catch) - ' + apiUrl.conf.GetChannel + ' >>> ' + error,
+          )
+        })
+    },
+    async getConfPrivilege() {
+      await this.$http
+        .post(apiUrl.conf.GetPrivilege, {}, { headers })
+        .then((response) => {
+          console.log(response)
+          if (response.data.status == 200) {
+            this.optPrivilege = response.data.privilege
+            console.log(this.optPrivilege)
+          } else {
+            console.log(
+              'callAPI - ' +
+                apiUrl.conf.GetPrivilege +
+                ' >>> ' +
+                response.data.status +
+                ', ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log(
+            'callAPI (catch) - ' + apiUrl.conf.GetPrivilege + ' >>> ' + error,
+          )
+        })
+    },
+    async getConfStatus() {
+      await this.$http
+        .post(apiUrl.conf.GetStatus, {}, { headers })
+        .then((response) => {
+          console.log(response)
+          if (response.data.status == 200) {
+            this.optStatus = response.data.result_status
+            console.log(this.optStatus)
+          } else {
+            console.log(
+              'callAPI - ' +
+                apiUrl.conf.GetStatus +
+                ' >>> ' +
+                response.data.status +
+                ', ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log(
+            'callAPI (catch) - ' + apiUrl.conf.GetStatus + ' >>> ' + error,
+          )
+        })
+    },
+    showPwd() {
+      if (this.memberProfile.pinType == 'password') {
+        this.memberProfile.pinType = 'text'
+      } else {
+        this.memberProfile.pinType = 'password'
+      }
+    },
+    dateTime(value) {
+      var myDate = new Date(value)
+      return moment(myDate).format('DD/MM/YYYY hh:mm:ss')
+    },
+    closeWindow() {
+      window.close()
+    },
+  },
+  mounted() {
+    this.getConfChannel()
+    this.getConfStatus()
+    this.getConfPrivilege()
+    this.getMemberProfile()
   },
   created() {
     ;(this.memberID = this.$route.params.memberID),
@@ -1001,7 +1418,6 @@ export default {
     return {
       imgBank,
       imgStatus,
-      ic,
     }
   },
 }

@@ -676,11 +676,13 @@
       }
     "
   >
+    <CModalHeader class="pt-2 pb-1">
+      <CModalTitle class="fw-lighter">
+        <strong><p class="h4 mb-0 mt-1">เพิ่มรายการฝาก</p></strong>
+      </CModalTitle>
+    </CModalHeader>
     <CModalBody class="m-0 p-0">
       <CCard class="border-success m-0 p-0">
-        <CCardHeader>
-          <strong><p class="h4 mb-0 mt-1">เพิ่มรายการฝาก</p></strong>
-        </CCardHeader>
         <CCardBody>
           <CCardText class="small">
             <form>
@@ -788,11 +790,13 @@
       }
     "
   >
+    <CModalHeader class="pt-2 pb-1">
+      <CModalTitle class="fw-lighter">
+        <strong><p class="h4 mb-0 mt-1">เพิ่มรายการถอน</p></strong>
+      </CModalTitle>
+    </CModalHeader>
     <CModalBody class="m-0 p-0">
       <CCard class="border-danger m-0 p-0">
-        <CCardHeader>
-          <strong><p class="h4 mb-0 mt-1">เพิ่มรายการถอน</p></strong>
-        </CCardHeader>
         <CCardBody>
           <CCardText class="small">
             <form>
