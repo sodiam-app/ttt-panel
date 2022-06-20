@@ -5,7 +5,7 @@ import store from './store'
 
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-createApp.prototype.$axios = axios
+//createApp.prototype.$axios = axios
 
 //import CoreuiVue from '@coreui/vue'
 import CoreuiVuePro from '@coreui/vue-pro'

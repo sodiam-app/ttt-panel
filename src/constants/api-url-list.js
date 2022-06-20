@@ -3,7 +3,7 @@ const gatewayUrl = 'http://192.168.1.41:10000'
 
 module.exports = {
   token:
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0aW1lIjoiMjAyMi0wNi0yMFQyMjoyNzo1MSswNzowMCIsInVzZXJuYW1lIjoibWFuYWdlcjAxIiwidXNlcl9pZCI6IjYyYTNhMmMwZGMwNDVmMDViMTI2MWJjYyIsInJvbGUiOiJtYW5hZ2VyIiwicmVxdWVzdCI6InBhbmVsIiwiaWF0IjoxNjU1NzM4ODcxLCJleHAiOjE2NTU3ODIwNzF9.kH74DXjs3GXsgjeIN8APaGyCe9xxayGqWSUhvaGILNc',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0aW1lIjoiMjAyMi0wNi0yMVQwNToyMTo0MCswNzowMCIsInVzZXJuYW1lIjoiYWRtaW45OSIsInVzZXJfaWQiOiI2MmIwZjJhNGQ4YWZkZDMyMzYzMGQwZTkiLCJyb2xlIjoiYWRtaW4iLCJyZXF1ZXN0IjoicGFuZWwiLCJpYXQiOjE2NTU3NjM3MDB9.zdM713S7uTRHvfR42YXykOgGUotQEaDF0W1wpdkor14',
   member: {
     GetAllmember: gatewayUrl + '/member/getallmember',
     GetMemberProfile: gatewayUrl + '/panel/getprofileuser',

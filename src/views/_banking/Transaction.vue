@@ -420,8 +420,11 @@
                         >{{ history.memb_username }}
                       </CButton>
                       <br />
-                      <CBadge color="success" shape="rounded-pill">
-                        --ปกติ
+                      <CBadge
+                        :color="convertMemberStatusColor(history.memb_status)"
+                        shape="rounded-pill"
+                      >
+                        {{ convertMemberStatus(history.memb_status) }}
                       </CBadge>
                     </CTableDataCell>
                     <CTableDataCell>
@@ -466,7 +469,7 @@
                     </CTableDataCell>
                     <CTableDataCell>
                       <CBadge :color="convertStatusColor(history.status)">
-                        {{ convertStatus(history.status) }}
+                        {{ convertHistoryStatus(history.status) }}
                       </CBadge>
                     </CTableDataCell>
                     <CTableDataCell>-----</CTableDataCell>
@@ -1364,7 +1367,7 @@ export default {
         return 'dark'
       }
     },
-    convertStatus(value) {
+    convertHistoryStatus(value) {
       const _val = value.toString().toLowerCase()
       if (_val == 'success') {
         return 'สำเร็จ'
@@ -1386,6 +1389,46 @@ export default {
         return 'danger'
       } else {
         return 'dark'
+      }
+    },
+    convertMemberStatus(value) {
+      if (!value) return 'ระบุไม่ได้'
+      const _val = value.toString().toLowerCase()
+      if (_val == 'active') {
+        return 'ปกติ'
+      } else if (_val == 'suspend') {
+        return 'ถูกระงับ'
+      } else if (_val == 'inactive') {
+        return 'ไม่เคลื่อนไหว'
+      } else if (_val == 'watchout') {
+        return 'เฝ้าระวัง'
+      } else if (_val == 'blacklist') {
+        return 'แบลคลิส'
+      } else {
+        return 'ระบุไม่ได้'
+      }
+    },
+    convertMemberStatusColor(value) {
+      if (!value) return 'info'
+      const _val = value.toString().toLowerCase()
+      if (_val == 'active') {
+        // ปกติ
+        return 'success'
+      } else if (_val == 'suspend') {
+        // ถูกระงับ
+        return 'danger'
+      } else if (_val == 'inactive') {
+        // ไม่เคลื่อนไหว
+        return 'secondary'
+      } else if (_val == 'watchout') {
+        // เฝ้าระวัง
+        return 'warning'
+      } else if (_val == 'blacklist') {
+        // แบลคลิส
+        return 'dark'
+      } else {
+        // ระบุไม่ได้
+        return 'light'
       }
     },
   },

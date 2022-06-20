@@ -675,27 +675,41 @@ export default {
         })
     },
     convertStatus(status) {
-      const _status = status.toString().toLowerCase()
-      if (_status == 'active') {
+      const _val = status.toString().toLowerCase()
+      if (_val == 'active') {
         return 'ปกติ'
-      } else if (_status == 'inactive') {
+      } else if (_val == 'suspend') {
         return 'ถูกระงับ'
-      } else if (_status == 'blacklist') {
+      } else if (_val == 'inactive') {
+        return 'ไม่เคลื่อนไหว'
+      } else if (_val == 'watchout') {
+        return 'เฝ้าระวัง'
+      } else if (_val == 'blacklist') {
         return 'แบลคลิส'
       } else {
-        return 'ไม่ระบุ'
+        return 'ระบุไม่ได้'
       }
     },
     convertStatusColor(status) {
-      const _status = status.toString().toLowerCase()
-      if (_status == 'active') {
+      const _val = status.toString().toLowerCase()
+      if (_val == 'active') {
+        // ปกติ
         return 'success'
-      } else if (_status == 'inactive') {
+      } else if (_val == 'suspend') {
+        // ถูกระงับ
         return 'danger'
-      } else if (_status == 'blacklist') {
+      } else if (_val == 'inactive') {
+        // ไม่เคลื่อนไหว
+        return 'secondary'
+      } else if (_val == 'watchout') {
+        // เฝ้าระวัง
+        return 'warning'
+      } else if (_val == 'blacklist') {
+        // แบลคลิส
         return 'dark'
       } else {
-        return 'secondary'
+        // ระบุไม่ได้
+        return 'light'
       }
     },
     convertStatusRowColor(status) {
