@@ -71,7 +71,7 @@
                       <CCol>
                         <div class="text-end me-2">
                           <h3>
-                            <b>445093.06</b>
+                            <b>-----.--</b>
                           </h3>
                         </div>
                       </CCol>
@@ -300,6 +300,7 @@
         </CNav>
       </CCardHeader>
       <CCardBody class="pt-1">
+        <!-- รอดำเนินการ -->
         <CTabPane
           role="tabpanel"
           aria-labelledby="home-tab"
@@ -313,7 +314,11 @@
                     <span class="me-2 small">
                       <small><em>อัพเดทอัตโนมัติ</em></small>
                     </span>
-                    <CFormSwitch id="formSwitchCheckChecked" checked />
+                    <CFormSwitch
+                      id="formSwitchCheckChecked"
+                      :onchange="updateFlagAutoHistory"
+                      v-model="flagAutoHistory"
+                    />
                   </div>
                 </div>
               </CCol>
@@ -327,6 +332,7 @@
                     <CTableHeaderCell scope="col">ประเภท</CTableHeaderCell>
                     <CTableHeaderCell scope="col">จำนวนเงิน</CTableHeaderCell>
                     <CTableHeaderCell scope="col">เวลา</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">web</CTableHeaderCell>
                     <CTableHeaderCell scope="col">ตรวจสอบ</CTableHeaderCell>
                     <CTableHeaderCell scope="col">จัดการ</CTableHeaderCell>
                     <CTableHeaderCell scope="col">
@@ -335,12 +341,137 @@
                     <CTableHeaderCell scope="col">ชื่อลูกค้า</CTableHeaderCell>
                     <CTableHeaderCell scope="col">บัญชีเว็บ</CTableHeaderCell>
                     <CTableHeaderCell scope="col">สถานะ</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">web</CTableHeaderCell>
                     <CTableHeaderCell scope="col">หมายเหตุ</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  <CTableRow color="success">
+                  <CTableRow
+                    v-for="(history, index) in dataHistory"
+                    :key="history._id"
+                    :color="convertTypeRowsColor(history.type)"
+                  >
+                    <CTableHeaderCell scope="row">
+                      {{ index + 1 }}.
+                    </CTableHeaderCell>
+                    <CTableDataCell>
+                      <div class="d-inline-flex align-items-center">
+                        <CIcon :icon="ic.cilBank" />
+                        <CBadge color="dark" class="ms-1 d-none d-md-block">
+                          --
+                        </CBadge>
+                      </div>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <CBadge :color="convertTypeColor(history.type)">
+                        {{ convertType(history.type) }}
+                      </CBadge>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <strong class="fst-italic">
+                        {{ convertAmount2Degit(history.amount) }}
+                      </strong>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <CRow>
+                        <p class="m-0">
+                          {{ convertTime(history.request_date) }}
+                        </p>
+                      </CRow>
+                      <CRow>
+                        <small class="fw-lighter m-0">
+                          {{ convertDate(history.request_date) }}
+                        </small>
+                      </CRow>
+                    </CTableDataCell>
+                    <CTableDataCell>{{ history.web_aka }}</CTableDataCell>
+                    <CTableDataCell>
+                      <CButton
+                        color="warning"
+                        variant="outline"
+                        size="sm"
+                        shape="rounded-pill"
+                      >
+                        <CIcon :icon="ic.cilCircle" size="sm" />
+                        <br />
+                        <small>เช็ค</small>
+                      </CButton>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <CButtonGroup role="group" size="sm">
+                        <CButton color="success" variant="outline">
+                          <CIcon :icon="ic.cilCheckAlt" size="sm" />
+                          <br />
+                          <small>อนุมัติ</small>
+                        </CButton>
+                        <CButton color="danger" variant="outline">
+                          <CIcon :icon="ic.cilX" size="sm" />
+                          <br />
+                          <small>ปฏิเสธ</small>
+                        </CButton>
+                      </CButtonGroup>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <CButton
+                        color="link"
+                        class="p-0"
+                        @click="
+                          navigateTo('/member/list/99dev/' + history.memb_id)
+                        "
+                        >{{ history.memb_username }}
+                      </CButton>
+                      <br />
+                      <CBadge color="success" shape="rounded-pill">
+                        --ปกติ
+                      </CBadge>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <CRow>
+                        <CCol lg="2" class="p-0 m-0">
+                          <CImage
+                            fluid
+                            :src="imgBank.kbank"
+                            width="20"
+                            class="ms-1 me-1"
+                          />
+                        </CCol>
+                        <CCol lg="10" class="ps-1">
+                          <strong> {{ history.memb_bank }} </strong>
+                        </CCol>
+                      </CRow>
+                      <CRow>
+                        <CCol class="offset-lg-2 small ps-1">
+                          {{ history.memb_name }}
+                        </CCol>
+                      </CRow>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <CRow>
+                        <CCol lg="2" class="p-0 m-0">
+                          <CImage
+                            fluid
+                            :src="imgBank.ttb"
+                            width="20"
+                            class="ms-1 me-1"
+                          />
+                        </CCol>
+                        <CCol lg="10" class="ps-1">
+                          <strong> {{ history.web_account_number }} </strong>
+                        </CCol>
+                      </CRow>
+                      <CRow>
+                        <CCol class="offset-lg-2 small ps-1">
+                          {{ history.web_account_name }}
+                        </CCol>
+                      </CRow>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <CBadge :color="convertStatusColor(history.status)">
+                        {{ convertStatus(history.status) }}
+                      </CBadge>
+                    </CTableDataCell>
+                    <CTableDataCell>-----</CTableDataCell>
+                  </CTableRow>
+                  <!-- <CTableRow color="success">
                     <CTableHeaderCell scope="row">1.</CTableHeaderCell>
                     <CTableDataCell>
                       <div class="d-inline-flex align-items-center">
@@ -438,12 +569,21 @@
                     </CTableDataCell>
                     <CTableDataCell>banpong888</CTableDataCell>
                     <CTableDataCell></CTableDataCell>
-                  </CTableRow>
+                  </CTableRow> -->
                 </CTableBody>
               </CTable>
             </div>
           </CCardText>
+          <div class="text-center">
+            <CSmartPagination
+              :activePage="activePage1"
+              :pages="totalPage1"
+              size="sm"
+              align="end"
+            />
+          </div>
         </CTabPane>
+        <!-- รายการล่าสุด -->
         <CTabPane
           role="tabpanel"
           aria-labelledby="profile-tab"
@@ -463,7 +603,8 @@
               </CCol>
             </CRow>
             <div class="table-responsive">
-              <CTable hover class="mb-3">
+              ยังไม่พร้อมใช้งาน
+              <!-- <CTable hover class="mb-3">
                 <CTableHead color="dark" class="fw-bold fst-italic">
                   <CTableRow>
                     <CTableHeaderCell scope="col">#</CTableHeaderCell>
@@ -568,20 +709,18 @@
                     <CTableDataCell></CTableDataCell>
                   </CTableRow>
                 </CTableBody>
-              </CTable>
+              </CTable> -->
             </div>
           </CCardText>
+          <div class="text-center">
+            <CSmartPagination
+              :activePage="activePage1"
+              :pages="totalPage1"
+              size="sm"
+              align="end"
+            />
+          </div>
         </CTabPane>
-
-        <div class="text-center">
-          <CPagination size="sm" align="end">
-            <CPaginationItem href="#">ก่อนหน้า</CPaginationItem>
-            <CPaginationItem href="#" active>1</CPaginationItem>
-            <CPaginationItem href="#">2</CPaginationItem>
-            <CPaginationItem href="#">3</CPaginationItem>
-            <CPaginationItem href="#">ถัดไป</CPaginationItem>
-          </CPagination>
-        </div>
       </CCardBody>
     </CCard>
   </div>
@@ -689,6 +828,7 @@
                 <CFormSwitch
                   label="ผ่านบัญชีโบนัส"
                   v-model="isBonusDeposit"
+                  @change="updateFlagAutoHistory"
                   disabled
                 />
                 <div v-if="isBonusDeposit == false">
@@ -1008,6 +1148,16 @@ export default {
         amount: '0',
         description: '',
       },
+      totalPage1: 1,
+      activePage1: 1,
+      totalPage2: 1,
+      activePage2: 1,
+
+      // data
+      flagAutoHistory: false,
+      updateHistoryAutoCount: 0,
+      updateHistoryAuto: null,
+      dataHistory: [],
 
       // list of select elements
       optMemberList: [],
@@ -1039,6 +1189,11 @@ export default {
     }
   },
   methods: {
+    navigateTo(route) {
+      // this.$router.push(route)
+      let _route = this.$router.resolve({ path: route })
+      window.open(_route.href)
+    },
     clickDeposit() {
       this.mdDeposit = !this.mdDeposit
       if (!this.dataDeposit.web_agent_id) {
@@ -1046,6 +1201,32 @@ export default {
         this.dataDeposit.web_agent_name = this.optDepositWebAgent[0].web_name
       }
       this.getMemberList()
+    },
+    loadHistory() {
+      if (this.updateHistoryAuto) {
+        return
+      }
+      const dots = setInterval(() => {
+        this.updateHistoryAutoCount = this.updateHistoryAutoCount + 1
+        console.log(this.updateHistoryAutoCount)
+        this.getHistory()
+      }, 5000)
+      this.updateHistoryAuto = dots
+    },
+    updateFlagAutoHistory() {
+      this.flagAutoHistory = !this.flagAutoHistory
+      if (this.flagAutoHistory == true) {
+        this.onAutoGetHistory()
+      } else {
+        this.offAutoGetHistory()
+      }
+    },
+    onAutoGetHistory() {
+      this.updateHistoryAuto = null
+      this.loadHistory()
+    },
+    offAutoGetHistory() {
+      clearInterval(this.updateHistoryAuto)
     },
     async getMemberList() {
       await this.$http
@@ -1115,9 +1296,106 @@ export default {
           )
         })
     },
+    async getHistory() {
+      await this.$http
+        .post(apiUrl.banking.history, {}, { headers })
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.dataHistory = response.data.result
+            this.totalPage1 = Math.ceil(this.dataHistory.length / 10)
+            console.log(this.dataHistory)
+          } else {
+            console.log(
+              'callAPI - ' +
+                apiUrl.banking.history +
+                ' >>> ' +
+                response.data.status +
+                ', ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('callAPI - ' + apiUrl.banking.history + ' >>> ' + error)
+        })
+    },
+    convertDate(value) {
+      var myDate = new Date(value)
+      return moment(myDate).format('DD/MM/YYYY')
+    },
+    convertTime(value) {
+      var myDate = new Date(value)
+      return moment(myDate).format('HH:mm')
+    },
+    convertAmount2Degit(value) {
+      return Number(value).toFixed(2)
+    },
+    convertType(value) {
+      const _val = value.toString().toLowerCase()
+      if (_val == 'deposit') {
+        return 'ฝาก'
+      } else if (_val == 'withdraw') {
+        return 'ถอน'
+      } else if (_val == 'bonus') {
+        return 'โบนัส'
+      } else {
+        return 'ระบุไม่ได้'
+      }
+    },
+    convertTypeColor(value) {
+      const _val = value.toString().toLowerCase()
+      if (_val == 'deposit') {
+        return 'success'
+      } else if (_val == 'withdraw') {
+        return 'danger'
+      } else if (_val == 'bonus') {
+        return 'info'
+      } else {
+        return 'dark'
+      }
+    },
+    convertTypeRowsColor(value) {
+      const _val = value.toString().toLowerCase()
+      if (_val == 'deposit') {
+        return 'success'
+      } else if (_val == 'withdraw') {
+        return 'danger'
+      } else {
+        return 'dark'
+      }
+    },
+    convertStatus(value) {
+      const _val = value.toString().toLowerCase()
+      if (_val == 'success') {
+        return 'สำเร็จ'
+      } else if (_val == 'pending') {
+        return 'รอดำเนินการ'
+      } else if (_val == 'reject') {
+        return 'ยกเลิก'
+      } else {
+        return 'ระบุไม่ได้'
+      }
+    },
+    convertStatusColor(value) {
+      const _val = value.toString().toLowerCase()
+      if (_val == 'success') {
+        return 'success'
+      } else if (_val == 'pending') {
+        return 'warning'
+      } else if (_val == 'reject') {
+        return 'danger'
+      } else {
+        return 'dark'
+      }
+    },
+  },
+  created() {
+    if (this.flagAutoHistory == true) {
+      this.loadHistory()
+    }
   },
   mounted() {
-    // this.submitDeposit()
+    this.getHistory()
   },
   setup() {
     return {

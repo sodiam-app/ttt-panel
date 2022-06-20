@@ -1,14 +1,15 @@
 // URL gateway API.
-const gatewayUrl = 'http://192.168.1.123:10000'
+const gatewayUrl = 'http://192.168.1.41:10000'
 
 module.exports = {
   token:
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0aW1lIjoiMjAyMi0wNi0yMFQxNjo0NzoxMCswNzowMCIsInVzZXJuYW1lIjoibWFuYWdlcjAxIiwidXNlcl9pZCI6IjYyYTNhMmMwZGMwNDVmMDViMTI2MWJjYyIsInJvbGUiOiJtYW5hZ2VyIiwicmVxdWVzdCI6InBhbmVsIiwiaWF0IjoxNjU1NzE4NDMwLCJleHAiOjE2NTU3NjE2MzB9.f2IPidpr1EixIbV2_zD9Jl3-LGOrftpVoKjZpvdpLA0',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0aW1lIjoiMjAyMi0wNi0yMFQyMjoyNzo1MSswNzowMCIsInVzZXJuYW1lIjoibWFuYWdlcjAxIiwidXNlcl9pZCI6IjYyYTNhMmMwZGMwNDVmMDViMTI2MWJjYyIsInJvbGUiOiJtYW5hZ2VyIiwicmVxdWVzdCI6InBhbmVsIiwiaWF0IjoxNjU1NzM4ODcxLCJleHAiOjE2NTU3ODIwNzF9.kH74DXjs3GXsgjeIN8APaGyCe9xxayGqWSUhvaGILNc',
   member: {
     GetAllmember: gatewayUrl + '/member/getallmember',
     GetMemberProfile: gatewayUrl + '/panel/getprofileuser',
   },
   banking: {
+    history: gatewayUrl + '/panel/history',
     deposit: {
       SubmitDeposit: gatewayUrl + '/panel/deposit',
     },
