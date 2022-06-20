@@ -198,7 +198,7 @@
                                 <CInputGroup>
                                   <CInputGroupText
                                     id="basic-cStatus"
-                                    class="p-2"
+                                    class="px-2"
                                   >
                                     <CImage
                                       fluid
@@ -255,12 +255,12 @@
                                 <CInputGroup>
                                   <CInputGroupText
                                     id="basic-cStatus"
-                                    class="p-2"
+                                    class="px-2"
                                   >
                                     <CImage
                                       fluid
                                       :src="
-                                        require('../../assets/images/privilege/vip-card.png')
+                                        require('../../assets/images/privilege/normal.png')
                                       "
                                       width="22"
                                     />
@@ -580,7 +580,12 @@
                                   <li
                                     class="list-group-item d-flex justify-content-between align-items-center"
                                   >
-                                    แนะนำเพื่อน:
+                                    แนะนำเพื่อน
+                                  </li>
+                                  <li
+                                    class="list-group-item d-flex justify-content-between align-items-center"
+                                  >
+                                    จำนวน:
                                     <span class="badge bg-dark rounded-pill">
                                       -- ยูส
                                     </span>
@@ -610,7 +615,7 @@
                                   <li
                                     class="list-group-item d-flex justify-content-between align-items-center"
                                   >
-                                    จำนวน:
+                                    จำนวนเงิน:
                                     <span class="badge bg-dark rounded-pill"
                                       >-- ฿</span
                                     >
@@ -726,18 +731,22 @@
                                     width="22"
                                   />
                                 </CInputGroupText>
-                                <CFormSelect id="cBanking">
-                                  <option value="ttb">
-                                    <img :src="imgBank.kbank" />
-                                    ทหารไทยธนชาต
+                                <CFormSelect
+                                  size="sm"
+                                  v-model="
+                                    memberProfile.banking_account.bank_id
+                                  "
+                                >
+                                  <option value="" disabled>
+                                    สามารถเลือกได้
                                   </option>
-                                  <option value="kbank" selected>
-                                    กสิกรไทย
+                                  <option
+                                    v-for="option in optBanking"
+                                    :key="option._id"
+                                    :value="option._id"
+                                  >
+                                    {{ option.banknameth }}
                                   </option>
-                                  <option value="00">กรุงเทพ</option>
-                                  <option value="00">กรุงไทย</option>
-                                  <option value="00">ไทยพาณิชย์</option>
-                                  <option value="00">กรุงศรีอยุธยา</option>
                                 </CFormSelect>
                               </CInputGroup>
                             </div>
@@ -1181,6 +1190,7 @@ export default {
       optChannel: [],
       optPrivilege: [],
       optStatus: [],
+      optBanking: [],
       optShownBankAcct: [
         { value: 0, text: '0213832833 (ttb Auto)', selected: true },
         { value: 1, text: '4732291820 (ttb VIP1)', selected: false },
@@ -1222,6 +1232,7 @@ export default {
           { headers },
         )
         .then((response) => {
+          console.log('getMemberProfile')
           console.log(response)
           if (response.data.status == 200) {
             let mem = response.data.result.profile_mem
@@ -1278,7 +1289,7 @@ export default {
             this.memberProfile.financial.withdraw_total_amount =
               mem.financial.withdraw_total_amount.toFixed(2)
             this.memberProfile.pd.username = mem.pd.username
-            this.memberProfile.pd.credit = mem.pd.credit
+            this.memberProfile.pd.credit = mem.pd.credit.toFixed(2)
             this.memberProfile.pd.currency = mem.pd.currency
             this.memberProfile.pd.hdp = mem.pd.hdp
             this.memberProfile.pd.mixParlay = mem.pd.mixParlay
@@ -1318,6 +1329,7 @@ export default {
       await this.$http
         .post(apiUrl.conf.GetChannel, {}, { headers })
         .then((response) => {
+          console.log('getConfChannel')
           console.log(response)
           if (response.data.status == 200) {
             this.optChannel = response.data.channel
@@ -1343,6 +1355,7 @@ export default {
       await this.$http
         .post(apiUrl.conf.GetPrivilege, {}, { headers })
         .then((response) => {
+          console.log('getConfPrivilege')
           console.log(response)
           if (response.data.status == 200) {
             this.optPrivilege = response.data.privilege
@@ -1368,6 +1381,7 @@ export default {
       await this.$http
         .post(apiUrl.conf.GetStatus, {}, { headers })
         .then((response) => {
+          console.log('getConfStatus')
           console.log(response)
           if (response.data.status == 200) {
             this.optStatus = response.data.result_status
@@ -1389,6 +1403,32 @@ export default {
           )
         })
     },
+    async getConfBanking() {
+      await this.$http
+        .post(apiUrl.conf.GetBanking, {}, { headers })
+        .then((response) => {
+          console.log('getConfBanking')
+          console.log(response)
+          if (response.data.status == 200) {
+            this.optBanking = response.data.result.banking
+            console.log(this.optBanking)
+          } else {
+            console.log(
+              'callAPI - ' +
+                apiUrl.conf.GetBanking +
+                ' >>> ' +
+                response.data.status +
+                ', ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log(
+            'callAPI (catch) - ' + apiUrl.conf.GetBanking + ' >>> ' + error,
+          )
+        })
+    },
     showPwd() {
       if (this.memberProfile.pinType == 'password') {
         this.memberProfile.pinType = 'text'
@@ -1405,6 +1445,7 @@ export default {
     },
   },
   mounted() {
+    this.getConfBanking()
     this.getConfChannel()
     this.getConfStatus()
     this.getConfPrivilege()

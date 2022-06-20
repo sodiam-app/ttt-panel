@@ -31,6 +31,7 @@ import tcrb from '@/assets/images/banking/th/smooth-corner/tcrb.png'
 import tisco from '@/assets/images/banking/th/smooth-corner/tisco.png'
 import tmb from '@/assets/images/banking/th/smooth-corner/tmb.png'
 import uob from '@/assets/images/banking/th/smooth-corner/uob.png'
+import all from '@/assets/images/banking/th/smooth-corner/all.png'
 export const imgBankSmoothSet = Object.assign(
   {},
   {
@@ -67,5 +68,6 @@ export const imgBankSmoothSet = Object.assign(
     tisco,
     tmb,
     uob,
+    all,
   },
 )

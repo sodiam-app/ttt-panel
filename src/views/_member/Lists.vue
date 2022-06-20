@@ -674,7 +674,6 @@ export default {
           )
         })
     },
-
     convertStatus(status) {
       const _status = status.toString().toLowerCase()
       if (_status == 'active') {
@@ -687,7 +686,6 @@ export default {
         return 'ไม่ระบุ'
       }
     },
-
     convertStatusColor(status) {
       const _status = status.toString().toLowerCase()
       if (_status == 'active') {
@@ -700,7 +698,6 @@ export default {
         return 'secondary'
       }
     },
-
     convertStatusRowColor(status) {
       const _status = status.toString().toLowerCase()
       if (_status == 'active') {

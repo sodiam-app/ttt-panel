@@ -85,7 +85,7 @@
                         <CButton
                           color="success"
                           class="text-light"
-                          @click="mdDeposit = !mdDeposit"
+                          @click="clickDeposit"
                         >
                           <strong>
                             <CIcon :icon="ic.cilCash" size="sm" />
@@ -190,7 +190,6 @@
                             </CCol>
                             <CCol sm="12" class="mb-2">
                               <CMultiSelect
-                                :options="optAdmin"
                                 placeholder="เลือกแอดมิน"
                                 select-all-label=""
                                 search-no-results-label="ไม่มีข้อมูล"
@@ -204,7 +203,7 @@
                             </CCol>
                             <CCol sm="12" class="mb-2">
                               <CMultiSelect
-                                :options="optAdmin"
+                                :options="optMemberList"
                                 placeholder="เลือกลูกค้า"
                                 select-all-label=""
                                 search-no-results-label="ไม่มีข้อมูล"
@@ -687,58 +686,109 @@
           <CCardText class="small">
             <form>
               <div class="mb-1">
-                <label for="depositBank" class="form-label"> *บัญชีฝาก </label>
-                <select
-                  class="form-select form-select-sm"
-                  aria-label="กรุณาเลือกบัญชีฝาก"
-                  id="depositBank"
-                >
-                  <option value="0213832833" selected>
-                    (ttb Auto) 0213832833
-                  </option>
-                  <option value="00928378472">(Reserve) 00928378472</option>
-                  <option value="66536462819">(tttAPI) 66536462819</option>
-                  <option value="0928837263">(Demo) 0928837263</option>
-                </select>
+                <CFormSwitch
+                  label="ผ่านบัญชีโบนัส"
+                  v-model="isBonusDeposit"
+                  disabled
+                />
+                <div v-if="isBonusDeposit == false">
+                  <label for="depositBank" class="form-label">
+                    * บัญชีฝาก
+                  </label>
+                  <select
+                    class="form-select form-select-sm"
+                    aria-label="กรุณาเลือกบัญชีฝาก"
+                    id="depositBank"
+                  >
+                    <option value="Bonus" selected>บัญชีโบนัส</option>
+                  </select>
+                </div>
               </div>
-              <hr />
+              <hr class="mt-2" />
+              <div class="mb-1">
+                <label for="depositDateTime" class="form-label mb-1">
+                  * เว็บลูกค้า
+                </label>
+                <!-- <select
+                  class="form-select form-select-sm"
+                  aria-label="กรุณาเลือกเว็บของลูกค้า"
+                  id="prefix"
+                >
+                  <option value="Banpong888" selected>Banpong888</option>
+                </select> -->
+                <CFormSelect size="sm" v-model="dataDeposit.web_agent_id">
+                  <option value="">กรุณาเลือกเว็บ</option>
+                  <option
+                    v-for="option in optDepositWebAgent"
+                    :key="option._id"
+                    :value="option._id"
+                  >
+                    {{ option.web_name }}
+                  </option>
+                </CFormSelect>
+              </div>
               <div class="mb-1">
                 <label for="depositMemberID" class="form-label mb-1">
-                  *ยูสเซอร์ลูกค้า
+                  * ยูสเซอร์ลูกค้า
                 </label>
-                <select
-                  class="form-select form-select-sm"
-                  aria-label="กรุณาเลือกยูสเซอร์"
-                  id="depositMemberID"
-                >
-                  <option value="99dev100001" selected>99dev100001</option>
-                  <option value="99dev100002">99dev100002</option>
-                  <option value="99dev100004">99dev100004</option>
-                  <option value="99dev100009">99dev100009</option>
-                </select>
-                <div id="emailHelp" class="form-text mt-0 mb-2">
+                <CFormSelect size="sm" v-model="dataDeposit.memb_id">
+                  <option value="">กรุณาเลือกยูสเซอร์</option>
+                  <option
+                    v-for="option in optMemberList"
+                    :key="option._id"
+                    :value="option._id"
+                  >
+                    {{ option.username }}
+                  </option>
+                </CFormSelect>
+                <div class="form-text mt-0 mb-2">
                   สามารถค้นหาด้วย: ยูส, เบอร์โทร, ชื่อ
                 </div>
               </div>
               <div class="mb-1">
                 <label for="depositDateTime" class="form-label mb-1">
-                  *วันเวลาที่ทำรายการ
+                  * วันเวลาที่ทำรายการ
                 </label>
-                <input
-                  type="date"
-                  class="form-control form-control-sm"
-                  id="depositDateTime"
-                />
+                <CRow class="g-2">
+                  <CCol sm="7">
+                    <CDatePicker
+                      size="sm"
+                      locale="th-TH"
+                      confirm-button="ตกลง"
+                      cancel-button="ยกเลิก"
+                      placeholder="วันที่ทำรายการ"
+                      footer
+                      :date="dataDeposit.transaction_date"
+                      v-model="dataDeposit.transaction_date"
+                      format="dd/MM/yyyy"
+                    />
+                  </CCol>
+                  <CCol sm>
+                    <CTimePicker
+                      size="sm"
+                      locale="th-TH"
+                      placeholder="เวลาที่ทำรายการ"
+                      :time="dataDeposit.transaction_time"
+                      v-model="dataDeposit.transaction_time"
+                    />
+                  </CCol>
+                </CRow>
               </div>
               <div class="mb-1">
                 <label for="depositAmount" class="form-label mb-1">
-                  *ยอดเงิน
+                  * ยอดเงิน
                 </label>
-                <input
-                  type="number"
-                  class="form-control form-control-sm"
-                  id="depositAmount"
-                />
+                <CInputGroup>
+                  <CInputGroupText>
+                    <CIcon :icon="ic.cilCash" />
+                  </CInputGroupText>
+                  <CFormInput
+                    type="number"
+                    id="depositAmount"
+                    v-model="dataDeposit.amount"
+                  />
+                  <CInputGroupText> ฿ </CInputGroupText>
+                </CInputGroup>
               </div>
               <hr class="mb-2" />
               <div class="mb-1">
@@ -747,20 +797,25 @@
                     class="form-control form-control-sm"
                     placeholder="Leave a comment here"
                     id="floatingTextarea1"
-                    style="height: 100px"
+                    style="height: 90px"
+                    v-model="dataDeposit.description"
                   ></textarea>
                   <label for="floatingTextarea2">หมายเหตุ</label>
                 </div>
               </div>
               <hr />
               <div class="text-end">
-                <CButton color="success" class="ms-1 text-light">
+                <CButton
+                  color="success"
+                  class="ms-1 text-light"
+                  @click="submitDeposit"
+                >
                   <CIcon :icon="ic.cilCheckCircle" />
                   ตกลง
                 </CButton>
                 <CButton
-                  color="danger text-light"
-                  class="ms-1"
+                  color="danger"
+                  class="text-light ms-1"
                   @click="
                     () => {
                       mdDeposit = false
@@ -896,7 +951,32 @@
 <script>
 import { imgBankSmoothSet as imgBank } from '@/assets/images/banking/th/smooth-corner'
 import { CIcon } from '@coreui/icons-vue'
-import { iconsSet as ic } from '@/assets/icons'
+import {
+  cilCash,
+  cilLoopCircular,
+  cilClearAll,
+  cilExternalLink,
+  cilCalendar,
+  cilClock,
+  cilMagnifyingGlass,
+  cilReload,
+  cilFilter,
+  cilFullscreenExit,
+  cilBank,
+  cilCircle,
+  cilCheckAlt,
+  cilX,
+  cilCheckCircle,
+  cilXCircle,
+} from '@coreui/icons'
+
+import { CDatePicker } from '@coreui/vue-pro'
+import moment from 'moment'
+
+const apiUrl = require('./../../constants/api-url-list')
+const headers = {
+  Authorization: 'Bearer ' + apiUrl.token,
+}
 
 import avatar from '@/assets/images/avatars/owner/02.png'
 
@@ -904,6 +984,7 @@ export default {
   name: 'Transection',
   comments: {
     CIcon,
+    CDatePicker,
   },
   data() {
     return {
@@ -914,21 +995,133 @@ export default {
       visibleBank: true,
       mdStatement: false,
       mdDeposit: false,
+      isBonusDeposit: true,
       mdWithdraw: false,
-      optAdmin: [
-        { name: '99dev100001', value: 0, text: '99dev100001', selected: false },
-        { name: '99dev100002', value: 1, text: '99dev100002', selected: false },
-        { name: '99dev100003', value: 2, text: '99dev100003', selected: false },
-        { name: '99dev100004', value: 3, text: '99dev100004', selected: false },
-        { name: '99dev100008', value: 4, text: '99dev100008', selected: false },
-        { name: '99dev100019', value: 5, text: '99dev100019', selected: false },
+      isBonusWithdraw: true,
+      dataDeposit: {
+        web_agent_id: '',
+        web_agent_name: '',
+        account_deposit: '',
+        memb_id: '',
+        transaction_date: new Date(),
+        transaction_time: new Date(),
+        amount: '0',
+        description: '',
+      },
+
+      // list of select elements
+      optMemberList: [],
+      optDepositWebAgent: [
+        {
+          _id: '629e381cb4839cabb5622da1',
+          web_name: 'Banpong888',
+          domain_name: 'https://www.banpong888.com',
+        },
       ],
+      ic: {
+        cilCash,
+        cilLoopCircular,
+        cilClearAll,
+        cilExternalLink,
+        cilCalendar,
+        cilClock,
+        cilMagnifyingGlass,
+        cilReload,
+        cilFilter,
+        cilFullscreenExit,
+        cilBank,
+        cilCircle,
+        cilCheckAlt,
+        cilX,
+        cilCheckCircle,
+        cilXCircle,
+      },
     }
+  },
+  methods: {
+    clickDeposit() {
+      this.mdDeposit = !this.mdDeposit
+      if (!this.dataDeposit.web_agent_id) {
+        this.dataDeposit.web_agent_id = this.optDepositWebAgent[0]._id
+        this.dataDeposit.web_agent_name = this.optDepositWebAgent[0].web_name
+      }
+      this.getMemberList()
+    },
+    async getMemberList() {
+      await this.$http
+        .post(
+          apiUrl.member.GetAllmember,
+          {
+            agent_id: this.dataDeposit.web_agent_id,
+            domain_name: this.dataDeposit.domain_name,
+          },
+          { headers },
+        )
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.optMemberList = response.data.result.Member
+            console.log(this.optMemberList)
+          } else {
+            console.log(
+              'callAPI - ' +
+                apiUrl.member.GetAllmember +
+                ' >>> ' +
+                response.data.status +
+                ', ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log(
+            'callAPI - ' + apiUrl.member.GetAllmember + ' >>> ' + error,
+          )
+        })
+    },
+    async submitDeposit() {
+      await this.$http
+        .post(
+          apiUrl.banking.deposit.SubmitDeposit,
+          {
+            account_deposit: this.dataDeposit.account_deposit,
+            memb_id: this.dataDeposit.memb_id,
+            transaction_date: moment().format(),
+            amount: this.dataDeposit.amount,
+            description: this.dataDeposit.description,
+          },
+          { headers },
+        )
+        .then((response) => {
+          if (response.data.status == 200) {
+            console.log(response.data.message + ' : ' + response.data.result)
+            this.mdDeposit = false
+            // clear data
+            this.dataDeposit.amount = '0'
+            this.dataDeposit.description = ''
+          } else {
+            console.log(
+              'callAPI - ' +
+                apiUrl.banking.deposit.SubmitDeposit +
+                ' >>> ' +
+                response.data.status +
+                ', ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log(
+            'callAPI - ' + apiUrl.member.GetAllmember + ' >>> ' + error,
+          )
+        })
+    },
+  },
+  mounted() {
+    // this.submitDeposit()
   },
   setup() {
     return {
       imgBank,
-      ic,
     }
   },
 }
