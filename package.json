@@ -32,14 +32,18 @@
     "@coreui/vue": "^4.1.0",
     "@coreui/vue-chartjs": "2.0.0",
     "@coreui/vue-pro": "^4.3.0",
+    "@nuxtjs/auth-next": "5.0.0-1648802546.c9880dc",
+    "@nuxtjs/axios": "^5.13.6",
     "axios": "^0.27.2",
     "core-js": "^3.19.0",
+    "jw-vue-pagination": "^1.0.3",
     "moment": "^2.29.3",
     "vue": "^3.2.23",
     "vue-axios": "^3.4.1",
     "vue-router": "^4.0.12",
     "vue3-clipboard": "^1.0.0",
-    "vuex": "^4.0.2"
+    "vuex": "^4.0.2",
+    "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

@@ -6,7 +6,7 @@
           <CCardGroup>
             <CCard class="p-4">
               <CCardBody>
-                <CForm>
+                <CForm @submit.prevent="submit">
                   <h1>Login</h1>
                   <p class="text-medium-emphasis">ระบบ ฝากถอน ttt-API</p>
                   <CInputGroup class="mb-3">
@@ -16,6 +16,7 @@
                     <CFormInput
                       placeholder="Username"
                       autocomplete="username"
+                      v-model="form.username"
                     />
                   </CInputGroup>
                   <CInputGroup class="mb-4">
@@ -26,16 +27,17 @@
                       type="password"
                       placeholder="Password"
                       autocomplete="current-password"
+                      v-model="form.password"
                     />
                   </CInputGroup>
                   <CRow>
                     <CCol :xs="6">
                       <CButton
+                        type="submit"
                         color="primary"
                         class="px-4 rounded-pill"
-                        @click="$router.push({ path: '/' })"
                       >
-                        <CIcon :icon="cilRoom" size="me-2" />
+                        <CIcon :icon="cilRoom" class="me-2" />
                         Login
                       </CButton>
                     </CCol>
@@ -73,13 +75,45 @@
 import { CIcon } from '@coreui/icons-vue'
 import { cilRoom } from '@coreui/icons'
 
+import { mapActions } from 'vuex'
+
 export default {
   name: 'Login',
   comments: {
     CIcon,
   },
+  data() {
+    return {
+      form: {
+        username: '',
+        password: '',
+      },
+    }
+  },
+  methods: {
+    ...mapActions({
+      singIn: 'auth/signIn',
+    }),
+    submit() {
+      this.singIn(this.form).then(
+        (response) => {
+          if (response.data.status == 200) {
+            this.$router.replace({
+              name: 'Dashboard',
+            })
+          } else {
+            console.log(response)
+          }
+        },
+        (error) => {
+          console.error(error)
+        },
+      )
+    },
+  },
   setup() {
     return {
+      // icon
       cilRoom,
     }
   },

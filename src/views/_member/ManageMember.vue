@@ -1093,11 +1093,6 @@ import avatar from '@/assets/images/avatars/owner/02.png'
 
 import moment from 'moment'
 
-const apiUrl = require('./../../constants/api-url-list')
-const headers = {
-  Authorization: 'Bearer ' + apiUrl.token,
-}
-
 import { CIcon } from '@coreui/icons-vue'
 import {
   cilShieldAlt,
@@ -1223,17 +1218,11 @@ export default {
   methods: {
     async getMemberProfile() {
       await this.$http
-        .post(
-          apiUrl.member.GetMemberProfile,
-          {
-            agent_id: '629e381cb4839cabb5622da1',
-            user_id: this.memberID,
-          },
-          { headers },
-        )
+        .post('panel/getprofileuser', {
+          agent_id: '629e381cb4839cabb5622da1',
+          user_id: this.memberID,
+        })
         .then((response) => {
-          console.log('getMemberProfile')
-          console.log(response)
           if (response.data.status == 200) {
             let mem = response.data.result.profile_mem
             if (mem.status.toString().toLowerCase() == 'active') {
@@ -1306,28 +1295,20 @@ export default {
             this.memberProfile.update_by = mem.update_by
           } else {
             console.log(
-              'callAPI - ' +
-                apiUrl.member.GetMemberProfile +
-                ' >>> ' +
+              'call api - panel/deposit : status = ' +
                 response.data.status +
-                ', ' +
+                ', message = ' +
                 response.data.message,
             )
-            // this.closeWindow()
           }
         })
         .catch((error) => {
-          console.log(
-            'callAPI (catch) - ' +
-              apiUrl.member.GetMemberProfile +
-              ' >>> ' +
-              error,
-          )
+          console.log('call api - panel/getprofileuser : error' + error)
         })
     },
     async getConfChannel() {
       await this.$http
-        .post(apiUrl.conf.GetChannel, {}, { headers })
+        .post('panel/getchannel', {})
         .then((response) => {
           console.log('getConfChannel')
           console.log(response)
@@ -1336,24 +1317,20 @@ export default {
             console.log(this.optChannel)
           } else {
             console.log(
-              'callAPI - ' +
-                apiUrl.conf.GetChannel +
-                ' >>> ' +
+              'call api - panel/getchannel : status = ' +
                 response.data.status +
-                ', ' +
+                ', message = ' +
                 response.data.message,
             )
           }
         })
         .catch((error) => {
-          console.log(
-            'callAPI (catch) - ' + apiUrl.conf.GetChannel + ' >>> ' + error,
-          )
+          console.log('call api - panel/getchannel : error' + error)
         })
     },
     async getConfPrivilege() {
       await this.$http
-        .post(apiUrl.conf.GetPrivilege, {}, { headers })
+        .post('panel/getprivilege', {})
         .then((response) => {
           console.log('getConfPrivilege')
           console.log(response)
@@ -1362,71 +1339,55 @@ export default {
             console.log(this.optPrivilege)
           } else {
             console.log(
-              'callAPI - ' +
-                apiUrl.conf.GetPrivilege +
-                ' >>> ' +
+              'call api - panel/getprivilege : status = ' +
                 response.data.status +
-                ', ' +
+                ', message = ' +
                 response.data.message,
             )
           }
         })
         .catch((error) => {
-          console.log(
-            'callAPI (catch) - ' + apiUrl.conf.GetPrivilege + ' >>> ' + error,
-          )
+          console.log('call api - panel/getprivilege : error' + error)
         })
     },
     async getConfStatus() {
       await this.$http
-        .post(apiUrl.conf.GetStatus, {}, { headers })
+        .post('panel/getstatus', {})
         .then((response) => {
-          console.log('getConfStatus')
-          console.log(response)
           if (response.data.status == 200) {
             this.optStatus = response.data.result_status
             console.log(this.optStatus)
           } else {
             console.log(
-              'callAPI - ' +
-                apiUrl.conf.GetStatus +
-                ' >>> ' +
+              'call api - panel/getstatus : status = ' +
                 response.data.status +
-                ', ' +
+                ', message = ' +
                 response.data.message,
             )
           }
         })
         .catch((error) => {
-          console.log(
-            'callAPI (catch) - ' + apiUrl.conf.GetStatus + ' >>> ' + error,
-          )
+          console.log('call api - panel/getstatus : error' + error)
         })
     },
     async getConfBanking() {
       await this.$http
-        .post(apiUrl.conf.GetBanking, {}, { headers })
+        .post('panel/getbanking', {})
         .then((response) => {
-          console.log('getConfBanking')
-          console.log(response)
           if (response.data.status == 200) {
             this.optBanking = response.data.result.banking
             console.log(this.optBanking)
           } else {
             console.log(
-              'callAPI - ' +
-                apiUrl.conf.GetBanking +
-                ' >>> ' +
+              'call api - panel/getbanking : status = ' +
                 response.data.status +
-                ', ' +
+                ', message = ' +
                 response.data.message,
             )
           }
         })
         .catch((error) => {
-          console.log(
-            'callAPI (catch) - ' + apiUrl.conf.GetBanking + ' >>> ' + error,
-          )
+          console.log('call api - panel/getbanking : error' + error)
         })
     },
     showPwd() {

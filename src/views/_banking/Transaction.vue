@@ -347,7 +347,7 @@
                 <CTableBody>
                   <CTableRow
                     v-for="(history, index) in dataHistory"
-                    :key="history._id"
+                    :key="history.id"
                     :color="convertTypeRowsColor(history.type)"
                   >
                     <CTableHeaderCell scope="row">
@@ -386,24 +386,57 @@
                     <CTableDataCell>{{ history.web_aka }}</CTableDataCell>
                     <CTableDataCell>
                       <CButton
+                        v-if="!history.Checked"
                         color="warning"
                         variant="outline"
                         size="sm"
                         shape="rounded-pill"
+                        @click.prevent="
+                          submitTransactionStatus(history._id, 'check')
+                        "
                       >
                         <CIcon :icon="ic.cilCircle" size="sm" />
                         <br />
                         <small>เช็ค</small>
                       </CButton>
+                      <div v-else class="d-inline-flex align-items-center">
+                        <CAvatar
+                          :src="
+                            getImgAvatar(
+                              history.Checked.checker_role,
+                              history.Checked.checker_avatar,
+                            )
+                          "
+                          size="sm"
+                          status="success"
+                        />
+                        <!-- <span class="ms-1"> -->
+                        <CBadge color="dark" shape="rounded-pill">
+                          {{ history.Checked.checker_username }}
+                        </CBadge>
+                        <!-- </span> -->
+                      </div>
                     </CTableDataCell>
                     <CTableDataCell>
                       <CButtonGroup role="group" size="sm">
-                        <CButton color="success" variant="outline">
+                        <CButton
+                          color="success"
+                          variant="outline"
+                          @click.prevent="
+                            submitTransactionStatus(history._id, 'approve')
+                          "
+                        >
                           <CIcon :icon="ic.cilCheckAlt" size="sm" />
                           <br />
                           <small>อนุมัติ</small>
                         </CButton>
-                        <CButton color="danger" variant="outline">
+                        <CButton
+                          color="danger"
+                          variant="outline"
+                          @click.prevent="
+                            submitTransactionStatus(history._id, 'cancel')
+                          "
+                        >
                           <CIcon :icon="ic.cilX" size="sm" />
                           <br />
                           <small>ปฏิเสธ</small>
@@ -1116,11 +1149,6 @@ import {
 import { CDatePicker } from '@coreui/vue-pro'
 import moment from 'moment'
 
-const apiUrl = require('./../../constants/api-url-list')
-const headers = {
-  Authorization: 'Bearer ' + apiUrl.token,
-}
-
 import avatar from '@/assets/images/avatars/owner/02.png'
 
 export default {
@@ -1141,6 +1169,11 @@ export default {
       isBonusDeposit: true,
       mdWithdraw: false,
       isBonusWithdraw: true,
+
+      // Web
+      providerCredit: 0,
+
+      // Deposit submit
       dataDeposit: {
         web_agent_id: '',
         web_agent_name: '',
@@ -1151,6 +1184,7 @@ export default {
         amount: '0',
         description: '',
       },
+
       totalPage1: 1,
       activePage1: 1,
       totalPage2: 1,
@@ -1231,50 +1265,41 @@ export default {
     offAutoGetHistory() {
       clearInterval(this.updateHistoryAuto)
     },
+    onChangePage(pageOfItems) {
+      this.pageOfItemsHistory = pageOfItems
+    },
     async getMemberList() {
       await this.$http
-        .post(
-          apiUrl.member.GetAllmember,
-          {
-            agent_id: this.dataDeposit.web_agent_id,
-            domain_name: this.dataDeposit.domain_name,
-          },
-          { headers },
-        )
+        .post('member/getallmember', {
+          agent_id: this.dataDeposit.web_agent_id,
+          domain_name: this.dataDeposit.domain_name,
+        })
         .then((response) => {
           if (response.data.status == 200) {
             this.optMemberList = response.data.result.Member
             console.log(this.optMemberList)
           } else {
             console.log(
-              'callAPI - ' +
-                apiUrl.member.GetAllmember +
-                ' >>> ' +
+              'call api - member/getallmember : status = ' +
                 response.data.status +
-                ', ' +
+                ', message = ' +
                 response.data.message,
             )
           }
         })
         .catch((error) => {
-          console.log(
-            'callAPI - ' + apiUrl.member.GetAllmember + ' >>> ' + error,
-          )
+          console.log('call api - member/getallmember : error' + error)
         })
     },
     async submitDeposit() {
       await this.$http
-        .post(
-          apiUrl.banking.deposit.SubmitDeposit,
-          {
-            account_deposit: this.dataDeposit.account_deposit,
-            memb_id: this.dataDeposit.memb_id,
-            transaction_date: moment().format(),
-            amount: this.dataDeposit.amount,
-            description: this.dataDeposit.description,
-          },
-          { headers },
-        )
+        .post('panel/deposit', {
+          account_deposit: this.dataDeposit.account_deposit,
+          memb_id: this.dataDeposit.memb_id,
+          transaction_date: moment().format(),
+          amount: this.dataDeposit.amount,
+          description: this.dataDeposit.description,
+        })
         .then((response) => {
           if (response.data.status == 200) {
             console.log(response.data.message + ' : ' + response.data.result)
@@ -1284,24 +1309,20 @@ export default {
             this.dataDeposit.description = ''
           } else {
             console.log(
-              'callAPI - ' +
-                apiUrl.banking.deposit.SubmitDeposit +
-                ' >>> ' +
+              'call api - panel/deposit : status = ' +
                 response.data.status +
-                ', ' +
+                ', message = ' +
                 response.data.message,
             )
           }
         })
         .catch((error) => {
-          console.log(
-            'callAPI - ' + apiUrl.member.GetAllmember + ' >>> ' + error,
-          )
+          console.log('call api - panel/deposit : error' + error)
         })
     },
     async getHistory() {
       await this.$http
-        .post(apiUrl.banking.history, {}, { headers })
+        .post('panel/history', {})
         .then((response) => {
           if (response.data.status == 200) {
             this.dataHistory = response.data.result
@@ -1309,18 +1330,51 @@ export default {
             console.log(this.dataHistory)
           } else {
             console.log(
-              'callAPI - ' +
-                apiUrl.banking.history +
-                ' >>> ' +
+              'call api - panel/history : status = ' +
                 response.data.status +
-                ', ' +
+                ', message = ' +
                 response.data.message,
             )
           }
         })
         .catch((error) => {
-          console.log('callAPI - ' + apiUrl.banking.history + ' >>> ' + error)
+          console.log('call api - panel/history : error' + error)
         })
+    },
+    async submitTransactionStatus(_id, _status) {
+      await this.$http
+        .post('panel/updatestatusdeposit', {
+          deposit_id: _id,
+          status: _status,
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.providerCredit = response.data.credit_web
+            console.log(
+              'call api - panel/updatestatustransaction : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          } else {
+            console.log(
+              'call api - panel/updatestatustransaction : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log(
+            'call api - panel/updatestatustransaction : error' + error,
+          )
+        }),
+        this.getHistory()
+    },
+    // convert function
+    getImgAvatar(role, img) {
+      return require('../../assets/images/avatars/' + role + '/' + img)
     },
     convertDate(value) {
       var myDate = new Date(value)

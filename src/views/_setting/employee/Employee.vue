@@ -554,7 +554,7 @@
                     align="center"
                     rounded
                     thumbnail
-                    :src="avatar"
+                    :src="avatar1"
                     width="150"
                     height="150"
                     class="mb-1"
@@ -679,10 +679,6 @@ import avatar1 from '@/assets/images/avatars/owner/02.png'
 import avatar2 from '@/assets/images/avatars/owner/01.png'
 import avatar3 from '@/assets/images/avatars/owner/04.png'
 import avatar4 from '@/assets/images/avatars/manager/02.png'
-const apiUrl = require('./../../../constants/api-url-list')
-const headers = {
-  Authorization: 'Bearer ' + apiUrl.token,
-}
 
 import { CIcon } from '@coreui/icons-vue'
 import {
@@ -779,36 +775,27 @@ export default {
   },
   methods: {
     async getRoleStaff() {
-      // console.log(headers)
-      // console.log(apiUrl.conf.GetRole)
       await this.$http
-        .post(apiUrl.conf.GetRole, {}, { headers })
+        .post('panel/getrole', {})
         .then((response) => {
-          // console.log(response)
           if (response.data.status == 200) {
             this.optRole = response.data.result
-            // console.log(this.optRole)
           } else {
             console.log(
-              'callAPI - ' +
-                apiUrl.conf.GetRole +
-                ' >>> ' +
+              'call api - panel/getrole : status = ' +
                 response.data.status +
-                ', ' +
+                ', message = ' +
                 response.data.message,
             )
           }
         })
         .catch((error) => {
-          console.log(
-            'callAPI (catch) - ' + apiUrl.conf.GetRole + ' >>> ' + error,
-          )
+          console.log('call api - panel/getrole : error' + error)
         })
     },
-
     async getAllEmployee() {
       await this.$http
-        .post(apiUrl.setting.employee.GetAllEmployee, {}, { headers })
+        .post('panel/getallemployee')
         .then((response) => {
           if (response.data.status == 200) {
             this.employees.listOfEmp = response.data.result.emp
@@ -819,28 +806,19 @@ export default {
             console.log(this.employees.listOfEmp)
           } else {
             console.log(
-              'callAPI - ' +
-                apiUrl.setting.employee.GetAllEmployee +
-                ' >>> ' +
+              'call api - panel/getallemployee : status = ' +
                 response.data.status +
-                ', ' +
+                ', message = ' +
                 response.data.message,
             )
           }
         })
         .catch((error) => {
-          console.log(
-            'callAPI (catch) - ' +
-              apiUrl.setting.employee.GetAllEmployee +
-              ' >>> ' +
-              error,
-          )
+          console.log('call api - panel/getallemployee : error' + error)
         })
     },
-
     async addEmployee() {
       this.addEmp.avatar = await this.getAvatar(this.addEmp.role)
-      console.log(headers)
       let _status = ''
       if (this.addEmp.status) {
         _status = 'Active'
@@ -848,46 +826,32 @@ export default {
         _status = 'Inactive'
       }
       await this.$http
-        .post(
-          apiUrl.setting.employee.AddEmployee,
-          {
-            agent_id: this.addEmp.agent_id,
-            username: this.addEmp.username,
-            password: this.addEmp.password,
-            tel: this.addEmp.tel,
-            avatar: this.addEmp.avatar,
-            name: this.addEmp.name,
-            role: this.addEmp.role,
-            status: _status,
-          },
-          { headers },
-        )
+        .post('panel/addemployee', {
+          agent_id: this.addEmp.agent_id,
+          username: this.addEmp.username,
+          password: this.addEmp.password,
+          tel: this.addEmp.tel,
+          avatar: this.addEmp.avatar,
+          name: this.addEmp.name,
+          role: this.addEmp.role,
+          status: _status,
+        })
         .then((response) => {
           if (response.data.status == 200) {
             console.log(response)
           } else {
-            this.addEmp.apiResult = response.data.message
-            this.addEmp.alertAddEmpVisible = true
             console.log(
-              'callAPI - ' +
-                apiUrl.setting.employee.AddEmployee +
-                ' >>> ' +
+              'call api - panel/addemployee : status = ' +
                 response.data.status +
-                ', ' +
+                ', message = ' +
                 response.data.message,
             )
           }
         })
         .catch((error) => {
-          console.log(
-            'callAPI - ' +
-              apiUrl.setting.employee.AddEmployee +
-              ' >>> ' +
-              error,
-          )
+          console.log('call api - panel/addemployee : error' + error)
         })
     },
-
     getAvatar(role) {
       let randomNo = 0
       if (role === 'admin') {
@@ -903,7 +867,6 @@ export default {
       }
       return this.leftPad(randomNo, 2) + '.png'
     },
-
     showPwd() {
       if (this.addEmp.pwdType == 'password') {
         this.addEmp.pwdType = 'text'
@@ -911,12 +874,10 @@ export default {
         this.addEmp.pwdType = 'password'
       }
     },
-
     getRandomArbitrary(min, max) {
       // return Math.random() * (max - min) + min
       return Math.floor(Math.random() * (max - min + 1)) + min
     },
-
     leftPad(number, targetLength) {
       var output = number + ''
       while (output.length < targetLength) {
@@ -924,7 +885,6 @@ export default {
       }
       return output
     },
-
     convertStatus(status) {
       const _status = status.toString().toLowerCase()
       if (_status == 'active') {
@@ -935,7 +895,6 @@ export default {
         return 'ไม่ระบุ'
       }
     },
-
     convertStatusColor(status) {
       const _status = status.toString().toLowerCase()
       if (_status == 'active') {
@@ -946,7 +905,6 @@ export default {
         return 'dark'
       }
     },
-
     compareRole(myself, emp) {
       const _myself = myself.toString().toLowerCase()
       const _emp = emp.toString().toLowerCase()
@@ -991,11 +949,9 @@ export default {
         return false
       }
     },
-
     getImgAvatar(role, img) {
       return require('../../../assets/images/avatars/' + role + '/' + img)
     },
-
     editEmpShown(empID) {
       this.mdEdit = !this.mdEdit
       this.employees.listOfEmp.forEach((value) => {

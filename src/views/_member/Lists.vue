@@ -613,10 +613,6 @@
 <script>
 import { imgBankSmoothSet as imgBank } from '@/assets/images/banking/th/smooth-corner'
 import { iconsSet as ic } from '@/assets/icons'
-const apiUrl = require('./../../constants/api-url-list')
-const headers = {
-  Authorization: 'Bearer ' + apiUrl.token,
-}
 
 export default {
   name: 'Lists',
@@ -643,14 +639,10 @@ export default {
     },
     async getMemberList() {
       await this.$http
-        .post(
-          apiUrl.member.GetAllmember,
-          {
-            agent_id: '629e381cb4839cabb5622da1',
-            domain_name: 'https://www.banpong888.com',
-          },
-          { headers },
-        )
+        .post('member/getallmember', {
+          agent_id: '629e381cb4839cabb5622da1',
+          domain_name: 'https://www.banpong888.com',
+        })
         .then((response) => {
           if (response.data.status == 200) {
             this.listOfMember = response.data.result.Member
@@ -659,19 +651,15 @@ export default {
             console.log(this.listOfMember)
           } else {
             console.log(
-              'callAPI - ' +
-                apiUrl.member.GetAllmember +
-                ' >>> ' +
+              'call api - member/getallmember : status = ' +
                 response.data.status +
-                ', ' +
+                ', message = ' +
                 response.data.message,
             )
           }
         })
         .catch((error) => {
-          console.log(
-            'callAPI - ' + apiUrl.member.GetAllmember + ' >>> ' + error,
-          )
+          console.log('call api - member/getallmember : error' + error)
         })
     },
     convertStatus(status) {
