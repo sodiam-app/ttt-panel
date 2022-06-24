@@ -1,4 +1,5 @@
-import axios from 'axios'
+// import axios from 'axios'
+import { authAxios, mainAxios } from '@/_conf'
 
 export default {
   namespaced: true,
@@ -39,7 +40,7 @@ export default {
   actions: {
     async signIn({ dispatch }, credentials) {
       return new Promise((resolve, reject) => {
-        axios.post('http://192.168.1.44:21001/login', credentials).then(
+        authAxios.post('login', credentials).then(
           (response) => {
             if (response.data.status == 200) {
               dispatch('atttoken', response.data.result.token)
@@ -71,7 +72,7 @@ export default {
       })
     },
     signOut({ commit }) {
-      return axios.post('panel/logoff', {}).then(() => {
+      return mainAxios.post('panel/logoff', {}).then(() => {
         commit('SET_TOKEN', null)
         commit('SET_USER', null)
         commit('SET_ROLE', null)
@@ -90,6 +91,15 @@ export default {
       commit('SET_USER', payload.user)
       commit('SET_ROLE', payload.role)
       commit('SET_STATUS', payload.status)
+      // if (payload.uer) {
+      //   commit('SET_USER', payload.user)
+      // }
+      // if (payload.role) {
+      //   commit('SET_ROLE', payload.role)
+      // }
+      // if (payload.state) {
+      //   commit('SET_STATUS', payload.status)
+      // }
     },
   },
 }

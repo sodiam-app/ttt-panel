@@ -8,7 +8,7 @@
               <CCardBody>
                 <CForm @submit.prevent="submit">
                   <h1>Login</h1>
-                  <p class="text-medium-emphasis">ระบบ ฝากถอน ttt-API</p>
+                  <p class="text-medium-emphasis">ระบบฝากถอนอัตโนมัติ</p>
                   <CInputGroup class="mb-3">
                     <CInputGroupText>
                       <CIcon icon="cil-user" />
@@ -24,44 +24,61 @@
                       <CIcon icon="cil-lock-locked" />
                     </CInputGroupText>
                     <CFormInput
-                      type="password"
+                      :type="pwdType"
                       placeholder="Password"
                       autocomplete="current-password"
                       v-model="form.password"
                     />
+                    <CButton
+                      type="button"
+                      color="secondary"
+                      variant="outline"
+                      @mousedown="showPwd"
+                      @mouseup="showPwd"
+                    >
+                      <CIcon :icon="cilLowVision" />
+                    </CButton>
                   </CInputGroup>
                   <CRow>
                     <CCol :xs="6">
-                      <CButton
+                      <CLoadingButton
+                        innerType="grow"
                         type="submit"
                         color="primary"
                         class="px-4 rounded-pill"
+                        :loading="loadingLoginBtn"
                       >
-                        <CIcon :icon="cilRoom" class="me-2" />
+                        <CIcon
+                          v-if="!loadingLoginBtn"
+                          :icon="cilRoom"
+                          class="me-2"
+                        />
                         Login
-                      </CButton>
+                      </CLoadingButton>
                     </CCol>
-                    <CCol :xs="6" class="text-right">
+                    <!-- <CCol :xs="6" class="text-right">
                       <CButton color="link" class="px-0">
                         Forgot password?
                       </CButton>
-                    </CCol>
+                    </CCol> -->
                   </CRow>
                 </CForm>
               </CCardBody>
             </CCard>
-            <CCard class="text-white bg-primary py-5" style="width: 44%">
+            <CCard class="text-white bg-secondary py-5" style="width: 44%">
               <CCardBody class="text-center">
                 <div>
-                  <h2>เข้าสู่ระบบด้วย QR-Code</h2>
-                  <hr />
-                  <img
-                    src="../../assets/images/qr-demo-001.png"
-                    class="img-fluid"
-                    alt=""
-                  />
+                  <!-- <h2>เข้าสู่ระบบด้วย QR-Code</h2> -->
+                  <!-- <hr /> -->
+                  <CImage rounded :src="imgLogin" class="img-fluid" alt="" />
                 </div>
-                <span>ttt-API System</span>
+                <hr />
+                <h4>
+                  <CBadge color="dark" shape="rounded-pill">
+                    <CIcon :icon="cilSmile" />
+                    บริการด้วยใจ ห่วงใยทุกคน
+                  </CBadge>
+                </h4>
               </CCardBody>
             </CCard>
           </CCardGroup>
@@ -73,7 +90,8 @@
 
 <script>
 import { CIcon } from '@coreui/icons-vue'
-import { cilRoom } from '@coreui/icons'
+import { cilRoom, cilSmile, cilLowVision } from '@coreui/icons'
+import imgLogin from '@/assets/images/login-logo.jpg'
 
 import { mapActions } from 'vuex'
 
@@ -84,10 +102,13 @@ export default {
   },
   data() {
     return {
+      imgLogin: imgLogin,
       form: {
         username: '',
         password: '',
       },
+      pwdType: 'password',
+      loadingLoginBtn: false,
     }
   },
   methods: {
@@ -95,6 +116,7 @@ export default {
       singIn: 'auth/signIn',
     }),
     submit() {
+      this.loadingLoginBtn = true
       this.singIn(this.form).then(
         (response) => {
           if (response.data.status == 200) {
@@ -103,18 +125,29 @@ export default {
             })
           } else {
             console.log(response)
+            this.loadingLoginBtn = false
           }
         },
         (error) => {
           console.error(error)
+          this.loadingLoginBtn = false
         },
       )
+    },
+    showPwd() {
+      if (this.pwdType == 'password') {
+        this.pwdType = 'text'
+      } else {
+        this.pwdType = 'password'
+      }
     },
   },
   setup() {
     return {
       // icon
       cilRoom,
+      cilSmile,
+      cilLowVision,
     }
   },
 }

@@ -1,16 +1,17 @@
 import store from '@/store'
-import axios from 'axios'
+// import axios from 'axios'
+import { mainAxios } from '@/_conf'
 
 store.subscribe((mutations) => {
   switch (mutations.type) {
     case 'auth/SET_TOKEN':
       if (mutations.payload) {
-        axios.defaults.headers.common[
+        mainAxios.defaults.headers.common[
           'Authorization'
         ] = `Bearer ${mutations.payload}`
         localStorage.setItem('token', mutations.payload)
       } else {
-        axios.defaults.headers.common['Authorization'] = null
+        mainAxios.defaults.headers.common['Authorization'] = null
         localStorage.removeItem('token')
       }
       break

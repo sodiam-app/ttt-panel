@@ -1,14 +1,15 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from './router'
+import router from './router/index.js'
 import store from './store'
 
 require('@/store/subscriber')
 
-import axios from 'axios'
+// import axios from 'axios'
 import VueAxios from 'vue-axios'
-axios.defaults.baseURL = 'http://192.168.1.44:10000'
-//createApp.prototype.$axios = axios
+import { mainAxios } from '@/_conf'
+
+// axios.defaults.baseURL = 'http://192.168.1.131:10000'
 
 //import CoreuiVue from '@coreui/vue'
 import CoreuiVuePro from '@coreui/vue-pro'
@@ -27,7 +28,7 @@ store.dispatch('auth/atttoken', localStorage.getItem('token')).then(() => {
   app.use(store)
   app.use(router)
   app.use(CoreuiVuePro)
-  app.use(VueAxios, axios)
+  app.use(VueAxios, mainAxios)
   app.provide('icons', icons)
   app.component('CIcon', CIcon)
   app.component('DocsCallout', DocsCallout)

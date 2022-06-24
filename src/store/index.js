@@ -3,7 +3,7 @@ import auth from './auth'
 
 export default createStore({
   state: {
-    sidebarVisible: false,
+    sidebarVisible: true,
     sidebarUnfoldable: false,
   },
   mutations: {

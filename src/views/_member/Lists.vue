@@ -88,10 +88,13 @@
                 <CTableDataCell>{{ member.prefix }}</CTableDataCell>
                 <CTableDataCell>
                   <CRow>
-                    <p class="m-0">{{ member.create_date }}</p>
+                    <!-- <p class="m-0">{{ member.create_date }}</p> -->
+                    <p class="m-0">{{ convertDate(member.create_date) }}</p>
                   </CRow>
                   <CRow>
-                    <small class="fw-lighter m-0">--:--</small>
+                    <small class="fw-lighter m-0">
+                      {{ convertTime(member.create_date) }}
+                    </small>
                   </CRow>
                 </CTableDataCell>
                 <CTableDataCell class="text-end">
@@ -613,6 +616,7 @@
 <script>
 import { imgBankSmoothSet as imgBank } from '@/assets/images/banking/th/smooth-corner'
 import { iconsSet as ic } from '@/assets/icons'
+import moment from 'moment'
 
 export default {
   name: 'Lists',
@@ -661,6 +665,14 @@ export default {
         .catch((error) => {
           console.log('call api - member/getallmember : error' + error)
         })
+    },
+    convertDate(value) {
+      var myDate = new Date(value)
+      return moment(myDate).format('DD/MM/YYYY')
+    },
+    convertTime(value) {
+      var myDate = new Date(value)
+      return moment(myDate).format('HH:mm')
     },
     convertStatus(status) {
       const _val = status.toString().toLowerCase()
