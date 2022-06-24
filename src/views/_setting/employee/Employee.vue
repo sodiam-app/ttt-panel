@@ -700,6 +700,7 @@ import {
   cilMagnifyingGlass,
   cilWarning,
 } from '@coreui/icons'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'SettingEmployee',
@@ -774,12 +775,26 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      tokenExpired: 'auth/tokenExpired',
+    }),
+    navigateTo(route) {
+      this.$router.push(route)
+    },
+    // api
     async getRoleStaff() {
       await this.$http
         .post('panel/getrole', {})
         .then((response) => {
           if (response.data.status == 200) {
             this.optRole = response.data.result
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
           } else {
             console.log(
               'call api - panel/getrole : status = ' +
@@ -804,6 +819,13 @@ export default {
             )
             console.log(this.employees.totalPage)
             console.log(this.employees.listOfEmp)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
           } else {
             console.log(
               'call api - panel/getallemployee : status = ' +
@@ -839,6 +861,13 @@ export default {
         .then((response) => {
           if (response.data.status == 200) {
             console.log(response)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
           } else {
             console.log(
               'call api - panel/addemployee : status = ' +
@@ -852,6 +881,7 @@ export default {
           console.log('call api - panel/addemployee : error' + error)
         })
     },
+    // functions
     getAvatar(role) {
       let randomNo = 0
       if (role === 'admin') {

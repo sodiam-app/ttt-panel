@@ -9,6 +9,10 @@
                 <CForm @submit.prevent="submit">
                   <h1>Login</h1>
                   <p class="text-medium-emphasis">ระบบฝากถอนอัตโนมัติ</p>
+                  <CAlert color="danger" class="py-1" :visible="isErrorVisible">
+                    <CIcon :icon="cilWarning" />
+                    {{ isErrorMessages }}
+                  </CAlert>
                   <CInputGroup class="mb-3">
                     <CInputGroupText>
                       <CIcon icon="cil-user" />
@@ -90,7 +94,7 @@
 
 <script>
 import { CIcon } from '@coreui/icons-vue'
-import { cilRoom, cilSmile, cilLowVision } from '@coreui/icons'
+import { cilRoom, cilSmile, cilLowVision, cilWarning } from '@coreui/icons'
 import imgLogin from '@/assets/images/login-logo.jpg'
 
 import { mapActions } from 'vuex'
@@ -109,6 +113,8 @@ export default {
       },
       pwdType: 'password',
       loadingLoginBtn: false,
+      isErrorVisible: false,
+      isErrorMessages: '',
     }
   },
   methods: {
@@ -124,12 +130,15 @@ export default {
               name: 'Dashboard',
             })
           } else {
-            console.log(response)
+            this.isErrorVisible = true
+            this.isErrorMessages = response.data.message
             this.loadingLoginBtn = false
           }
         },
         (error) => {
           console.error(error)
+          this.isErrorVisible = true
+          this.isErrorMessages = error
           this.loadingLoginBtn = false
         },
       )
@@ -148,7 +157,11 @@ export default {
       cilRoom,
       cilSmile,
       cilLowVision,
+      cilWarning,
     }
+  },
+  created() {
+    localStorage.clear()
   },
 }
 </script>

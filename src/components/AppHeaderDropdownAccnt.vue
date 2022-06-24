@@ -71,15 +71,20 @@ export default {
       signOutAction: 'auth/signOut',
     }),
     singOut() {
-      this.signOutAction().then(() => {
-        this.navigateTo('/pages/login')
-      })
+      this.signOutAction()
+        .then(() => {
+          this.navigateTo('/pages/login')
+        })
+        .catch((error) => {
+          console.log('call api - auth/signOut : error' + error)
+        })
     },
     navigateTo(route) {
       this.$router.push(route)
     },
     getImgAvatar(role, img) {
-      return require('../assets/images/avatars/' + role + '/' + img)
+      if (role && img)
+        return require('../assets/images/avatars/' + role + '/' + img)
     },
   },
   computed: {

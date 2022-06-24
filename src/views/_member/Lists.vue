@@ -137,466 +137,14 @@
                     color="primary"
                     variant="ghost"
                     size="sm"
-                    @click="navigateTo('/member/list/99dev/' + member._id)"
+                    @click="
+                      navigateToNewTab('/member/list/99dev/' + member._id)
+                    "
                   >
                     <CIcon :icon="ic.cilExternalLink" class="small" />
                   </CButton>
                 </CTableDataCell>
               </CTableRow>
-              <!-- <CTableRow color="success">
-                <CTableDataCell scope="row" class="text-center">
-                  <CRow>
-                    <p class="m-0">1.</p>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0"><small>273781</small></small>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <CBadge color="success" shape="rounded-pill"> ปกติ </CBadge>
-                </CTableDataCell>
-                <CTableDataCell>99dev100001</CTableDataCell>
-                <CTableDataCell>นายสมชาย หลายใจ</CTableDataCell>
-                <CTableDataCell>0614496192</CTableDataCell>
-                <CTableDataCell>banpong888</CTableDataCell>
-                <CTableDataCell>
-                  <CRow>
-                    <p class="m-0">02/05/2022</p>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0">20:49:11</small>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-end">
-                  <strong class="fst-italic">100.00</strong>
-                </CTableDataCell>
-                <CTableDataCell class="text-end">
-                  <CRow>
-                    <small class="fw-lighter m-0">ฝาก: 0.00</small>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0">ถอน: 0.00</small>
-                  </CRow>
-                  <hr class="m-0" />
-                  <CRow>
-                    <p class="m-0">ดุล: 0.00</p>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-end">
-                  lind.demo.xxx
-                </CTableDataCell>
-                <CTableDataCell class="text-end pe-2">
-                  <CButton color="success" variant="ghost" size="sm">
-                    <CIcon :icon="ic.cibLine" class="small" />
-                  </CButton>
-                  <CButton
-                    color="primary"
-                    variant="ghost"
-                    size="sm"
-                    @click="navigateTo('/member/list/99dev/100001')"
-                  >
-                    <CIcon :icon="ic.cilExternalLink" class="small" />
-                  </CButton>
-                </CTableDataCell>
-              </CTableRow> -->
-              <!-- <CTableRow color="success">
-                <CTableDataCell scope="row" class="text-center">
-                  <CRow>
-                    <p class="m-0">2.</p>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0"><small>883711</small></small>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <CBadge color="success" shape="rounded-pill"> ปกติ </CBadge>
-                </CTableDataCell>
-                <CTableDataCell>99dev100002</CTableDataCell>
-                <CTableDataCell>นางสมปอง ลองใจ</CTableDataCell>
-                <CTableDataCell>0823345829</CTableDataCell>
-                <CTableDataCell>banpong888</CTableDataCell>
-                <CTableDataCell>
-                  <CRow>
-                    <p class="m-0">02/05/2022</p>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0">11:00:30</small>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-end">
-                  <strong class="fst-italic">1.00</strong>
-                </CTableDataCell>
-                <CTableDataCell class="text-end">
-                  <CRow>
-                    <small class="fw-lighter m-0">ฝาก: 1.00</small>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0">ถอน: 0.00</small>
-                  </CRow>
-                  <hr class="m-0" />
-                  <CRow>
-                    <p class="m-0">ดุล: 0.00</p>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-end">
-                  passdjs.licck
-                </CTableDataCell>
-                <CTableDataCell class="text-end pe-2">
-                  <CButton color="success" variant="ghost" size="sm">
-                    <CIcon :icon="ic.cibLine" class="small" />
-                  </CButton>
-                  <CButton
-                    color="primary"
-                    variant="ghost"
-                    size="sm"
-                    @click="navigateTo('/member/list/99dev/100002')"
-                  >
-                    <CIcon :icon="ic.cilExternalLink" class="small" />
-                  </CButton>
-                </CTableDataCell>
-              </CTableRow>
-              <CTableRow color="danger">
-                <CTableDataCell scope="row" class="text-center">
-                  <CRow>
-                    <p class="m-0">3.</p>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0"><small>9928377</small></small>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <CBadge color="danger" shape="rounded-pill">
-                    โดนระงับ
-                  </CBadge>
-                </CTableDataCell>
-                <CTableDataCell>99dev100009</CTableDataCell>
-                <CTableDataCell>นางสาวสมหญิง จริงใจ</CTableDataCell>
-                <CTableDataCell>0983888231</CTableDataCell>
-                <CTableDataCell>banpong888</CTableDataCell>
-                <CTableDataCell>
-                  <CRow>
-                    <p class="m-0">19/04/2022</p>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0">05:11:40</small>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-end">
-                  <strong class="fst-italic">0.00</strong>
-                </CTableDataCell>
-                <CTableDataCell class="text-end">
-                  <CRow>
-                    <small class="fw-lighter m-0">ฝาก: 0.00</small>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0">ถอน: 0.00</small>
-                  </CRow>
-                  <hr class="m-0" />
-                  <CRow>
-                    <p class="m-0">ดุล: 0.00</p>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-end"> </CTableDataCell>
-                <CTableDataCell class="text-end pe-2">
-                  <CButton
-                    color="primary"
-                    variant="ghost"
-                    size="sm"
-                    @click="navigateTo('/member/list/99dev/100009')"
-                  >
-                    <CIcon :icon="ic.cilExternalLink" class="small" />
-                  </CButton>
-                </CTableDataCell>
-              </CTableRow>
-              <CTableRow color="success">
-                <CTableDataCell scope="row" class="text-center">
-                  <CRow>
-                    <p class="m-0">4.</p>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0"><small>1192873</small></small>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <CBadge color="success" shape="rounded-pill"> ปกติ </CBadge>
-                </CTableDataCell>
-                <CTableDataCell>99dev100004</CTableDataCell>
-                <CTableDataCell>นายสมหมาย หมายใจ</CTableDataCell>
-                <CTableDataCell>0567789832</CTableDataCell>
-                <CTableDataCell>banpong888</CTableDataCell>
-                <CTableDataCell>
-                  <CRow>
-                    <p class="m-0">30/01/2022</p>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0">01:06:59</small>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-end">
-                  <strong class="fst-italic">50.00</strong>
-                </CTableDataCell>
-                <CTableDataCell class="text-end">
-                  <CRow>
-                    <small class="fw-lighter m-0">ฝาก: 0.00</small>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0">ถอน: 0.00</small>
-                  </CRow>
-                  <hr class="m-0" />
-                  <CRow>
-                    <p class="m-0">ดุล: 0.00</p>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-end"> ddllk1231</CTableDataCell>
-                <CTableDataCell class="text-end pe-2">
-                  <CButton color="success" variant="ghost" size="sm">
-                    <CIcon :icon="ic.cibLine" class="small" />
-                  </CButton>
-                  <CButton
-                    color="primary"
-                    variant="ghost"
-                    size="sm"
-                    @click="navigateTo('/member/list/99dev/100004')"
-                  >
-                    <CIcon :icon="ic.cilExternalLink" class="small" />
-                  </CButton>
-                </CTableDataCell>
-              </CTableRow>
-              <CTableRow color="warning">
-                <CTableDataCell scope="row" class="text-center">
-                  <CRow>
-                    <p class="m-0">5.</p>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0"><small>2299921</small></small>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <CBadge color="warning" shape="rounded-pill">
-                    เฝ้าระวัง
-                  </CBadge>
-                </CTableDataCell>
-                <CTableDataCell>99dev100068</CTableDataCell>
-                <CTableDataCell>นายตรอมใจ ใหทองคำ</CTableDataCell>
-                <CTableDataCell>0778873881</CTableDataCell>
-                <CTableDataCell>banpong888</CTableDataCell>
-                <CTableDataCell>
-                  <CRow>
-                    <p class="m-0">01/01/2022</p>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0">00:01:44</small>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-end">
-                  <strong class="fst-italic">5.00</strong>
-                </CTableDataCell>
-                <CTableDataCell class="text-end">
-                  <CRow>
-                    <small class="fw-lighter m-0">ฝาก: 5.00</small>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0">ถอน: 900.00</small>
-                  </CRow>
-                  <hr class="m-0" />
-                  <CRow>
-                    <p class="m-0">ดุล: -33.00</p>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-end"> hacker99x</CTableDataCell>
-                <CTableDataCell class="text-end pe-2">
-                  <CButton color="success" variant="ghost" size="sm">
-                    <CIcon :icon="ic.cibLine" class="small" />
-                  </CButton>
-                  <CButton
-                    color="primary"
-                    variant="ghost"
-                    size="sm"
-                    @click="navigateTo('/member/list/99dev/100068')"
-                  >
-                    <CIcon :icon="ic.cilExternalLink" class="small" />
-                  </CButton>
-                </CTableDataCell>
-              </CTableRow>
-              <CTableRow color="dark">
-                <CTableDataCell scope="row" class="text-center text-danger">
-                  <CRow>
-                    <p class="m-0">6.</p>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0"><small>777728</small></small>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <CRow>
-                    <CCol>
-                      <CBadge color="dark" shape="rounded-pill">
-                        แบลคลิส
-                      </CBadge>
-                    </CCol>
-                  </CRow>
-                  <CRow>
-                    <CCol>
-                      <CBadge color="danger" shape="rounded-pill">
-                        โดนระงับ
-                      </CBadge>
-                    </CCol>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-danger">99dev109928</CTableDataCell>
-                <CTableDataCell class="text-danger">
-                  นายงงใจ บรรลัยมาก
-                </CTableDataCell>
-                <CTableDataCell class="text-danger">099883991</CTableDataCell>
-                <CTableDataCell class="text-danger">banpong888</CTableDataCell>
-                <CTableDataCell class="text-danger">
-                  <CRow>
-                    <p class="m-0">29/12/2022</p>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0">09:00:29</small>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-end text-danger">
-                  <strong class="fst-italic">210.00</strong>
-                </CTableDataCell>
-                <CTableDataCell class="text-end text-danger">
-                  <CRow>
-                    <small class="fw-lighter m-0">ฝาก: 999.00</small>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0">ถอน: 1000000.00</small>
-                  </CRow>
-                  <hr class="m-0" />
-                  <CRow>
-                    <p class="m-0">ดุล: 1000.00</p>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-end text-danger">
-                  xxxkksj
-                </CTableDataCell>
-                <CTableDataCell class="text-end pe-2">
-                  <CButton color="success" variant="ghost" size="sm">
-                    <CIcon :icon="ic.cibLine" class="small" />
-                  </CButton>
-                  <CButton
-                    color="primary"
-                    variant="ghost"
-                    size="sm"
-                    @click="navigateTo('/member/list/99dev/109928')"
-                  >
-                    <CIcon :icon="ic.cilExternalLink" class="small" />
-                  </CButton>
-                </CTableDataCell>
-              </CTableRow>
-              <CTableRow color="success">
-                <CTableDataCell scope="row" class="text-center">
-                  <CRow>
-                    <p class="m-0">7.</p>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0"><small>9983998</small></small>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <CBadge color="success" shape="rounded-pill"> ปกติ </CBadge>
-                </CTableDataCell>
-                <CTableDataCell>99dev100106</CTableDataCell>
-                <CTableDataCell>นางสายไหม ขยันหรอ</CTableDataCell>
-                <CTableDataCell>0987789876</CTableDataCell>
-                <CTableDataCell>banpong888</CTableDataCell>
-                <CTableDataCell>
-                  <CRow>
-                    <p class="m-0">09/10/2022</p>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0">19:57:12</small>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-end">
-                  <strong class="fst-italic">450.00</strong>
-                </CTableDataCell>
-                <CTableDataCell class="text-end">
-                  <CRow>
-                    <small class="fw-lighter m-0">ฝาก: 450.00</small>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0">ถอน: 0.00</small>
-                  </CRow>
-                  <hr class="m-0" />
-                  <CRow>
-                    <p class="m-0">ดุล: 0.00</p>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-end"> iddemo551 </CTableDataCell>
-                <CTableDataCell class="text-end pe-2">
-                  <CButton color="success" variant="ghost" size="sm">
-                    <CIcon :icon="ic.cibLine" class="small" />
-                  </CButton>
-                  <CButton
-                    color="primary"
-                    variant="ghost"
-                    size="sm"
-                    @click="navigateTo('/member/list/99dev/100106')"
-                  >
-                    <CIcon :icon="ic.cilExternalLink" class="small" />
-                  </CButton>
-                </CTableDataCell>
-              </CTableRow>
-              <CTableRow color="success">
-                <CTableDataCell scope="row" class="text-center">
-                  <CRow>
-                    <p class="m-0">8.</p>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0"><small>663521</small></small>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <CBadge color="success" shape="rounded-pill"> ปกติ </CBadge>
-                </CTableDataCell>
-                <CTableDataCell>99dev100099</CTableDataCell>
-                <CTableDataCell>นายชาติชาย สมใจอยาก</CTableDataCell>
-                <CTableDataCell>0624423981</CTableDataCell>
-                <CTableDataCell>banpong888</CTableDataCell>
-                <CTableDataCell>
-                  <CRow>
-                    <p class="m-0">01/05/2022</p>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0">21:09:33</small>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-end">
-                  <strong class="fst-italic">9.00</strong>
-                </CTableDataCell>
-                <CTableDataCell class="text-end">
-                  <CRow>
-                    <small class="fw-lighter m-0">ฝาก: 0.00</small>
-                  </CRow>
-                  <CRow>
-                    <small class="fw-lighter m-0">ถอน: 0.00</small>
-                  </CRow>
-                  <hr class="m-0" />
-                  <CRow>
-                    <p class="m-0">ดุล: 0.00</p>
-                  </CRow>
-                </CTableDataCell>
-                <CTableDataCell class="text-end"> sskkjd12s </CTableDataCell>
-                <CTableDataCell class="text-end pe-2">
-                  <CButton color="success" variant="ghost" size="sm">
-                    <CIcon :icon="ic.cibLine" class="small" />
-                  </CButton>
-                  <CButton
-                    color="primary"
-                    variant="ghost"
-                    size="sm"
-                    @click="navigateTo('/member/list/99dev/100099')"
-                  >
-                    <CIcon :icon="ic.cilExternalLink" class="small" />
-                  </CButton>
-                </CTableDataCell>
-              </CTableRow> -->
             </CTableBody>
           </CTable>
         </div>
@@ -617,6 +165,7 @@
 import { imgBankSmoothSet as imgBank } from '@/assets/images/banking/th/smooth-corner'
 import { iconsSet as ic } from '@/assets/icons'
 import moment from 'moment'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'Lists',
@@ -636,11 +185,18 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      tokenExpired: 'auth/tokenExpired',
+    }),
     navigateTo(route) {
+      this.$router.push(route)
+    },
+    navigateToNewTab(route) {
       // this.$router.push(route)
       let _route = this.$router.resolve({ path: route })
       window.open(_route.href)
     },
+    // api
     async getMemberList() {
       await this.$http
         .post('member/getallmember', {
@@ -653,6 +209,13 @@ export default {
             this.totalPage = Math.ceil(response.data.result.total / 10)
             console.log(this.totalPage)
             console.log(this.listOfMember)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
           } else {
             console.log(
               'call api - member/getallmember : status = ' +
@@ -666,6 +229,7 @@ export default {
           console.log('call api - member/getallmember : error' + error)
         })
     },
+    // functions
     convertDate(value) {
       var myDate = new Date(value)
       return moment(myDate).format('DD/MM/YYYY')

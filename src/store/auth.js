@@ -72,12 +72,23 @@ export default {
       })
     },
     signOut({ commit }) {
-      return mainAxios.post('panel/logoff', {}).then(() => {
-        commit('SET_TOKEN', null)
-        commit('SET_USER', null)
-        commit('SET_ROLE', null)
-        commit('SET_STATUS', null)
-      })
+      return mainAxios
+        .post('panel/logoff', {})
+        .then(() => {
+          commit('SET_TOKEN', null)
+          // commit('SET_USER', null)
+          // commit('SET_ROLE', null)
+          // commit('SET_STATUS', null)
+        })
+        .catch((error) => {
+          console.log('call api - panel/logoff : error' + error)
+        })
+    },
+    tokenExpired({ commit }) {
+      commit('SET_TOKEN', null)
+      // commit('SET_USER', null)
+      // commit('SET_ROLE', null)
+      // commit('SET_STATUS', null)
     },
     async atttoken({ commit, state }, token) {
       if (token) {

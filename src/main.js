@@ -23,6 +23,7 @@ store.dispatch('auth/attempt', {
   role: localStorage.getItem('role'),
   status: localStorage.getItem('status'),
 })
+
 store.dispatch('auth/atttoken', localStorage.getItem('token')).then(() => {
   const app = createApp(App)
   app.use(store)

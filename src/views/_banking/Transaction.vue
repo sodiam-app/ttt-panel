@@ -333,8 +333,12 @@
                     <CTableHeaderCell scope="col">จำนวนเงิน</CTableHeaderCell>
                     <CTableHeaderCell scope="col">เวลา</CTableHeaderCell>
                     <CTableHeaderCell scope="col">web</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">ตรวจสอบ</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">จัดการ</CTableHeaderCell>
+                    <CTableHeaderCell scope="col" class="text-center">
+                      ตรวจสอบ
+                    </CTableHeaderCell>
+                    <CTableHeaderCell scope="col" class="text-center">
+                      จัดการ
+                    </CTableHeaderCell>
                     <CTableHeaderCell scope="col">
                       ยูสเซอร์ลูกค้า
                     </CTableHeaderCell>
@@ -384,7 +388,7 @@
                       </CRow>
                     </CTableDataCell>
                     <CTableDataCell>{{ history.web_aka }}</CTableDataCell>
-                    <CTableDataCell>
+                    <CTableDataCell class="text-center">
                       <CButton
                         v-if="!history.Checked"
                         color="warning"
@@ -392,14 +396,18 @@
                         size="sm"
                         shape="rounded-pill"
                         @click.prevent="
-                          submitTransactionStatus(history._id, 'check')
+                          submitTransactionStatus(
+                            history._id,
+                            'check',
+                            history.type,
+                          )
                         "
                       >
                         <CIcon :icon="ic.cilCircle" size="sm" />
                         <br />
                         <small>เช็ค</small>
                       </CButton>
-                      <div v-else class="d-inline-flex align-items-center">
+                      <div v-else class="align-items-center">
                         <CAvatar
                           :src="
                             getImgAvatar(
@@ -409,6 +417,7 @@
                           "
                           size="sm"
                           status="success"
+                          class="mb-1"
                         />
                         <!-- <span class="ms-1"> -->
                         <CBadge color="dark" shape="rounded-pill">
@@ -423,7 +432,11 @@
                           color="success"
                           variant="outline"
                           @click.prevent="
-                            submitTransactionStatus(history._id, 'approve')
+                            submitTransactionStatus(
+                              history._id,
+                              'approve',
+                              history.type,
+                            )
                           "
                         >
                           <CIcon :icon="ic.cilCheckAlt" size="sm" />
@@ -434,7 +447,11 @@
                           color="danger"
                           variant="outline"
                           @click.prevent="
-                            submitTransactionStatus(history._id, 'cancel')
+                            submitTransactionStatus(
+                              history._id,
+                              'cancel',
+                              history.type,
+                            )
                           "
                         >
                           <CIcon :icon="ic.cilX" size="sm" />
@@ -445,10 +462,13 @@
                     </CTableDataCell>
                     <CTableDataCell>
                       <CButton
+                        size="sm"
                         color="link"
                         class="p-0"
                         @click="
-                          navigateTo('/member/list/99dev/' + history.memb_id)
+                          navigateToNewTap(
+                            '/member/list/99dev/' + history.memb_id,
+                          )
                         "
                         >{{ history.memb_username }}
                       </CButton>
@@ -465,8 +485,8 @@
                         <CCol lg="2" class="p-0 m-0">
                           <CImage
                             fluid
-                            :src="imgBank.kbank"
-                            width="20"
+                            :src="getBankIMG(history.memb_banking_code)"
+                            width="25"
                             class="ms-1 me-1"
                           />
                         </CCol>
@@ -485,8 +505,8 @@
                         <CCol lg="2" class="p-0 m-0">
                           <CImage
                             fluid
-                            :src="imgBank.ttb"
-                            width="20"
+                            :src="getBankIMG(history.web_account_code)"
+                            width="25"
                             class="ms-1 me-1"
                           />
                         </CCol>
@@ -505,7 +525,9 @@
                         {{ convertHistoryStatus(history.status) }}
                       </CBadge>
                     </CTableDataCell>
-                    <CTableDataCell>-----</CTableDataCell>
+                    <CTableDataCell>
+                      {{ history.description }}
+                    </CTableDataCell>
                   </CTableRow>
                   <!-- <CTableRow color="success">
                     <CTableHeaderCell scope="row">1.</CTableHeaderCell>
@@ -1150,6 +1172,7 @@ import { CDatePicker } from '@coreui/vue-pro'
 import moment from 'moment'
 
 import avatar from '@/assets/images/avatars/owner/02.png'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'Transection',
@@ -1226,7 +1249,146 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      tokenExpired: 'auth/tokenExpired',
+    }),
+    // api
+    async getMemberList() {
+      await this.$http
+        .post('member/getallmember', {
+          agent_id: this.dataDeposit.web_agent_id,
+          domain_name: this.dataDeposit.domain_name,
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.optMemberList = response.data.result.Member
+            console.log(this.optMemberList)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - member/getallmember : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('call api - member/getallmember : error' + error)
+        })
+    },
+    async submitDeposit() {
+      await this.$http
+        .post('panel/deposit', {
+          account_deposit: this.dataDeposit.account_deposit,
+          memb_id: this.dataDeposit.memb_id,
+          transaction_date: moment().format(),
+          amount: this.dataDeposit.amount,
+          description: this.dataDeposit.description,
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            console.log(response.data.message + ' : ' + response.data.result)
+            this.mdDeposit = false
+            // clear data
+            this.dataDeposit.amount = '0'
+            this.dataDeposit.description = ''
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - panel/deposit : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('call api - panel/deposit : error' + error)
+        })
+    },
+    async getHistory() {
+      await this.$http
+        .post('panel/history', {})
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.dataHistory = response.data.result
+            this.totalPage1 = Math.ceil(this.dataHistory.length / 10)
+            console.log(this.dataHistory)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - panel/history : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('call api - panel/history : error' + error)
+        })
+    },
+    async submitTransactionStatus(_id, _status, _type) {
+      await this.$http
+        .post('panel/updatetransaction', {
+          doc_id: _id,
+          status: _status,
+          type: _type,
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.providerCredit = response.data.credit_web
+            console.log(
+              'call api - panel/updatetransaction : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - panel/updatetransaction : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('call api - panel/updatetransaction : error' + error)
+        }),
+        this.getHistory()
+    },
+    // functions
     navigateTo(route) {
+      this.$router.push(route)
+    },
+    navigateToNewTap(route) {
       // this.$router.push(route)
       let _route = this.$router.resolve({ path: route })
       window.open(_route.href)
@@ -1268,113 +1430,16 @@ export default {
     onChangePage(pageOfItems) {
       this.pageOfItemsHistory = pageOfItems
     },
-    async getMemberList() {
-      await this.$http
-        .post('member/getallmember', {
-          agent_id: this.dataDeposit.web_agent_id,
-          domain_name: this.dataDeposit.domain_name,
-        })
-        .then((response) => {
-          if (response.data.status == 200) {
-            this.optMemberList = response.data.result.Member
-            console.log(this.optMemberList)
-          } else {
-            console.log(
-              'call api - member/getallmember : status = ' +
-                response.data.status +
-                ', message = ' +
-                response.data.message,
-            )
-          }
-        })
-        .catch((error) => {
-          console.log('call api - member/getallmember : error' + error)
-        })
+    // convert functions
+    getImgAvatar(role, avatar) {
+      const img = require('../../assets/images/avatars/' + role + '/' + avatar)
+      return img
     },
-    async submitDeposit() {
-      await this.$http
-        .post('panel/deposit', {
-          account_deposit: this.dataDeposit.account_deposit,
-          memb_id: this.dataDeposit.memb_id,
-          transaction_date: moment().format(),
-          amount: this.dataDeposit.amount,
-          description: this.dataDeposit.description,
-        })
-        .then((response) => {
-          if (response.data.status == 200) {
-            console.log(response.data.message + ' : ' + response.data.result)
-            this.mdDeposit = false
-            // clear data
-            this.dataDeposit.amount = '0'
-            this.dataDeposit.description = ''
-          } else {
-            console.log(
-              'call api - panel/deposit : status = ' +
-                response.data.status +
-                ', message = ' +
-                response.data.message,
-            )
-          }
-        })
-        .catch((error) => {
-          console.log('call api - panel/deposit : error' + error)
-        })
-    },
-    async getHistory() {
-      await this.$http
-        .post('panel/history', {})
-        .then((response) => {
-          if (response.data.status == 200) {
-            this.dataHistory = response.data.result
-            this.totalPage1 = Math.ceil(this.dataHistory.length / 10)
-            console.log(this.dataHistory)
-          } else {
-            console.log(
-              'call api - panel/history : status = ' +
-                response.data.status +
-                ', message = ' +
-                response.data.message,
-            )
-          }
-        })
-        .catch((error) => {
-          console.log('call api - panel/history : error' + error)
-        })
-    },
-    async submitTransactionStatus(_id, _status) {
-      await this.$http
-        .post('panel/updatestatusdeposit', {
-          deposit_id: _id,
-          status: _status,
-        })
-        .then((response) => {
-          if (response.data.status == 200) {
-            this.providerCredit = response.data.credit_web
-            console.log(
-              'call api - panel/updatestatustransaction : status = ' +
-                response.data.status +
-                ', message = ' +
-                response.data.message,
-            )
-          } else {
-            console.log(
-              'call api - panel/updatestatustransaction : status = ' +
-                response.data.status +
-                ', message = ' +
-                response.data.message,
-            )
-          }
-        })
-        .catch((error) => {
-          console.log(
-            'call api - panel/updatestatustransaction : error' + error,
-          )
-        }),
-        this.getHistory()
-    },
-    // convert function
-    getImgAvatar(role, img) {
-      return require('../../assets/images/avatars/' + role + '/' + img)
+    getBankIMG(bankCode) {
+      let img = require('../../assets/images/banking/th/smooth-corner/' +
+        bankCode +
+        '.png')
+      return img
     },
     convertDate(value) {
       var myDate = new Date(value)
