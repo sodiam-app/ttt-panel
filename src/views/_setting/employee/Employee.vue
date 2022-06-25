@@ -67,12 +67,7 @@
           ผู้ดูแลระบบ
         </CCol>
         <CCol class="text-end">
-          <CButton
-            color="dark"
-            class="ms-1"
-            size="sm"
-            @click="mdCreate = !mdCreate"
-          >
+          <CButton color="dark" class="ms-1" size="sm" @click="addEmpShown">
             <CIcon :icon="ic.cilSmilePlus" />
             เพิ่มแอดมิน
           </CButton>
@@ -116,10 +111,10 @@
                     size="sm"
                     status="success"
                   />
-                  <span class="ms-1">{{ emp.name }}</span>
+                  <span class="ms-1">{{ emp.username }}</span>
                 </div>
               </CTableDataCell>
-              <CTableDataCell>{{ emp.username }}</CTableDataCell>
+              <CTableDataCell>{{ emp.name }}</CTableDataCell>
               <CTableDataCell>
                 <strong>{{ emp.role_description }}</strong>
               </CTableDataCell>
@@ -817,7 +812,6 @@ export default {
             this.employees.totalPage = Math.ceil(
               response.data.result.total / 10,
             )
-            console.log(this.employees.totalPage)
             console.log(this.employees.listOfEmp)
           } else if (
             response.data.status == 502 ||
@@ -860,6 +854,7 @@ export default {
         })
         .then((response) => {
           if (response.data.status == 200) {
+            this.mdCreate = false
             console.log(response)
           } else if (
             response.data.status == 502 ||
@@ -869,6 +864,9 @@ export default {
               this.navigateTo('/pages/login')
             })
           } else {
+            this.mdCreate = true
+            this.addEmp.alertAddEmpVisible = true
+            this.addEmp.apiResult = response.data.message
             console.log(
               'call api - panel/addemployee : status = ' +
                 response.data.status +
@@ -878,7 +876,13 @@ export default {
           }
         })
         .catch((error) => {
+          this.mdCreate = true
+          this.addEmp.alertAddEmpVisible = true
+          this.addEmp.apiResult = error
           console.log('call api - panel/addemployee : error' + error)
+        })
+        .finally(() => {
+          this.getAllEmployee()
         })
     },
     // functions
@@ -889,7 +893,7 @@ export default {
       } else if (role === 'owner') {
         randomNo = this.getRandomArbitrary(1, 4)
       } else if (role === 'manager') {
-        randomNo = this.getRandomArbitrary(1, 10)
+        randomNo = this.getRandomArbitrary(1, 8)
       } else if (role === 'staff') {
         randomNo = this.getRandomArbitrary(1, 24)
       } else if (role === 'partner') {
@@ -981,6 +985,20 @@ export default {
     },
     getImgAvatar(role, img) {
       return require('../../../assets/images/avatars/' + role + '/' + img)
+    },
+    addEmpShown() {
+      this.addEmp.agent_id = '629e381cb4839cabb5622da1'
+      this.addEmp.username = ''
+      this.addEmp.password = ''
+      this.addEmp.tel = ''
+      this.addEmp.avatar = ''
+      this.addEmp.name = ''
+      this.addEmp.role = 'staff'
+      this.addEmp.status = true
+      this.addEmp.apiResult = ''
+      this.addEmp.alertAddEmpVisible = false
+      this.addEmp.pwdType = 'password'
+      this.mdCreate = !this.mdCreate
     },
     editEmpShown(empID) {
       this.mdEdit = !this.mdEdit
