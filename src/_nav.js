@@ -15,12 +15,12 @@ export default [
     to: '/banking/transaction',
     icon: 'cil-institution',
   },
-  {
-    component: 'CNavItem',
-    name: 'โอนมือ',
-    to: '/banking/transfer',
-    icon: 'cil-braille',
-  },
+  // {
+  //   component: 'CNavItem',
+  //   name: 'โอนมือ',
+  //   to: '/banking/transfer',
+  //   icon: 'cil-braille',
+  // },
   {
     component: 'CNavTitle',
     name: 'ข้อมูลลูกค้า',
@@ -37,127 +37,127 @@ export default [
     to: '/member/list',
     icon: 'cil-group',
   },
-  {
-    component: 'CNavItem',
-    name: 'รายชื่อลูกค้าเปิดใหม่',
-    to: '/member/list-new',
-    icon: 'cil-child',
-  },
-  {
-    component: 'CNavItem',
-    name: 'แบลคลิส',
-    to: '/member/blacklist',
-    icon: 'cil-thumb-down',
-  },
+  // {
+  //   component: 'CNavItem',
+  //   name: 'รายชื่อลูกค้าเปิดใหม่',
+  //   to: '/member/list-new',
+  //   icon: 'cil-child',
+  // },
+  // {
+  //   component: 'CNavItem',
+  //   name: 'แบลคลิส',
+  //   to: '/member/blacklist',
+  //   icon: 'cil-thumb-down',
+  // },
   {
     component: 'CNavTitle',
     name: 'การตั้งค่า',
   },
-  {
-    component: 'CNavGroup',
-    name: 'ระบบ',
-    to: '/setting',
-    icon: 'cil-settings',
-    items: [
-      {
-        component: 'CNavItem',
-        name: 'ทั่วไป',
-        to: '/setting/general',
-      },
-      {
-        component: 'CNavItem',
-        name: 'บัญชีเว็บ',
-        to: '/setting/banking-acct',
-      },
-      {
-        component: 'CNavItem',
-        name: 'หน้าเว็บ',
-        to: '/setting/front-end',
-      },
-      {
-        component: 'CNavItem',
-        name: 'ความปลอดภัย',
-        to: '/setting/security',
-      },
-      {
-        component: 'CNavItem',
-        name: 'เว็บเอเย่น',
-        to: '/setting/agent',
-      },
-      {
-        component: 'CNavItem',
-        name: 'บัญชีดำ',
-        to: '/setting/balck-list',
-      },
-    ],
-  },
-  {
-    component: 'CNavGroup',
-    name: 'โปรโมชั่น',
-    to: '/promotion',
-    icon: 'cil-gift',
-    items: [
-      {
-        component: 'CNavItem',
-        name: 'ตั้งค่าโปร',
-        to: '/promotion/setting',
-      },
-      {
-        component: 'CNavItem',
-        name: 'การเข้าร่วม',
-        to: '/promotion/joined',
-      },
-    ],
-  },
+  // {
+  //   component: 'CNavGroup',
+  //   name: 'ระบบ',
+  //   to: '/setting',
+  //   icon: 'cil-settings',
+  //   items: [
+  //     {
+  //       component: 'CNavItem',
+  //       name: 'ทั่วไป',
+  //       to: '/setting/general',
+  //     },
+  //     {
+  //       component: 'CNavItem',
+  //       name: 'บัญชีเว็บ',
+  //       to: '/setting/banking-acct',
+  //     },
+  //     {
+  //       component: 'CNavItem',
+  //       name: 'หน้าเว็บ',
+  //       to: '/setting/front-end',
+  //     },
+  //     {
+  //       component: 'CNavItem',
+  //       name: 'ความปลอดภัย',
+  //       to: '/setting/security',
+  //     },
+  //     {
+  //       component: 'CNavItem',
+  //       name: 'เว็บเอเย่น',
+  //       to: '/setting/agent',
+  //     },
+  //     {
+  //       component: 'CNavItem',
+  //       name: 'บัญชีดำ',
+  //       to: '/setting/balck-list',
+  //     },
+  //   ],
+  // },
+  // {
+  //   component: 'CNavGroup',
+  //   name: 'โปรโมชั่น',
+  //   to: '/promotion',
+  //   icon: 'cil-gift',
+  //   items: [
+  //     {
+  //       component: 'CNavItem',
+  //       name: 'ตั้งค่าโปร',
+  //       to: '/promotion/setting',
+  //     },
+  //     {
+  //       component: 'CNavItem',
+  //       name: 'การเข้าร่วม',
+  //       to: '/promotion/joined',
+  //     },
+  //   ],
+  // },
   {
     component: 'CNavItem',
     name: 'พนักงาน',
     to: '/setting/employee',
     icon: 'cil-contact',
   },
-  {
-    component: 'CNavTitle',
-    name: 'รายงาน',
-  },
-  {
-    component: 'CNavGroup',
-    name: 'รายงาน',
-    to: '/report',
-    icon: 'cil-folder-open',
-    items: [
-      {
-        component: 'CNavItem',
-        name: 'ตัดรอบบิล',
-        to: '/report/bill-cycle',
-      },
-      {
-        component: 'CNavItem',
-        name: 'ภาพรวม (สถิติ)',
-        to: '/report/overall-stat',
-      },
-      {
-        component: 'CNavItem',
-        name: 'ภาพรวมยูสเซอร์',
-        to: '/report/overall-members',
-      },
-      {
-        component: 'CNavItem',
-        name: 'สรุปยอดรายเดือน',
-        to: '/report/monthly-summary',
-      },
-      {
-        component: 'CNavItem',
-        name: 'ความเคลื่อนไหว',
-        to: '/report/action-event',
-      },
-    ],
-  },
-  {
-    component: 'CNavItem',
-    name: 'นำออกเอกสาร',
-    to: '/report/export',
-    icon: 'cil-cloud-download',
-  },
+  // {
+  //   component: 'CNavTitle',
+  //   name: 'รายงาน',
+  // },
+  // {
+  //   component: 'CNavGroup',
+  //   name: 'รายงาน',
+  //   to: '/report',
+  //   icon: 'cil-folder-open',
+  //   items: [
+  //     {
+  //       component: 'CNavItem',
+  //       name: 'ตัดรอบบิล',
+  //       to: '/report/bill-cycle',
+  //     },
+  //     {
+  //       component: 'CNavItem',
+  //       name: 'ภาพรวม (สถิติ)',
+  //       to: '/report/overall-stat',
+  //     },
+  //     {
+  //       component: 'CNavItem',
+  //       name: 'ภาพรวมยูสเซอร์',
+  //       to: '/report/overall-members',
+  //     },
+  //     {
+  //       component: 'CNavItem',
+  //       name: 'สรุปยอดรายเดือน',
+  //       to: '/report/monthly-summary',
+  //     },
+  //     {
+  //       component: 'CNavItem',
+  //       name: 'ความเคลื่อนไหว',
+  //       to: '/report/action-event',
+  //     },
+  //   ],
+  // },
+  // {
+  //   component: 'CNavItem',
+  //   name: 'นำออกเอกสาร',
+  //   to: '/report/export',
+  //   icon: 'cil-cloud-download',
+  // },
 
   // {
   //   component: 'CNavItem',

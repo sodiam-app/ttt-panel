@@ -1,7 +1,7 @@
 <template>
   <CDropdown variant="nav-item">
     <!-- <CDropdownToggle placement="bottom-end" class="py-0" :caret="false"> -->
-    <CDropdownToggle class="py-0" :caret="false">
+    <CDropdownToggle class="py-0" :caret="false" href="javascript:void(0)">
       <CAvatar
         :src="getImgAvatar(user.role, user.avatar)"
         size="md"

@@ -274,11 +274,7 @@
               class="text-reset"
               href="javascript:void(0);"
               :active="tabPaneActiveKey === 1"
-              @click="
-                () => {
-                  tabPaneActiveKey = 1
-                }
-              "
+              @click.once="onClicktabPaneActive(1)"
             >
               รอดำเนินการ
             </CNavLink>
@@ -288,11 +284,7 @@
               class="text-reset"
               href="javascript:void(0);"
               :active="tabPaneActiveKey === 2"
-              @click="
-                () => {
-                  tabPaneActiveKey = 2
-                }
-              "
+              @click.once="onClicktabPaneActive(2)"
             >
               รายการล่าสุด
             </CNavLink>
@@ -318,6 +310,7 @@
                       id="formSwitchCheckChecked"
                       :onchange="updateFlagAutoHistory"
                       v-model="flagAutoHistory"
+                      disabled
                     />
                   </div>
                 </div>
@@ -387,7 +380,7 @@
                         </small>
                       </CRow>
                     </CTableDataCell>
-                    <CTableDataCell>{{ history.web_aka }}</CTableDataCell>
+                    <CTableDataCell>{{ history.web_prefix }}</CTableDataCell>
                     <CTableDataCell class="text-center">
                       <CButton
                         v-if="!history.Checked"
@@ -432,9 +425,9 @@
                           color="success"
                           variant="outline"
                           @click.prevent="
-                            submitTransactionStatus(
+                            submitApprove(
                               history._id,
-                              'approve',
+                              history.Checked,
                               history.type,
                             )
                           "
@@ -522,112 +515,14 @@
                     </CTableDataCell>
                     <CTableDataCell>
                       <CBadge :color="convertStatusColor(history.status)">
-                        {{ convertHistoryStatus(history.status) }}
+                        <!-- {{ convertHistoryStatus(history.status) }} -->
+                        {{ history.status }}
                       </CBadge>
                     </CTableDataCell>
                     <CTableDataCell>
                       {{ history.description }}
                     </CTableDataCell>
                   </CTableRow>
-                  <!-- <CTableRow color="success">
-                    <CTableHeaderCell scope="row">1.</CTableHeaderCell>
-                    <CTableDataCell>
-                      <div class="d-inline-flex align-items-center">
-                        <CIcon :icon="ic.cilBank" />
-                        <CBadge color="dark" class="ms-1 d-none d-md-block">
-                          NetBank
-                        </CBadge>
-                      </div>
-                    </CTableDataCell>
-                    <CTableDataCell>
-                      <CBadge color="success">ฝาก</CBadge>
-                    </CTableDataCell>
-                    <CTableDataCell>
-                      <strong class="fst-italic">100.00</strong>
-                    </CTableDataCell>
-                    <CTableDataCell>
-                      <CRow>
-                        <p class="m-0">20:49</p>
-                      </CRow>
-                      <CRow>
-                        <small class="fw-lighter m-0">02/05/2022</small>
-                      </CRow>
-                    </CTableDataCell>
-                    <CTableDataCell>
-                      <CButton
-                        color="warning"
-                        variant="outline"
-                        size="sm"
-                        shape="rounded-pill"
-                      >
-                        <CIcon :icon="ic.cilCircle" size="sm" />
-                        <br />
-                        <small>เช็ค</small>
-                      </CButton>
-                    </CTableDataCell>
-                    <CTableDataCell>
-                      <CButtonGroup role="group" size="sm">
-                        <CButton color="success" variant="outline">
-                          <CIcon :icon="ic.cilCheckAlt" size="sm" />
-                          <br />
-                          <small>อนุมัติ</small>
-                        </CButton>
-                        <CButton color="danger" variant="outline">
-                          <CIcon :icon="ic.cilX" size="sm" />
-                          <br />
-                          <small>ปฏิเสธ</small>
-                        </CButton>
-                      </CButtonGroup>
-                    </CTableDataCell>
-                    <CTableDataCell>
-                      <a href="#">99dev100001</a>
-                      <br />
-                      <CBadge color="success" shape="rounded-pill">ปกติ</CBadge>
-                    </CTableDataCell>
-                    <CTableDataCell>
-                      <CRow>
-                        <CCol lg="2" class="p-0 m-0">
-                          <CImage
-                            fluid
-                            :src="imgBank.kbank"
-                            width="20"
-                            class="ms-1 me-1"
-                          />
-                        </CCol>
-                        <CCol lg="10" class="ps-1">
-                          <strong> 0213832833 </strong>
-                        </CCol>
-                      </CRow>
-                      <CRow>
-                        <CCol class="offset-lg-2 small ps-1">
-                          นายสมพงค์ คงขำ</CCol
-                        >
-                      </CRow>
-                    </CTableDataCell>
-                    <CTableDataCell>
-                      <CRow>
-                        <CCol lg="2" class="p-0 m-0">
-                          <CImage
-                            fluid
-                            :src="imgBank.ttb"
-                            width="20"
-                            class="ms-1 me-1"
-                          />
-                        </CCol>
-                        <CCol lg="10" class="ps-1">
-                          <strong> 0019203948 </strong>
-                        </CCol>
-                      </CRow>
-                      <CRow>
-                        <CCol class="offset-lg-2 small ps-1"> Demo-name </CCol>
-                      </CRow>
-                    </CTableDataCell>
-                    <CTableDataCell>
-                      <CBadge color="warning">Pending</CBadge>
-                    </CTableDataCell>
-                    <CTableDataCell>banpong888</CTableDataCell>
-                    <CTableDataCell></CTableDataCell>
-                  </CTableRow> -->
                 </CTableBody>
               </CTable>
             </div>
@@ -655,14 +550,13 @@
                     <span class="me-2 small">
                       <small><em>อัพเดทอัตโนมัติ</em></small>
                     </span>
-                    <CFormSwitch id="formSwitchCheckChecked" checked />
+                    <CFormSwitch id="formSwitchCheckChecked" disabled />
                   </div>
                 </div>
               </CCol>
             </CRow>
             <div class="table-responsive">
-              ยังไม่พร้อมใช้งาน
-              <!-- <CTable hover class="mb-3">
+              <CTable hover class="mb-3">
                 <CTableHead color="dark" class="fw-bold fst-italic">
                   <CTableRow>
                     <CTableHeaderCell scope="col">#</CTableHeaderCell>
@@ -684,54 +578,89 @@
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  <CTableRow color="success">
-                    <CTableHeaderCell scope="row">1.</CTableHeaderCell>
+                  <CTableRow
+                    v-for="(historylasted, index) in dataHistoryLasted"
+                    :key="historylasted.id"
+                    :color="convertTypeRowsColor(historylasted.type)"
+                  >
+                    <CTableHeaderCell scope="row">
+                      {{ index + 1 }}
+                    </CTableHeaderCell>
                     <CTableDataCell>
                       <div class="text-break"></div>
                       <div class="d-inline-flex align-items-center">
                         <CIcon :icon="ic.cilBank" />
                         <CBadge color="dark" class="ms-1 d-none d-md-block">
-                          NetBank
+                          -----
                         </CBadge>
                       </div>
                     </CTableDataCell>
                     <CTableDataCell>
-                      <CBadge color="success">ฝาก</CBadge>
+                      <CBadge :color="convertTypeColor(historylasted.type)">
+                        {{ convertType(historylasted.type) }}
+                      </CBadge>
                     </CTableDataCell>
                     <CTableDataCell>
-                      <strong class="fst-italic">100.00</strong>
+                      <strong class="fst-italic">
+                        {{ convertAmount2Degit(historylasted.amount) }}
+                      </strong>
                     </CTableDataCell>
                     <CTableDataCell>
                       <CRow>
-                        <p class="m-0">20:49</p>
+                        <p class="m-0">
+                          {{
+                            convertTime(historylasted.approve_by.approve_date)
+                          }}
+                        </p>
                       </CRow>
                       <CRow>
-                        <small class="fw-lighter m-0">02/05/2022</small>
+                        <small class="fw-lighter m-0">
+                          {{
+                            convertDate(historylasted.approve_by.approve_date)
+                          }}
+                        </small>
                       </CRow>
                     </CTableDataCell>
                     <CTableDataCell>
-                      <a href="#">99dev100001</a>
+                      <CButton
+                        size="sm"
+                        color="link"
+                        class="p-0"
+                        @click="
+                          navigateToNewTap(
+                            '/member/list/99dev/' + historylasted.memb_id,
+                          )
+                        "
+                        >{{ historylasted.memb_username }}
+                      </CButton>
                       <br />
-                      <CBadge color="success" shape="rounded-pill">ปกติ</CBadge>
+                      <CBadge
+                        :color="
+                          convertMemberStatusColor(historylasted.memb_status)
+                        "
+                        shape="rounded-pill"
+                      >
+                        {{ convertMemberStatus(historylasted.memb_status) }}
+                      </CBadge>
                     </CTableDataCell>
                     <CTableDataCell>
                       <CRow>
                         <CCol lg="2" class="p-0 m-0">
                           <CImage
                             fluid
-                            :src="imgBank.kbank"
+                            :src="getBankIMG(historylasted.memb_banking_code)"
                             width="20"
                             class="ms-1 me-1"
                           />
                         </CCol>
                         <CCol lg="10" class="ps-1">
-                          <strong> 0213832833 </strong>
+                          <strong> {{ historylasted.memb_bank }} </strong>
                         </CCol>
                       </CRow>
                       <CRow>
                         <CCol class="offset-lg-2 small ps-1">
-                          นายสมพงค์ คงขำ</CCol
-                        >
+                          {{ historylasted.memb_name }}
+                        </CCol>
                       </CRow>
                     </CTableDataCell>
                     <CTableDataCell>
@@ -739,41 +668,61 @@
                         <CCol lg="2" class="p-0 m-0">
                           <CImage
                             fluid
-                            :src="imgBank.ttb"
+                            :src="getBankIMG(historylasted.web_account_code)"
                             width="20"
                             class="ms-1 me-1"
                           />
                         </CCol>
                         <CCol lg="10" class="ps-1">
-                          <strong> 0019203948 </strong>
+                          <strong>
+                            {{ historylasted.web_account_number }}
+                          </strong>
                         </CCol>
                       </CRow>
                       <CRow>
-                        <CCol class="offset-lg-2 small ps-1"> Demo-name </CCol>
+                        <CCol class="offset-lg-2 small ps-1">
+                          {{ historylasted.web_account_name }}
+                        </CCol>
                       </CRow>
                     </CTableDataCell>
                     <CTableDataCell>
-                      <CBadge color="success">Success</CBadge>
+                      <CBadge :color="convertStatusColor(historylasted.status)">
+                        {{ historylasted.status }}
+                      </CBadge>
                     </CTableDataCell>
                     <CTableDataCell>
-                      <div class="d-inline-flex align-items-center">
-                        <CAvatar :src="avatar" size="sm" status="success" />
-                        <CBadge color="dark" class="ms-1 d-none d-md-block">
-                          แอดมินนัท
+                      <div class="align-items-center">
+                        <CAvatar
+                          :src="
+                            getImgAvatar(
+                              historylasted.approve_by.approve_role,
+                              historylasted.approve_by.approve_avatar,
+                            )
+                          "
+                          size="sm"
+                          status="success"
+                          class="mb-1"
+                        />
+                        <CBadge color="dark" shape="rounded-pill">
+                          {{ historylasted.approve_by.approve_username }}
                         </CBadge>
                       </div>
                     </CTableDataCell>
-                    <CTableDataCell>banpong999</CTableDataCell>
-                    <CTableDataCell></CTableDataCell>
+                    <CTableDataCell>
+                      {{ historylasted.web_prefix }}
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      {{ historylasted.description }}
+                    </CTableDataCell>
                   </CTableRow>
                 </CTableBody>
-              </CTable> -->
+              </CTable>
             </div>
           </CCardText>
           <div class="text-center">
             <CSmartPagination
-              :activePage="activePage1"
-              :pages="totalPage1"
+              :activePage="activePage2"
+              :pages="totalPage2"
               size="sm"
               align="end"
             />
@@ -914,14 +863,18 @@
                 >
                   <option value="Banpong888" selected>Banpong888</option>
                 </select> -->
-                <CFormSelect size="sm" v-model="dataDeposit.web_agent_id">
+                <CFormSelect
+                  size="sm"
+                  v-model="dataDeposit.web_agent_id"
+                  @change="getMemberList($event.target.value)"
+                >
                   <option value="">กรุณาเลือกเว็บ</option>
                   <option
                     v-for="option in optDepositWebAgent"
                     :key="option._id"
                     :value="option._id"
                   >
-                    {{ option.web_name }}
+                    {{ option.name }}
                   </option>
                 </CFormSelect>
               </div>
@@ -1144,6 +1097,186 @@
       </CCard>
     </CModalBody>
   </CModal>
+
+  <!-- ----- -->
+  <!-- Confirm Approve -->
+  <!-- ------ -->
+  <CModal
+    backdrop="static"
+    :visible="mdConfirmApprove"
+    @close="
+      () => {
+        mdConfirmApprove = false
+      }
+    "
+  >
+    <CModalBody class="m-0 p-0">
+      <CCard class="border-warning m-0 p-0">
+        <CCardBody>
+          <CCardText class="small text-center">
+            <CModalTitle class="fw-bolder text-decoration-underline mb-2 mt-1">
+              ยืนยันการอนุมัติ
+            </CModalTitle>
+            <span
+              >คุณกำลังดำเนินการ <b>"อนุมัติ"</b> โดยไม่ผ่านการ
+              <b>"เช็ค"</b></span
+            >
+            <p>
+              <CIcon :icon="ic.cilHandPointDown" />
+              กรุณาตรวจสอบข้อมูลอีกครั้ง
+            </p>
+            <hr />
+            <CAlert color="danger" class="py-1" :visible="errApproveVisible">
+              <CIcon :icon="ic.cilWarning" />
+              {{ errApproveMessage }}
+            </CAlert>
+            <ul class="list-group mb-1">
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                ช่องทาง / ประเภท:
+                <div>
+                  <span class="badge bg-dark me-1"> --- </span>
+                  <span
+                    :class="
+                      'badge bg-' + convertTypeColor(dataConfirmApprove.type)
+                    "
+                  >
+                    {{ convertType(dataConfirmApprove.type) }}
+                  </span>
+                </div>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                จำนวนเงิน:
+                <span
+                  :class="
+                    'badge rounded-pill bg-' +
+                    convertTypeColor(dataConfirmApprove.type)
+                  "
+                >
+                  {{ convertAmount2Degit(dataConfirmApprove.amount) }} ฿
+                </span>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                เวลา:
+                <div class="text-end">
+                  <span class="fw-bolder">
+                    {{ convertTime(dataConfirmApprove.request_date) }}
+                  </span>
+                  <br />
+                  <span class="fw-lighter small">
+                    {{ convertDate(dataConfirmApprove.request_date) }}
+                  </span>
+                </div>
+              </li>
+            </ul>
+            <ul class="list-group mb-1">
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                web:
+                <span> {{ dataConfirmApprove.web_aka }} </span>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                ยูสเซอร์ลูกค้า:
+                <CButton
+                  size="sm"
+                  color="link"
+                  class="p-0"
+                  @click="
+                    navigateToNewTap(
+                      '/member/list/99dev/' + dataConfirmApprove.memb_id,
+                    )
+                  "
+                >
+                  {{ dataConfirmApprove.memb_username }}
+                </CButton>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                บัญชีลูกค้า:
+                <div class="text-end d-flex">
+                  <div class="d-inline d-block">
+                    <strong>{{ dataConfirmApprove.memb_bank }}</strong>
+                    <br />
+                    <span>{{ dataConfirmApprove.memb_name }}</span>
+                  </div>
+                  <div class="d-inline">
+                    <CImage
+                      fluid
+                      :src="getBankIMG(dataConfirmApprove.memb_banking_code)"
+                      width="30"
+                      class="ms-1 me-1"
+                    />
+                  </div>
+                </div>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                บัญชีเว็บ:
+                <div class="text-end d-flex">
+                  <div class="d-inline d-block">
+                    <strong>
+                      {{ dataConfirmApprove.web_account_number }}
+                    </strong>
+                    <br />
+                    <span>{{ dataConfirmApprove.web_account_name }}</span>
+                  </div>
+                  <div class="d-inline">
+                    <CImage
+                      fluid
+                      :src="getBankIMG(dataConfirmApprove.web_account_code)"
+                      width="30"
+                      class="ms-1 me-1"
+                    />
+                  </div>
+                </div>
+              </li>
+            </ul>
+            <hr />
+            <div class="text-center mb-2">
+              <CButton
+                size="sm"
+                color="secondary"
+                class="text-light ms-1"
+                @click="
+                  () => {
+                    mdConfirmApprove = false
+                  }
+                "
+              >
+                <CIcon :icon="ic.cilXCircle" />
+                ปิด
+              </CButton>
+              <CButton
+                size="sm"
+                color="warning"
+                class="ms-1 text-light"
+                @click="
+                  submitTransactionStatus(
+                    dataConfirmApprove._id,
+                    'approve',
+                    dataConfirmApprove.type,
+                  )
+                "
+              >
+                <CIcon :icon="ic.cilCheckCircle" />
+                ตกลง
+              </CButton>
+            </div>
+          </CCardText>
+        </CCardBody>
+      </CCard>
+    </CModalBody>
+  </CModal>
 </template>
 
 <script>
@@ -1166,6 +1299,8 @@ import {
   cilX,
   cilCheckCircle,
   cilXCircle,
+  cilHandPointDown,
+  cilWarning,
 } from '@coreui/icons'
 
 import { CDatePicker } from '@coreui/vue-pro'
@@ -1189,9 +1324,12 @@ export default {
       visibleBank: true,
       mdStatement: false,
       mdDeposit: false,
+      mdConfirmApprove: false,
       isBonusDeposit: true,
       mdWithdraw: false,
       isBonusWithdraw: true,
+      errApproveVisible: true,
+      errApproveMessage: 'dkaslkadsklas',
 
       // Web
       providerCredit: 0,
@@ -1199,7 +1337,6 @@ export default {
       // Deposit submit
       dataDeposit: {
         web_agent_id: '',
-        web_agent_name: '',
         account_deposit: '',
         memb_id: '',
         transaction_date: new Date(),
@@ -1218,16 +1355,12 @@ export default {
       updateHistoryAutoCount: 0,
       updateHistoryAuto: null,
       dataHistory: [],
+      dataHistoryLasted: [],
+      dataConfirmApprove: {},
 
       // list of select elements
       optMemberList: [],
-      optDepositWebAgent: [
-        {
-          _id: '629e381cb4839cabb5622da1',
-          web_name: 'Banpong888',
-          domain_name: 'https://www.banpong888.com',
-        },
-      ],
+      optDepositWebAgent: [],
       ic: {
         cilCash,
         cilLoopCircular,
@@ -1245,6 +1378,8 @@ export default {
         cilX,
         cilCheckCircle,
         cilXCircle,
+        cilHandPointDown,
+        cilWarning,
       },
     }
   },
@@ -1253,11 +1388,38 @@ export default {
       tokenExpired: 'auth/tokenExpired',
     }),
     // api
-    async getMemberList() {
+    async getWebPrefixList() {
       await this.$http
-        .post('member/getallmember', {
-          agent_id: this.dataDeposit.web_agent_id,
-          domain_name: this.dataDeposit.domain_name,
+        .post('panel/getprefix', {})
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.optDepositWebAgent = response.data.result_perfix
+            console.log(this.optDepositWebAgent)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - panel/getprefix : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('call api - panel/getprefix : error' + error)
+        })
+    },
+    async getMemberList(webID) {
+      await this.$http
+        .post('panel/getallmember', {
+          agent_id: webID,
+          domain_name: '',
         })
         .then((response) => {
           if (response.data.status == 200) {
@@ -1272,7 +1434,7 @@ export default {
             })
           } else {
             console.log(
-              'call api - member/getallmember : status = ' +
+              'call api - panel/getallmember : status = ' +
                 response.data.status +
                 ', message = ' +
                 response.data.message,
@@ -1280,7 +1442,7 @@ export default {
           }
         })
         .catch((error) => {
-          console.log('call api - member/getallmember : error' + error)
+          console.log('call api - panel/getallmember : error' + error)
         })
     },
     async submitDeposit() {
@@ -1347,6 +1509,66 @@ export default {
           console.log('call api - panel/history : error' + error)
         })
     },
+    async getHistoryLasted() {
+      await this.$http
+        .post('panel/historylasted', {})
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.dataHistoryLasted = response.data.result
+            this.totalPage2 = Math.ceil(this.dataHistoryLasted.length / 10)
+            console.log(this.dataHistoryLasted)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - panel/historylasted : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('call api - panel/historylasted : error' + error)
+        })
+    },
+    async submitApprove(_id, _checked, _type) {
+      if (_checked == null) {
+        // this.dataHistory.forEach((value) => {
+        //   if (value._id == _id) {
+        //     this.dataConfirmApprove = value
+        //     // this.submitTransactionStatus(value._id, 'approve', value.type)
+        //     this.mdConfirmApprove = true
+        //     return null
+        //   }
+        // })
+        let _isfound = false
+        for (var val in this.dataHistory) {
+          if (this.dataHistory[val]._id == _id) {
+            console.log(this.dataHistory[val]._id)
+            this.dataConfirmApprove = this.dataHistory[val]
+            // this.submitTransactionStatus(value._id, 'approve', value.type)
+            this.mdConfirmApprove = true
+            this.errApproveVisible = false
+            this.errApproveMessage = ''
+            _isfound = true
+            break
+          }
+        }
+        if (!_isfound) {
+          this.dataConfirmApprove = {}
+          this.errApproveVisible = true
+          this.errApproveMessage = 'ไม่พบรายการนี้ในระบบ'
+        }
+      } else {
+        this.submitTransactionStatus(_id, 'approve', _type)
+      }
+    },
     async submitTransactionStatus(_id, _status, _type) {
       await this.$http
         .post('panel/updatetransaction', {
@@ -1357,6 +1579,7 @@ export default {
         .then((response) => {
           if (response.data.status == 200) {
             this.providerCredit = response.data.credit_web
+            this.mdConfirmApprove = false
             console.log(
               'call api - panel/updatetransaction : status = ' +
                 response.data.status +
@@ -1371,6 +1594,8 @@ export default {
               this.navigateTo('/pages/login')
             })
           } else {
+            this.errApproveVisible = true
+            this.errApproveMessage = response.data.message
             console.log(
               'call api - panel/updatetransaction : status = ' +
                 response.data.status +
@@ -1395,11 +1620,12 @@ export default {
     },
     clickDeposit() {
       this.mdDeposit = !this.mdDeposit
-      if (!this.dataDeposit.web_agent_id) {
-        this.dataDeposit.web_agent_id = this.optDepositWebAgent[0]._id
-        this.dataDeposit.web_agent_name = this.optDepositWebAgent[0].web_name
+      if (this.optDepositWebAgent.length != 0) {
+        if (!this.dataDeposit.web_agent_id) {
+          this.dataDeposit.web_agent_id = this.optDepositWebAgent[0]._id
+        }
+        this.getMemberList(this.dataDeposit.web_agent_id)
       }
-      this.getMemberList()
     },
     loadHistory() {
       if (this.updateHistoryAuto) {
@@ -1429,6 +1655,15 @@ export default {
     },
     onChangePage(pageOfItems) {
       this.pageOfItemsHistory = pageOfItems
+    },
+    onClicktabPaneActive(_index) {
+      this.tabPaneActiveKey = _index
+      if (_index == 1) {
+        this.getHistory()
+      }
+      if (_index == 2) {
+        this.getHistoryLasted()
+      }
     },
     // convert functions
     getImgAvatar(role, avatar) {
@@ -1502,6 +1737,8 @@ export default {
       const _val = value.toString().toLowerCase()
       if (_val == 'success') {
         return 'success'
+      } else if (_val == 'approve') {
+        return 'success'
       } else if (_val == 'pending') {
         return 'warning'
       } else if (_val == 'reject') {
@@ -1552,12 +1789,18 @@ export default {
     },
   },
   created() {
-    if (this.flagAutoHistory == true) {
-      this.loadHistory()
+    if (this.tabPaneActiveKey == 1) {
+      this.getHistory()
+    }
+    if (this.tabPaneActiveKey == 2) {
+      this.getHistoryLasted()
     }
   },
   mounted() {
-    this.getHistory()
+    if (this.flagAutoHistory == true) {
+      this.loadHistory()
+    }
+    this.getWebPrefixList()
   },
   setup() {
     return {
