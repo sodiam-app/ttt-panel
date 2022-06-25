@@ -955,6 +955,16 @@
                 </div>
               </div>
               <hr />
+              <CAlert
+                color="danger"
+                variant="solid"
+                class="py-2"
+                :visible="dataDeposit.errorVisible"
+              >
+                <CIcon :icon="ic.cilWarning" />
+
+                {{ dataDeposit.errorMessage }}
+              </CAlert>
               <div class="text-end">
                 <CButton
                   color="success"
@@ -1343,6 +1353,8 @@ export default {
         transaction_time: new Date(),
         amount: '0',
         description: '',
+        errorVisible: false,
+        errorMessage: '',
       },
 
       totalPage1: 1,
@@ -1461,6 +1473,8 @@ export default {
             // clear data
             this.dataDeposit.amount = '0'
             this.dataDeposit.description = ''
+            this.dataDeposit.errorVisible = false
+            this.dataDeposit.errorMessage = ''
           } else if (
             response.data.status == 502 ||
             response.data.status == 503
@@ -1469,6 +1483,8 @@ export default {
               this.navigateTo('/pages/login')
             })
           } else {
+            this.dataDeposit.errorVisible = true
+            this.dataDeposit.errorMessage = response.data.message
             console.log(
               'call api - panel/deposit : status = ' +
                 response.data.status +
@@ -1478,7 +1494,12 @@ export default {
           }
         })
         .catch((error) => {
+          this.dataDeposit.errorVisible = true
+          this.dataDeposit.errorMessage = error
           console.log('call api - panel/deposit : error' + error)
+        })
+        .finally(() => {
+          this.onClicktabPaneActive(this.tabPaneActiveKey)
         })
     },
     async getHistory() {
