@@ -274,7 +274,7 @@
               class="text-reset"
               href="javascript:void(0);"
               :active="tabPaneActiveKey === 1"
-              @click.once="onClicktabPaneActive(1)"
+              @click="onClicktabPaneActive(1)"
             >
               รอดำเนินการ
             </CNavLink>
@@ -284,7 +284,7 @@
               class="text-reset"
               href="javascript:void(0);"
               :active="tabPaneActiveKey === 2"
-              @click.once="onClicktabPaneActive(2)"
+              @click="onClicktabPaneActive(2)"
             >
               รายการล่าสุด
             </CNavLink>
@@ -474,46 +474,61 @@
                       </CBadge>
                     </CTableDataCell>
                     <CTableDataCell>
-                      <CRow>
-                        <CCol lg="2" class="p-0 m-0">
+                      <CRow :xs="{ cols: 'auto', gutterX: 0, gutterY: 1 }">
+                        <CCol xs>
                           <CImage
                             fluid
                             :src="getBankIMG(history.memb_banking_code)"
-                            width="25"
+                            width="20"
                             class="ms-1 me-1"
                           />
                         </CCol>
-                        <CCol lg="10" class="ps-1">
-                          <strong> {{ history.memb_bank }} </strong>
-                        </CCol>
-                      </CRow>
-                      <CRow>
-                        <CCol class="offset-lg-2 small ps-1">
-                          {{ history.memb_name }}
+                        <CCol>
+                          <div class="fw-bolder">
+                            {{ history.memb_bank }}
+                          </div>
+                          <div class="fst-italic">
+                            {{ history.memb_name }}
+                          </div>
                         </CCol>
                       </CRow>
                     </CTableDataCell>
                     <CTableDataCell>
-                      <CRow>
-                        <CCol lg="2" class="p-0 m-0">
-                          <CImage
-                            fluid
-                            :src="getBankIMG(history.web_account_code)"
-                            width="25"
-                            class="ms-1 me-1"
-                          />
-                        </CCol>
-                        <CCol lg="10" class="ps-1">
-                          <strong> {{ history.web_account_number }} </strong>
-                        </CCol>
-                      </CRow>
-                      <CRow>
-                        <CCol class="offset-lg-2 small ps-1">
-                          {{ history.web_account_name }}
-                        </CCol>
-                      </CRow>
+                      <div v-if="history.sub_type != 'bonus'">
+                        <CRow :xs="{ cols: 'auto', gutterX: 0, gutterY: 1 }">
+                          <CCol xs>
+                            <CImage
+                              fluid
+                              :src="getBankIMG(history.web_account_code)"
+                              width="20"
+                              class="ms-1 me-1"
+                            />
+                          </CCol>
+                          <CCol>
+                            <div class="fw-bolder">
+                              {{ history.web_account_number }}
+                            </div>
+                            <div class="fst-italic">
+                              {{ history.web_account_name }}
+                            </div>
+                          </CCol>
+                        </CRow>
+                      </div>
+                      <div v-else class="d-inline-flex align-items-start">
+                        <CIcon class="text-info" :icon="ic.cibPalantir" />
+                        <CBadge color="info" class="ms-1 d-none d-md-block">
+                          บัญชีโบนัส
+                        </CBadge>
+                      </div>
                     </CTableDataCell>
                     <CTableDataCell>
+                      <CSpinner
+                        v-if="history.status == 'pending'"
+                        component="span"
+                        color="warning"
+                        size="sm"
+                        class="me-1"
+                      />
                       <CBadge :color="convertStatusColor(history.status)">
                         <!-- {{ convertHistoryStatus(history.status) }} -->
                         {{ history.status }}
@@ -644,46 +659,54 @@
                       </CBadge>
                     </CTableDataCell>
                     <CTableDataCell>
-                      <CRow>
-                        <CCol lg="2" class="p-0 m-0">
-                          <CImage
-                            fluid
-                            :src="getBankIMG(historylasted.memb_banking_code)"
-                            width="20"
-                            class="ms-1 me-1"
-                          />
-                        </CCol>
-                        <CCol lg="10" class="ps-1">
-                          <strong> {{ historylasted.memb_bank }} </strong>
-                        </CCol>
-                      </CRow>
-                      <CRow>
-                        <CCol class="offset-lg-2 small ps-1">
-                          {{ historylasted.memb_name }}
-                        </CCol>
-                      </CRow>
+                      <div>
+                        <CRow :xs="{ cols: 'auto', gutterX: 0, gutterY: 1 }">
+                          <CCol xs>
+                            <CImage
+                              fluid
+                              :src="getBankIMG(historylasted.memb_banking_code)"
+                              width="20"
+                              class="ms-1 me-1"
+                            />
+                          </CCol>
+                          <CCol>
+                            <div class="fw-bolder">
+                              {{ historylasted.memb_bank }}
+                            </div>
+                            <div class="fst-italic">
+                              {{ historylasted.memb_name }}
+                            </div>
+                          </CCol>
+                        </CRow>
+                      </div>
                     </CTableDataCell>
                     <CTableDataCell>
-                      <CRow>
-                        <CCol lg="2" class="p-0 m-0">
-                          <CImage
-                            fluid
-                            :src="getBankIMG(historylasted.web_account_code)"
-                            width="20"
-                            class="ms-1 me-1"
-                          />
-                        </CCol>
-                        <CCol lg="10" class="ps-1">
-                          <strong>
-                            {{ historylasted.web_account_number }}
-                          </strong>
-                        </CCol>
-                      </CRow>
-                      <CRow>
-                        <CCol class="offset-lg-2 small ps-1">
-                          {{ historylasted.web_account_name }}
-                        </CCol>
-                      </CRow>
+                      <div v-if="historylasted.sub_type != 'bonus'">
+                        <CRow :xs="{ cols: 'auto', gutterX: 0, gutterY: 1 }">
+                          <CCol xs>
+                            <CImage
+                              fluid
+                              :src="getBankIMG(historylasted.web_account_code)"
+                              width="20"
+                              class="ms-1 me-1"
+                            />
+                          </CCol>
+                          <CCol>
+                            <div class="fw-bolder">
+                              {{ historylasted.web_account_number }}
+                            </div>
+                            <div class="fst-italic">
+                              {{ historylasted.web_account_name }}
+                            </div>
+                          </CCol>
+                        </CRow>
+                      </div>
+                      <div v-else class="d-inline-flex align-items-start">
+                        <CIcon class="text-info" :icon="ic.cibPalantir" />
+                        <CBadge color="info" class="ms-1 d-none d-md-block">
+                          บัญชีโบนัส
+                        </CBadge>
+                      </div>
                     </CTableDataCell>
                     <CTableDataCell>
                       <CBadge :color="convertStatusColor(historylasted.status)">
@@ -832,26 +855,56 @@
           <CCardText class="small">
             <form>
               <div class="mb-1">
-                <CFormSwitch
-                  label="ผ่านบัญชีโบนัส"
-                  v-model="isBonusDeposit"
-                  @change="updateFlagAutoHistory"
-                  disabled
-                />
-                <div v-if="isBonusDeposit == false">
+                <CFormSwitch label="ผ่านบัญชีโบนัส" v-model="isBonusDeposit" />
+                <div v-if="!isBonusDeposit">
                   <label for="depositBank" class="form-label">
-                    * บัญชีฝาก
+                    * บัญชีเว็บ
                   </label>
-                  <select
+                  <CInputGroup class="mb-3">
+                    <CInputGroupText id="basic-addon1">
+                      <CIcon :icon="ic.cilCreditCard" />
+                    </CInputGroupText>
+                    <CFormSelect
+                      size="sm"
+                      v-model="dataDeposit.account_deposit"
+                    >
+                      <option value="" selected>บัญชีโบนัส</option>
+                      <option
+                        v-for="option in optBankDeposit"
+                        :key="option._id"
+                        :value="option._id"
+                      >
+                        [{{ option.bank_code }}] | {{ option.bank_account }} ({{
+                          option.account_name
+                        }})
+                      </option>
+                    </CFormSelect>
+                  </CInputGroup>
+                  <!-- <select
                     class="form-select form-select-sm"
                     aria-label="กรุณาเลือกบัญชีฝาก"
                     id="depositBank"
                   >
-                    <option value="Bonus" selected>บัญชีโบนัส</option>
-                  </select>
+                    <option value="" selected>บัญชีโบนัส</option>
+                    <option
+                      v-for="option in optBankDeposit"
+                      :key="option._id"
+                      :value="option._id"
+                    >
+                      [{{ option.bank_code }}] | {{ option.bank_account }} ({{
+                        option.account_name
+                      }})
+                    </option>
+                  </select> -->
                 </div>
               </div>
-              <hr class="mt-2" />
+              <div v-if="isBonusDeposit" class="fw-bolder fst-italic small">
+                *
+                <span class="text-decoration-underline">
+                  กรณีฝากยอดผ่านบัญชีโบนัสระบบจะยึดเวลาปัจจุบัน
+                </span>
+              </div>
+              <hr class="mt-2 mb-2" />
               <div class="mb-1">
                 <label for="depositDateTime" class="form-label mb-1">
                   * เว็บลูกค้า
@@ -863,40 +916,51 @@
                 >
                   <option value="Banpong888" selected>Banpong888</option>
                 </select> -->
-                <CFormSelect
-                  size="sm"
-                  v-model="dataDeposit.web_agent_id"
-                  @change="getMemberList($event.target.value)"
-                >
-                  <option value="">กรุณาเลือกเว็บ</option>
-                  <option
-                    v-for="option in optDepositWebAgent"
-                    :key="option._id"
-                    :value="option._id"
+                <CInputGroup>
+                  <CInputGroupText id="basic-addon1">
+                    <CIcon :icon="ic.cilPin" />
+                  </CInputGroupText>
+                  <CFormSelect
+                    size="sm"
+                    v-model="dataDeposit.web_agent_id"
+                    @change="getMemberList($event.target.value)"
                   >
-                    {{ option.name }}
-                  </option>
-                </CFormSelect>
+                    <option value="">กรุณาเลือกเว็บ</option>
+                    <option
+                      v-for="option in optDepositWebAgent"
+                      :key="option._id"
+                      :value="option._id"
+                    >
+                      {{ option.name }}
+                    </option>
+                  </CFormSelect>
+                </CInputGroup>
               </div>
               <div class="mb-1">
                 <label for="depositMemberID" class="form-label mb-1">
                   * ยูสเซอร์ลูกค้า
                 </label>
-                <CFormSelect size="sm" v-model="dataDeposit.memb_id">
-                  <option value="">กรุณาเลือกยูสเซอร์</option>
-                  <option
-                    v-for="option in optMemberList"
-                    :key="option._id"
-                    :value="option._id"
-                  >
-                    {{ option.username }}
-                  </option>
-                </CFormSelect>
+                <CInputGroup>
+                  <CInputGroupText id="basic-addon1">
+                    <CIcon :icon="ic.cilGroup" />
+                  </CInputGroupText>
+                  <CFormSelect size="sm" v-model="dataDeposit.memb_id">
+                    <option value="">กรุณาเลือกยูสเซอร์</option>
+                    <option
+                      v-for="option in optMemberList"
+                      :key="option._id"
+                      :value="option._id"
+                    >
+                      {{ option.username }} ({{ option.profile.name }}
+                      {{ option.profile.surename }})
+                    </option>
+                  </CFormSelect>
+                </CInputGroup>
                 <div class="form-text mt-0 mb-2">
                   สามารถค้นหาด้วย: ยูส, เบอร์โทร, ชื่อ
                 </div>
               </div>
-              <div class="mb-1">
+              <div v-if="!isBonusDeposit" class="mb-1">
                 <label for="depositDateTime" class="form-label mb-1">
                   * วันเวลาที่ทำรายการ
                 </label>
@@ -909,9 +973,11 @@
                       cancel-button="ยกเลิก"
                       placeholder="วันที่ทำรายการ"
                       footer
-                      :date="dataDeposit.transaction_date"
-                      v-model="dataDeposit.transaction_date"
+                      :date="new Date()"
                       format="dd/MM/yyyy"
+                      data-coreui-weekdayFormat="long"
+                      :calendarDate="dataDeposit.transaction_date"
+                      v-model="dataDeposit.transaction_date"
                     />
                   </CCol>
                   <CCol sm>
@@ -919,8 +985,8 @@
                       size="sm"
                       locale="th-TH"
                       placeholder="เวลาที่ทำรายการ"
-                      :time="dataDeposit.transaction_time"
-                      v-model="dataDeposit.transaction_time"
+                      :time="new Date()"
+                      id="timeDeposit"
                     />
                   </CCol>
                 </CRow>
@@ -941,6 +1007,9 @@
                   <CInputGroupText> ฿ </CInputGroupText>
                 </CInputGroup>
               </div>
+              <!-- <div class="mb-1">
+                <CFormInput type="file" id="fileSlipDeposit" size="sm" />
+              </div> -->
               <hr class="mb-2" />
               <div class="mb-1">
                 <div class="form-floating">
@@ -1311,6 +1380,11 @@ import {
   cilXCircle,
   cilHandPointDown,
   cilWarning,
+  cilBadge,
+  cilCreditCard,
+  cibPalantir,
+  cilGroup,
+  cilPin,
 } from '@coreui/icons'
 
 import { CDatePicker } from '@coreui/vue-pro'
@@ -1327,6 +1401,7 @@ export default {
   },
   data() {
     return {
+      picked: new Date(),
       demo: '',
       avatar: avatar,
       tabPaneActiveKey: 1,
@@ -1339,7 +1414,7 @@ export default {
       mdWithdraw: false,
       isBonusWithdraw: true,
       errApproveVisible: true,
-      errApproveMessage: 'dkaslkadsklas',
+      errApproveMessage: '',
 
       // Web
       providerCredit: 0,
@@ -1349,8 +1424,8 @@ export default {
         web_agent_id: '',
         account_deposit: '',
         memb_id: '',
-        transaction_date: new Date(),
-        transaction_time: new Date(),
+        transaction_date: Date(),
+        transaction_time: Date(),
         amount: '0',
         description: '',
         errorVisible: false,
@@ -1373,6 +1448,7 @@ export default {
       // list of select elements
       optMemberList: [],
       optDepositWebAgent: [],
+      optBankDeposit: [],
       ic: {
         cilCash,
         cilLoopCircular,
@@ -1392,6 +1468,11 @@ export default {
         cilXCircle,
         cilHandPointDown,
         cilWarning,
+        cilBadge,
+        cilCreditCard,
+        cibPalantir,
+        cilGroup,
+        cilPin,
       },
     }
   },
@@ -1455,6 +1536,36 @@ export default {
         })
         .catch((error) => {
           console.log('call api - panel/getallmember : error' + error)
+        })
+    },
+    async getWebDeposit(webID) {
+      await this.$http
+        .post('panel/getbanktrnsaction', {
+          agent_id: webID,
+          type: 'deposit',
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.optBankDeposit = response.data.result
+            console.log(this.optBankDeposit)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - panel/getbanktrnsaction : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('call api - panel/getbanktrnsaction : error' + error)
         })
     },
     async submitDeposit() {
@@ -1645,8 +1756,14 @@ export default {
         if (!this.dataDeposit.web_agent_id) {
           this.dataDeposit.web_agent_id = this.optDepositWebAgent[0]._id
         }
+        this.getWebDeposit(this.dataDeposit.web_agent_id)
         this.getMemberList(this.dataDeposit.web_agent_id)
       }
+    },
+    getDate(event, checkIn, checkOut) {
+      console.log(event)
+      console.log(checkIn)
+      console.log(checkOut)
     },
     loadHistory() {
       if (this.updateHistoryAuto) {
@@ -1762,7 +1879,7 @@ export default {
         return 'success'
       } else if (_val == 'pending') {
         return 'warning'
-      } else if (_val == 'reject') {
+      } else if (_val == 'cancel') {
         return 'danger'
       } else {
         return 'dark'
@@ -1822,6 +1939,7 @@ export default {
       this.loadHistory()
     }
     this.getWebPrefixList()
+    // this.mdDeposit = true
   },
   setup() {
     return {
