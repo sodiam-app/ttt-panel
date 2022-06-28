@@ -53,44 +53,44 @@ export default [
     component: 'CNavTitle',
     name: 'การตั้งค่า',
   },
-  // {
-  //   component: 'CNavGroup',
-  //   name: 'ระบบ',
-  //   to: '/setting',
-  //   icon: 'cil-settings',
-  //   items: [
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'ทั่วไป',
-  //       to: '/setting/general',
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'บัญชีเว็บ',
-  //       to: '/setting/banking-acct',
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'หน้าเว็บ',
-  //       to: '/setting/front-end',
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'ความปลอดภัย',
-  //       to: '/setting/security',
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'เว็บเอเย่น',
-  //       to: '/setting/agent',
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'บัญชีดำ',
-  //       to: '/setting/balck-list',
-  //     },
-  //   ],
-  // },
+  {
+    component: 'CNavGroup',
+    name: 'ระบบ',
+    to: '/setting',
+    icon: 'cil-settings',
+    items: [
+      {
+        component: 'CNavItem',
+        name: 'ทั่วไป',
+        to: '/setting/general',
+      },
+      {
+        component: 'CNavItem',
+        name: 'บัญชีเว็บ',
+        to: '/setting/banking-acct',
+      },
+      // {
+      //   component: 'CNavItem',
+      //   name: 'หน้าเว็บ',
+      //   to: '/setting/front-end',
+      // },
+      // {
+      //   component: 'CNavItem',
+      //   name: 'ความปลอดภัย',
+      //   to: '/setting/security',
+      // },
+      // {
+      //   component: 'CNavItem',
+      //   name: 'เว็บเอเย่น',
+      //   to: '/setting/agent',
+      // },
+      // {
+      //   component: 'CNavItem',
+      //   name: 'บัญชีดำ',
+      //   to: '/setting/balck-list',
+      // },
+    ],
+  },
   // {
   //   component: 'CNavGroup',
   //   name: 'โปรโมชั่น',

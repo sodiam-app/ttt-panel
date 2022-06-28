@@ -46,6 +46,7 @@
                       <CFormInput
                         id="cPrefix"
                         :disabled="isEdit == false ? true : false"
+                        v-model="dataConf.prefix"
                       />
                     </CInputGroup>
                   </div>
@@ -62,6 +63,7 @@
                       <CFormInput
                         id="cLoginUrl"
                         :disabled="isEdit == false ? true : false"
+                        v-model="dataConf.url_login"
                       />
                     </CInputGroup>
                   </div>
@@ -78,6 +80,7 @@
                       <CFormInput
                         id="cPartnerUrl"
                         :disabled="isEdit == false ? true : false"
+                        v-model="dataConf.partner_url"
                       />
                     </CInputGroup>
                   </div>
@@ -92,8 +95,10 @@
                         <CIcon :icon="ic.cilEthernet" />
                       </CInputGroupText>
                       <CFormInput
+                        type="number"
                         id="cMaxIPPerDay"
                         :disabled="isEdit == false ? true : false"
+                        v-model="dataConf.limit_ip"
                       />
                     </CInputGroup>
                   </div>
@@ -110,6 +115,7 @@
                       <CFormInput
                         id="cUserTemplate"
                         :disabled="isEdit == false ? true : false"
+                        v-model="dataConf.user_template"
                       />
                     </CInputGroup>
                   </div>
@@ -124,15 +130,17 @@
                         <CIcon :icon="ic.cilMediaStepForward" />
                       </CInputGroupText>
                       <CFormInput
+                        type="number"
                         id="cLastUser"
                         :disabled="isEdit == false ? true : false"
+                        v-model="dataConf.lastuser"
                       />
                     </CInputGroup>
                   </div>
                 </CCol>
               </CRow>
-              <hr />
-              <CRow :xs="{ cols: 1, gutterY: 2 }" :md="{ cols: 2, gutterY: 2 }">
+              <!-- <hr /> -->
+              <!-- <CRow :xs="{ cols: 1, gutterY: 2 }" :md="{ cols: 2, gutterY: 2 }">
                 <CCol>
                   <div>
                     <label for="cLineDeposit" class="form-label">
@@ -167,7 +175,7 @@
                     </CInputGroup>
                   </div>
                 </CCol>
-              </CRow>
+              </CRow> -->
             </CCol>
           </CRow>
           <hr />
@@ -195,8 +203,8 @@
                           <CFormInput
                             type="number"
                             id="cLineWithdraw"
-                            value="10"
                             :disabled="isEdit == false ? true : false"
+                            v-model="dataConf.deposit_min"
                           />
                           <CInputGroupText> ฿ </CInputGroupText>
                         </CInputGroup>
@@ -214,8 +222,8 @@
                           <CFormInput
                             type="number"
                             id="cDepositMax"
-                            value="10000"
                             :disabled="isEdit == false ? true : false"
+                            v-model="dataConf.deposit_max"
                           />
                           <CInputGroupText> ฿ </CInputGroupText>
                         </CInputGroup>
@@ -248,8 +256,8 @@
                           <CFormInput
                             type="number"
                             id="cWithdrawMin"
-                            value="10"
                             :disabled="isEdit == false ? true : false"
+                            v-model="dataConf.withdraw_min"
                           />
                           <CInputGroupText> ฿ </CInputGroupText>
                         </CInputGroup>
@@ -267,8 +275,8 @@
                           <CFormInput
                             type="number"
                             id="cWithdrawMax"
-                            value="10000"
                             :disabled="isEdit == false ? true : false"
+                            v-model="dataConf.withdraw_max"
                           />
                           <CInputGroupText> ฿ </CInputGroupText>
                         </CInputGroup>
@@ -286,8 +294,8 @@
                           <CFormInput
                             type="number"
                             id="cWithdrawMax"
-                            value="5"
                             :disabled="isEdit == false ? true : false"
+                            v-model="dataConf.withdraw_limit_round"
                           />
                           <CInputGroupText> ครั้ง / วัน </CInputGroupText>
                         </CInputGroup>
@@ -337,8 +345,6 @@ import {
   cilColorBorder,
 } from '@coreui/icons'
 
-import avatar from '@/assets/images/avatars/owner/02.png'
-
 export default {
   components: {},
   name: 'Setting General',
@@ -347,8 +353,31 @@ export default {
   },
   data() {
     return {
+      dataConf: {
+        _id: '629e381cb4839cabb5622da1',
+        prefix: '99dev',
+        url_login: 'https://www.banpong888.com/login',
+        partner_url: 'https://www.banpong888.com/register',
+        limit_ip: 2 + '',
+        user_template: 'bp888',
+        lastuser: 100236 + '',
+        deposit_min: 1 + '',
+        deposit_max: 10 + '',
+        withdraw_min: 5 + '',
+        withdraw_max: 300 + '',
+        withdraw_limit_round: 9 + '',
+        withdraw_amount_select: {
+          1: 50,
+          2: 100,
+          3: 200,
+          4: 300,
+          5: 400,
+          6: 2000,
+          7: 2500,
+        },
+      },
+
       isEdit: false,
-      avatar: avatar,
       ic: {
         cilShieldAlt,
         cilLink,

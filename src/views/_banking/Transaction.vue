@@ -1,6 +1,6 @@
 <template>
   <div>
-    <CCard class="mb-2">
+    <CCard class="mb-2" v-if="bankingVisible">
       <CCardBody class="p-2">
         <CContainer fluid class="ps-0 pe-0">
           <CRow class="mb-2">
@@ -253,7 +253,12 @@
                 </CCol>
                 <CCol lg="2" class="ps-0">
                   <div class="text-end">
-                    <CButton color="secondary" variant="outline" size="sm">
+                    <CButton
+                      color="secondary"
+                      variant="outline"
+                      size="sm"
+                      @click="bankingVisible = !bankingVisible"
+                    >
                       <strong>
                         <CIcon :icon="ic.cilFullscreenExit" size="sm" />
                       </strong>
@@ -266,6 +271,18 @@
         </CContainer>
       </CCardBody>
     </CCard>
+    <div v-else class="text-end mb-2">
+      <CButton
+        color="secondary"
+        variant="outline"
+        size="sm"
+        @click="bankingVisible = !bankingVisible"
+      >
+        <strong>
+          <CIcon :icon="ic.cilFullscreen" size="sm" />
+        </strong>
+      </CButton>
+    </div>
     <CCard>
       <CCardHeader>
         <CNav variant="tabs" class="card-header-tabs">
@@ -326,9 +343,10 @@
                     <CTableHeaderCell scope="col">จำนวนเงิน</CTableHeaderCell>
                     <CTableHeaderCell scope="col">เวลา</CTableHeaderCell>
                     <CTableHeaderCell scope="col">web</CTableHeaderCell>
-                    <CTableHeaderCell scope="col" class="text-center">
+                    <!-- <CTableHeaderCell scope="col" class="text-center">
                       ตรวจสอบ
-                    </CTableHeaderCell>
+                    </CTableHeaderCell> -->
+                    <CTableHeaderCell scope="col">ผู้ดูแล</CTableHeaderCell>
                     <CTableHeaderCell scope="col" class="text-center">
                       จัดการ
                     </CTableHeaderCell>
@@ -346,6 +364,7 @@
                     v-for="(history, index) in dataHistory"
                     :key="history.id"
                     :color="convertTypeRowsColor(history.type)"
+                    class=""
                   >
                     <CTableHeaderCell scope="row">
                       {{ index + 1 }}.
@@ -381,7 +400,7 @@
                       </CRow>
                     </CTableDataCell>
                     <CTableDataCell>{{ history.web_prefix }}</CTableDataCell>
-                    <CTableDataCell class="text-center">
+                    <!-- <CTableDataCell class="text-center">
                       <CButton
                         v-if="!history.Checked"
                         color="warning"
@@ -397,8 +416,9 @@
                         "
                       >
                         <CIcon :icon="ic.cilCircle" size="sm" />
-                        <br />
-                        <small>เช็ค</small>
+                        <div class="lh-1 mb-1">
+                          <small>เช็ค</small>
+                        </div>
                       </CButton>
                       <div v-else class="align-items-center">
                         <CAvatar
@@ -412,15 +432,49 @@
                           status="success"
                           class="mb-1"
                         />
-                        <!-- <span class="ms-1"> -->
                         <CBadge color="dark" shape="rounded-pill">
                           {{ history.Checked.checker_username }}
                         </CBadge>
-                        <!-- </span> -->
+                      </div>
+                    </CTableDataCell> -->
+                    <CTableDataCell>
+                      <div
+                        v-if="!checkLockedTransac(history.lock)"
+                        class="d-inline-flex align-items-center"
+                      >
+                        <CAvatar
+                          :src="
+                            getImgAvatar(
+                              history.lock.lock_role,
+                              history.lock.lock_avatar,
+                            )
+                          "
+                          size="sm"
+                          status="success"
+                          class="mb-1"
+                        />
+                        <!-- <CSpinner size="sm" variant="grow" class="me-1" /> -->
+                        <CBadge color="dark" shape="rounded-pill">
+                          {{ history.lock.lock_by }}
+                        </CBadge>
+                      </div>
+                      <div
+                        v-if="checkLockedTransacByMe(history.lock)"
+                        class="d-inline-flex align-items-center"
+                      >
+                        <CSpinner
+                          size="sm"
+                          variant="grow"
+                          class="me-1"
+                          color="danger"
+                        />
+                        <CBadge color="primary" shape="rounded-pill">
+                          คุณ
+                        </CBadge>
                       </div>
                     </CTableDataCell>
-                    <CTableDataCell>
-                      <CButtonGroup role="group" size="sm">
+                    <CTableDataCell class="text-center">
+                      <!-- <CButtonGroup role="group" size="sm">
                         <CButton
                           color="success"
                           variant="outline"
@@ -433,8 +487,9 @@
                           "
                         >
                           <CIcon :icon="ic.cilCheckAlt" size="sm" />
-                          <br />
-                          <small>อนุมัติ</small>
+                          <div class="lh-1 mb-1">
+                            <small>อนุมัติ</small>
+                          </div>
                         </CButton>
                         <CButton
                           color="danger"
@@ -448,8 +503,27 @@
                           "
                         >
                           <CIcon :icon="ic.cilX" size="sm" />
-                          <br />
-                          <small>ปฏิเสธ</small>
+                          <div class="lh-1 mb-1">
+                            <small>ปฏิเสธ</small>
+                          </div>
+                        </CButton>
+                      </CButtonGroup> -->
+                      <CButtonGroup
+                        v-if="checkLockedTransac(history.lock)"
+                        role="group"
+                        size="sm"
+                      >
+                        <CButton
+                          color="info"
+                          variant="outline"
+                          @click.prevent="
+                            showManageTransaction(history._id, history.type)
+                          "
+                        >
+                          <CIcon :icon="ic.cilCog" size="sm" />
+                          <div class="lh-1 mb-1">
+                            <small>จัดการ</small>
+                          </div>
                         </CButton>
                       </CButtonGroup>
                     </CTableDataCell>
@@ -487,11 +561,11 @@
                           <div class="fw-bolder">
                             {{ history.memb_bank }}
                           </div>
-                          <div class="fst-italic">
-                            {{ history.memb_name }}
-                          </div>
                         </CCol>
                       </CRow>
+                      <div class="fst-italic small">
+                        {{ history.memb_name }}
+                      </div>
                     </CTableDataCell>
                     <CTableDataCell>
                       <div v-if="history.sub_type != 'bonus'">
@@ -508,11 +582,11 @@
                             <div class="fw-bolder">
                               {{ history.web_account_number }}
                             </div>
-                            <div class="fst-italic">
-                              {{ history.web_account_name }}
-                            </div>
                           </CCol>
                         </CRow>
+                        <div class="fst-italic small">
+                          {{ history.web_account_name }}
+                        </div>
                       </div>
                       <div v-else class="d-inline-flex align-items-start">
                         <CIcon class="text-info" :icon="ic.cibPalantir" />
@@ -522,17 +596,19 @@
                       </div>
                     </CTableDataCell>
                     <CTableDataCell>
-                      <CSpinner
-                        v-if="history.status == 'pending'"
-                        component="span"
-                        color="warning"
-                        size="sm"
-                        class="me-1"
-                      />
-                      <CBadge :color="convertStatusColor(history.status)">
-                        <!-- {{ convertHistoryStatus(history.status) }} -->
-                        {{ history.status }}
-                      </CBadge>
+                      <div class="d-inline-flex align-items-start">
+                        <CSpinner
+                          v-if="history.status == 'pending'"
+                          component="span"
+                          color="warning"
+                          size="sm"
+                          class="me-1"
+                        />
+                        <CBadge :color="convertStatusColor(history.status)">
+                          <!-- {{ convertHistoryStatus(history.status) }} -->
+                          {{ history.status }}
+                        </CBadge>
+                      </div>
                     </CTableDataCell>
                     <CTableDataCell>
                       {{ history.description }}
@@ -673,11 +749,11 @@
                             <div class="fw-bolder">
                               {{ historylasted.memb_bank }}
                             </div>
-                            <div class="fst-italic">
-                              {{ historylasted.memb_name }}
-                            </div>
                           </CCol>
                         </CRow>
+                        <div class="fst-italic small">
+                          {{ historylasted.memb_name }}
+                        </div>
                       </div>
                     </CTableDataCell>
                     <CTableDataCell>
@@ -695,11 +771,11 @@
                             <div class="fw-bolder">
                               {{ historylasted.web_account_number }}
                             </div>
-                            <div class="fst-italic">
-                              {{ historylasted.web_account_name }}
-                            </div>
                           </CCol>
                         </CRow>
+                        <div class="fst-italic small">
+                          {{ historylasted.web_account_name }}
+                        </div>
                       </div>
                       <div v-else class="d-inline-flex align-items-start">
                         <CIcon class="text-info" :icon="ic.cibPalantir" />
@@ -1356,6 +1432,357 @@
       </CCard>
     </CModalBody>
   </CModal>
+
+  <!-- ----- -->
+  <!-- Manage Transaction -->
+  <!-- ------ -->
+  <CModal
+    backdrop="static"
+    :visible="mdManageTransaction"
+    @close="
+      () => {
+        mdManageTransaction = false
+      }
+    "
+  >
+    <CModalBody class="m-0 p-0">
+      <CCard class="border-warning m-0 p-0">
+        <CCardBody>
+          <CCardText class="small text-center">
+            <CModalTitle class="fw-bolder text-decoration-underline mb-1 mt-1">
+              การจัดการการอนุมัติ
+            </CModalTitle>
+            <p class="mb-2">
+              <CIcon :icon="ic.cilHandPointDown" />
+              กรุณาตรวจสอบความถูกต้องของข้อมูลก่อนการดำเนินการ
+            </p>
+            <hr class="mt-0" />
+            <CAlert
+              color="danger"
+              class="py-1"
+              :visible="errManageTransacVisible"
+            >
+              <CIcon :icon="ic.cilWarning" />
+              {{ errManageTransacMessage }}
+            </CAlert>
+            <ul class="list-group mb-1">
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center py-1"
+              >
+                ช่องทาง / ประเภท:
+                <div>
+                  <span class="badge bg-dark me-1"> --- </span>
+                  <span
+                    :class="
+                      'badge bg-' + convertTypeColor(dataManageTransaction.type)
+                    "
+                  >
+                    {{ convertType(dataManageTransaction.type) }}
+                  </span>
+                </div>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center py-1"
+              >
+                จำนวนเงิน:
+                <span
+                  :class="
+                    'badge rounded-pill bg-' +
+                    convertTypeColor(dataManageTransaction.type)
+                  "
+                >
+                  {{ convertAmount2Degit(dataManageTransaction.amount) }} ฿
+                </span>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center py-1"
+              >
+                เวลา:
+                <div class="text-end">
+                  <div class="fw-bolder">
+                    {{ convertTime(dataManageTransaction.request_date) }}
+                  </div>
+                  <div class="fw-lighter lh-1 small">
+                    {{ convertDate(dataManageTransaction.request_date) }}
+                  </div>
+                  <!-- <span class="fw-bolder lh-1">
+                    {{ convertTime(dataManageTransaction.request_date) }}
+                  </span>
+                  <br />
+                  <span class="fw-lighter small">
+                    {{ convertDate(dataManageTransaction.request_date) }}
+                  </span> -->
+                </div>
+              </li>
+            </ul>
+            <ul class="list-group mb-1">
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center lh-1"
+              >
+                web:
+                <span> {{ dataManageTransaction.web_aka }} </span>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center lh-1 py-1"
+              >
+                ยูสเซอร์ลูกค้า:
+                <CButton
+                  size="sm"
+                  color="link"
+                  class="p-0"
+                  @click="
+                    navigateToNewTap(
+                      '/member/list/99dev/' + dataManageTransaction.memb_id,
+                    )
+                  "
+                >
+                  {{ dataManageTransaction.memb_username }}
+                </CButton>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                บัญชีลูกค้า:
+                <div class="text-end d-flex">
+                  <div class="d-inline d-block">
+                    <div class="fw-bolder lh-1">
+                      {{ dataManageTransaction.memb_bank }}
+                    </div>
+                    <div class="fst-italic small">
+                      {{ dataManageTransaction.memb_name }}
+                    </div>
+                  </div>
+                  <div class="d-inline">
+                    <CImage
+                      fluid
+                      :src="getBankIMG(dataManageTransaction.memb_banking_code)"
+                      width="30"
+                      class="ms-2"
+                    />
+                  </div>
+                </div>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                บัญชีเว็บ:
+                <div class="text-end d-flex">
+                  <div class="d-inline d-block">
+                    <div class="fw-bolder lh-1">
+                      {{ dataManageTransaction.web_account_number }}
+                    </div>
+                    <div class="fst-italic small">
+                      {{ dataManageTransaction.web_account_name }}
+                    </div>
+                  </div>
+                  <div class="d-inline">
+                    <CImage
+                      fluid
+                      :src="getBankIMG(dataManageTransaction.web_account_code)"
+                      width="30"
+                      class="ms-2"
+                    />
+                  </div>
+                </div>
+              </li>
+            </ul>
+            <CCard
+              v-if="dataManageTransaction.description"
+              class="mt-0 mb-1 text-start border-start-2 border-start-warning small"
+            >
+              <CCardHeader class="py-1">* หมายเหตุก่อนหน้า</CCardHeader>
+              <CCardBody class="py-1">
+                <CCardText>
+                  <div
+                    v-for="note in dataManageTransaction.description"
+                    :key="note._id"
+                  >
+                    <CBadge
+                      :color="convertUserNoteColor(note.username)"
+                      shape="rounded-pill"
+                    >
+                      {{ note.username }}
+                    </CBadge>
+                    : {{ note.note }}
+                  </div>
+                </CCardText>
+              </CCardBody>
+            </CCard>
+            <div class="form-floating">
+              <textarea
+                class="form-control form-control-sm"
+                placeholder="Leave a comment here"
+                id="floatingTextarea1"
+                style="height: 90px"
+                v-model="dataDeposit.description"
+              ></textarea>
+              <label for="floatingTextarea2">หมายเหตุ</label>
+            </div>
+            <hr />
+            <div class="text-center mb-2">
+              <div class="d-flex justify-content-between">
+                <!-- start -->
+                <div>
+                  <!-- <CButton
+                size="sm"
+                color="warning"
+                class="ms-1 text-light"
+                @click="
+                  submitTransactionStatus(
+                    dataManageTransaction._id,
+                    'check',
+                    dataManageTransaction.type,
+                  )
+                "
+              >
+                <CIcon :icon="ic.cilPencil" />
+                เช็ค
+              </CButton> -->
+                  <CButton
+                    size="sm"
+                    color="success"
+                    class="text-light"
+                    @click="
+                      submitTransactionStatus(
+                        dataManageTransaction._id,
+                        'approve',
+                        dataManageTransaction.type,
+                      )
+                    "
+                  >
+                    <CIcon :icon="ic.cilCheckCircle" />
+                    อนุมัติ
+                  </CButton>
+                  <CButton
+                    size="sm"
+                    color="danger"
+                    class="text-light ms-1"
+                    @click="
+                      submitTransactionStatus(
+                        dataManageTransaction._id,
+                        'cancel',
+                        dataManageTransaction.type,
+                      )
+                    "
+                  >
+                    <CIcon :icon="ic.cilXCircle" />
+                    ปฏิเสธ
+                  </CButton>
+                </div>
+                <!-- end -->
+                <div>
+                  <CButton
+                    size="sm"
+                    color="info"
+                    class="text-light ms-1"
+                    @click="
+                      submitTransactionStatus(
+                        dataManageTransaction._id,
+                        'save',
+                        dataManageTransaction.type,
+                      )
+                    "
+                  >
+                    <CIcon :icon="ic.cilSave" />
+                    บันทึก
+                  </CButton>
+                  <CButton
+                    size="sm"
+                    color="secondary"
+                    class="text-light ms-1"
+                    @click="
+                      submitTransactionStatus(
+                        dataManageTransaction._id,
+                        'close',
+                        dataManageTransaction.type,
+                      )
+                    "
+                  >
+                    <CIcon :icon="ic.cilX" />
+                    ปิด
+                  </CButton>
+                </div>
+              </div>
+            </div>
+          </CCardText>
+        </CCardBody>
+      </CCard>
+    </CModalBody>
+  </CModal>
+
+  <!-- ----- -->
+  <!-- Popup Alert Click Same Job -->
+  <!-- ------ -->
+  <CModal
+    backdrop="static"
+    alignment="center"
+    scrollable
+    :visible="mdClickSameJob"
+    @close="
+      () => {
+        mdClickSameJob = false
+      }
+    "
+  >
+    <CModalHeader class="pt-3 pb-2 bg-warning border-warning bg-opacity-75">
+      <CModalTitle class="text-center fw-bolder">
+        <CIcon size="lg" :icon="ic.cilWarning" />
+        เกิดข้อผิดพลาด
+      </CModalTitle>
+    </CModalHeader>
+    <CModalBody
+      class="bg-warning bg-opacity-50 border-bottom border-4 border-warning"
+    >
+      <!-- <CModalTitle class="text-center fw-bolder">
+        <CIcon :icon="ic.cilWarning" />
+        เกิดข้อผิดพลาด
+      </CModalTitle> -->
+      <div class="mb-3">
+        ไม่สามารถ <span class="fw-bolder fst-italic">" จัดการ "</span>
+        รายการนี้ได้ เนื่องจาก ผู้ดูแล
+        <span class="badge rounded-pill bg-info">{{
+          errClickSameJob.user
+        }}</span>
+        กำลังดำเนินการนี้อยู่ เมื่อ:
+        <span class="fw-light me-1">
+          {{ convertDate(errClickSameJob.date) }}
+        </span>
+        <span class="fw-bold"> {{ convertTime(errClickSameJob.date) }}</span>
+      </div>
+      <div class="text-center">
+        <CButton
+          color="dark"
+          size="sm"
+          class="text-white"
+          @click="
+            () => {
+              mdClickSameJob = false
+            }
+          "
+        >
+          <CIcon :icon="ic.cilXCircle" />
+          ปิด
+        </CButton>
+      </div>
+    </CModalBody>
+    <!-- <CModalFooter class="pt-1 pb-2 bg-warning bg-opacity-75">
+      <div class="align-self-center">
+        <CButton
+          color="secondary"
+          size="sm"
+          class="text-center"
+          @click="
+            () => {
+              mdManageAlert = false
+            }
+          "
+        >
+          <CIcon :icon="ic.cilXCircle" />
+          ปิด
+        </CButton>
+      </div>
+    </CModalFooter> -->
+  </CModal>
 </template>
 
 <script>
@@ -1385,13 +1812,17 @@ import {
   cibPalantir,
   cilGroup,
   cilPin,
+  cilFullscreen,
+  cilPencil,
+  cilSave,
+  cilCog,
 } from '@coreui/icons'
 
 import { CDatePicker } from '@coreui/vue-pro'
 import moment from 'moment'
 
 import avatar from '@/assets/images/avatars/owner/02.png'
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'Transection',
@@ -1402,19 +1833,35 @@ export default {
   data() {
     return {
       picked: new Date(),
-      demo: '',
+      bankingVisible: true,
       avatar: avatar,
       tabPaneActiveKey: 1,
       visibleSearch: false,
       visibleBank: true,
+
+      // Modal (Popup)
       mdStatement: false,
       mdDeposit: false,
       mdConfirmApprove: false,
-      isBonusDeposit: true,
+      mdManageTransaction: false,
+      mdClickSameJob: false,
+
       mdWithdraw: false,
+
+      // Alert Popup
+      alertMessage: '',
+      errClickSameJob: {
+        user: '',
+        date: '',
+      },
+
+      // controls
+      isBonusDeposit: true,
       isBonusWithdraw: true,
-      errApproveVisible: true,
+      errApproveVisible: false,
       errApproveMessage: '',
+      errManageTransacVisible: false,
+      errManageTransacMessage: '',
 
       // Web
       providerCredit: 0,
@@ -1444,6 +1891,7 @@ export default {
       dataHistory: [],
       dataHistoryLasted: [],
       dataConfirmApprove: {},
+      dataManageTransaction: {},
 
       // list of select elements
       optMemberList: [],
@@ -1473,6 +1921,10 @@ export default {
         cibPalantir,
         cilGroup,
         cilPin,
+        cilFullscreen,
+        cilPencil,
+        cilSave,
+        cilCog,
       },
     }
   },
@@ -1670,6 +2122,7 @@ export default {
         })
     },
     async submitApprove(_id, _checked, _type) {
+      // ไม่ได้ใช้งานแล้วเนื่องจากมีการตัดเรื่องการ check ออก
       if (_checked == null) {
         // this.dataHistory.forEach((value) => {
         //   if (value._id == _id) {
@@ -1702,6 +2155,7 @@ export default {
       }
     },
     async submitTransactionStatus(_id, _status, _type) {
+      // Check, Approve, Cancel, Close
       await this.$http
         .post('panel/updatetransaction', {
           doc_id: _id,
@@ -1711,7 +2165,8 @@ export default {
         .then((response) => {
           if (response.data.status == 200) {
             this.providerCredit = response.data.credit_web
-            this.mdConfirmApprove = false
+            // this.mdConfirmApprove = false
+            this.mdManageTransaction = false
             console.log(
               'call api - panel/updatetransaction : status = ' +
                 response.data.status +
@@ -1726,7 +2181,9 @@ export default {
               this.navigateTo('/pages/login')
             })
           } else {
-            this.errApproveVisible = true
+            // this.errApproveVisible = true
+            // this.errApproveMessage = response.data.message
+            this.errManageTransacVisible = true
             this.errApproveMessage = response.data.message
             console.log(
               'call api - panel/updatetransaction : status = ' +
@@ -1738,8 +2195,54 @@ export default {
         })
         .catch((error) => {
           console.log('call api - panel/updatetransaction : error' + error)
-        }),
-        this.getHistory()
+        })
+        .finally(() => {
+          this.getHistory()
+        })
+    },
+    async showManageTransaction(_id, _type) {
+      await this.$http
+        .post('panel/historybyId', {
+          doc_id: _id,
+          type: _type,
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.dataManageTransaction = response.data.result
+            this.mdManageTransaction = true
+            console.log(
+              'call api - panel/historybyId : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          } else if (response.data.status == 201) {
+            this.errClickSameJob.user = response.data.lock.lock_by_name
+            this.errClickSameJob.date = response.data.lock.lock_date
+            this.mdClickSameJob = true
+            this.getHistory()
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - panel/historybyId : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('call api - panel/historybyId : error' + error)
+        })
+        .finally(() => {
+          // this.getHistory()
+        })
     },
     // functions
     navigateTo(route) {
@@ -1801,6 +2304,20 @@ export default {
       }
       if (_index == 2) {
         this.getHistoryLasted()
+      }
+    },
+    checkLockedTransac(_locked) {
+      if (!_locked) return true
+      if (_locked.lock_by != this.user.username) return false
+      else {
+        return true
+      }
+    },
+    checkLockedTransacByMe(_locked) {
+      if (!_locked) return false
+      if (_locked.lock_by == this.user.username) return true
+      else {
+        return false
       }
     },
     // convert functions
@@ -1925,6 +2442,15 @@ export default {
         return 'light'
       }
     },
+    convertUserNoteColor(value) {
+      if (!value) return 'danger'
+      const _val = value.toString().toLowerCase()
+      if (_val == 'system') {
+        return 'secondary'
+      } else {
+        return 'warning'
+      }
+    },
   },
   created() {
     if (this.tabPaneActiveKey == 1) {
@@ -1934,12 +2460,18 @@ export default {
       this.getHistoryLasted()
     }
   },
+  computed: {
+    ...mapGetters({
+      user: 'auth/user',
+    }),
+  },
   mounted() {
     if (this.flagAutoHistory == true) {
       this.loadHistory()
     }
     this.getWebPrefixList()
-    // this.mdDeposit = true
+    // test modal popup
+    // this.mdClickSameJob = true
   },
   setup() {
     return {
