@@ -95,7 +95,7 @@
                         <CButton
                           color="danger"
                           class="text-light"
-                          @click="mdWithdraw = !mdWithdraw"
+                          @click="clickWithdraw"
                         >
                           <strong>
                             <CIcon :icon="ic.cilExternalLink" size="sm" />
@@ -438,39 +438,49 @@
                       </div>
                     </CTableDataCell> -->
                     <CTableDataCell>
-                      <div
-                        v-if="!checkLockedTransac(history.lock)"
-                        class="d-inline-flex align-items-center"
-                      >
-                        <CAvatar
-                          :src="
-                            getImgAvatar(
-                              history.lock.lock_role,
-                              history.lock.lock_avatar,
-                            )
-                          "
-                          size="sm"
-                          status="success"
-                          class="mb-1"
-                        />
-                        <!-- <CSpinner size="sm" variant="grow" class="me-1" /> -->
-                        <CBadge color="dark" shape="rounded-pill">
-                          {{ history.lock.lock_by }}
-                        </CBadge>
+                      <div v-if="!checkLockedTransac(history.lock)">
+                        <div class="d-inline-flex align-items-center">
+                          <CAvatar
+                            :src="
+                              getImgAvatar(
+                                history.lock.lock_role,
+                                history.lock.lock_avatar,
+                              )
+                            "
+                            size="sm"
+                            status="success"
+                            class="mb-1"
+                          />
+                          <!-- <CSpinner size="sm" variant="grow" class="me-1" /> -->
+                          <CBadge color="dark" shape="rounded-pill">
+                            {{ history.lock.lock_by }}
+                          </CBadge>
+                        </div>
+                        <div class="small">
+                          <timeago
+                            auto-update
+                            :datetime="history.lock.lock_date"
+                          />
+                        </div>
                       </div>
-                      <div
-                        v-if="checkLockedTransacByMe(history.lock)"
-                        class="d-inline-flex align-items-center"
-                      >
-                        <CSpinner
-                          size="sm"
-                          variant="grow"
-                          class="me-1"
-                          color="danger"
-                        />
-                        <CBadge color="primary" shape="rounded-pill">
-                          คุณ
-                        </CBadge>
+                      <div v-if="checkLockedTransacByMe(history.lock)">
+                        <div class="d-inline-flex align-items-center">
+                          <CSpinner
+                            size="sm"
+                            variant="grow"
+                            class="me-1"
+                            color="danger"
+                          />
+                          <CBadge color="primary" shape="rounded-pill">
+                            คุณ
+                          </CBadge>
+                        </div>
+                        <div class="small">
+                          <timeago
+                            auto-update
+                            :datetime="history.lock.lock_date"
+                          />
+                        </div>
                       </div>
                     </CTableDataCell>
                     <CTableDataCell class="text-center">
@@ -508,11 +518,7 @@
                           </div>
                         </CButton>
                       </CButtonGroup> -->
-                      <CButtonGroup
-                        v-if="checkLockedTransac(history.lock)"
-                        role="group"
-                        size="sm"
-                      >
+                      <CButtonGroup role="group" size="sm">
                         <CButton
                           color="info"
                           variant="outline"
@@ -610,8 +616,16 @@
                         </CBadge>
                       </div>
                     </CTableDataCell>
-                    <CTableDataCell>
-                      {{ history.description }}
+                    <CTableDataCell class="small">
+                      <div v-for="note in history.description" :key="note._id">
+                        <CBadge
+                          :color="convertUserNoteColor(note.username)"
+                          shape="rounded-pill"
+                        >
+                          {{ note.username }}
+                        </CBadge>
+                        : {{ note.note }}
+                      </div>
                     </CTableDataCell>
                   </CTableRow>
                 </CTableBody>
@@ -925,8 +939,8 @@
         <strong><p class="h4 mb-0 mt-1">เพิ่มรายการฝาก</p></strong>
       </CModalTitle>
     </CModalHeader>
-    <CModalBody class="m-0 p-0">
-      <CCard class="border-success m-0 p-0">
+    <CModalBody class="m-0 p-0 bg-success">
+      <CCard class="m-0 p-0 border-bottom border-success">
         <CCardBody>
           <CCardText class="small">
             <form>
@@ -956,22 +970,6 @@
                       </option>
                     </CFormSelect>
                   </CInputGroup>
-                  <!-- <select
-                    class="form-select form-select-sm"
-                    aria-label="กรุณาเลือกบัญชีฝาก"
-                    id="depositBank"
-                  >
-                    <option value="" selected>บัญชีโบนัส</option>
-                    <option
-                      v-for="option in optBankDeposit"
-                      :key="option._id"
-                      :value="option._id"
-                    >
-                      [{{ option.bank_code }}] | {{ option.bank_account }} ({{
-                        option.account_name
-                      }})
-                    </option>
-                  </select> -->
                 </div>
               </div>
               <div v-if="isBonusDeposit" class="fw-bolder fst-italic small">
@@ -982,28 +980,22 @@
               </div>
               <hr class="mt-2 mb-2" />
               <div class="mb-1">
-                <label for="depositDateTime" class="form-label mb-1">
+                <label for="depositWebAgent" class="form-label mb-1">
                   * เว็บลูกค้า
                 </label>
-                <!-- <select
-                  class="form-select form-select-sm"
-                  aria-label="กรุณาเลือกเว็บของลูกค้า"
-                  id="prefix"
-                >
-                  <option value="Banpong888" selected>Banpong888</option>
-                </select> -->
                 <CInputGroup>
-                  <CInputGroupText id="basic-addon1">
+                  <CInputGroupText>
                     <CIcon :icon="ic.cilPin" />
                   </CInputGroupText>
                   <CFormSelect
+                    id="depositWebAgent"
                     size="sm"
                     v-model="dataDeposit.web_agent_id"
                     @change="getMemberList($event.target.value)"
                   >
                     <option value="">กรุณาเลือกเว็บ</option>
                     <option
-                      v-for="option in optDepositWebAgent"
+                      v-for="option in optWebAgent"
                       :key="option._id"
                       :value="option._id"
                     >
@@ -1020,7 +1012,11 @@
                   <CInputGroupText id="basic-addon1">
                     <CIcon :icon="ic.cilGroup" />
                   </CInputGroupText>
-                  <CFormSelect size="sm" v-model="dataDeposit.memb_id">
+                  <CFormSelect
+                    id="depositMemberID"
+                    size="sm"
+                    v-model="dataDeposit.memb_id"
+                  >
                     <option value="">กรุณาเลือกยูสเซอร์</option>
                     <option
                       v-for="option in optMemberList"
@@ -1043,6 +1039,7 @@
                 <CRow class="g-2">
                   <CCol sm="7">
                     <CDatePicker
+                      id="depositDateTime"
                       size="sm"
                       locale="th-TH"
                       confirm-button="ตกลง"
@@ -1083,9 +1080,6 @@
                   <CInputGroupText> ฿ </CInputGroupText>
                 </CInputGroup>
               </div>
-              <!-- <div class="mb-1">
-                <CFormInput type="file" id="fileSlipDeposit" size="sm" />
-              </div> -->
               <hr class="mb-2" />
               <div class="mb-1">
                 <div class="form-floating">
@@ -1157,63 +1151,114 @@
       </CModalTitle>
     </CModalHeader>
     <CModalBody class="m-0 p-0">
-      <CCard class="border-danger m-0 p-0">
+      <CCard class="border-bottom border-danger">
         <CCardBody>
           <CCardText class="small">
             <form>
-              <div class="mb-1">
-                <label for="depositBank" class="form-label"> *บัญชีถอน </label>
-                <select
-                  class="form-select form-select-sm"
-                  aria-label="กรุณาเลือกบัญชีฝาก"
-                  id="depositBank"
-                >
-                  <option value="0213832833" selected>
-                    (ttb Auto) 0213832833
-                  </option>
-                  <option value="00928378472">(Reserve) 00928378472</option>
-                  <option value="66536462819">(tttAPI) 66536462819</option>
-                  <option value="0928837263">(Demo) 0928837263</option>
-                </select>
+              <CFormSwitch label="ผ่านบัญชีโบนัส" v-model="isBonusWithdraw" />
+              <div v-if="!isBonusWithdraw">
+                <div class="mb-1">
+                  <label for="withdrawBank" class="form-label">
+                    *บัญชีถอน
+                  </label>
+                  <CInputGroup class="mb-3">
+                    <CInputGroupText>
+                      <CIcon :icon="ic.cilCreditCard" />
+                    </CInputGroupText>
+                    <CFormSelect
+                      id="withdrawBank"
+                      size="sm"
+                      v-model="dataWithdraw.account_withdraw"
+                    >
+                      <option value="" selected>บัญชีโบนัส</option>
+                      <option
+                        v-for="option in optBankWithdraw"
+                        :key="option._id"
+                        :value="option._id"
+                      >
+                        [{{ option.bank_code }}] | {{ option.bank_account }} ({{
+                          option.account_name
+                        }})
+                      </option>
+                    </CFormSelect>
+                  </CInputGroup>
+                </div>
+                <div v-if="isBonusWithdraw" class="fw-bolder fst-italic small">
+                  *
+                  <span class="text-decoration-underline">
+                    กรณีถอนยอดผ่านบัญชีโบนัสระบบจะยึดเวลาปัจจุบัน
+                  </span>
+                </div>
               </div>
-              <hr />
+              <hr class="mt-2 mb-2" />
               <div class="mb-1">
-                <label for="depositMemberID" class="form-label mb-1">
-                  *ยูสเซอร์ลูกค้า
+                <label for="withdrawWebAgent" class="form-label mb-1">
+                  * เว็บลูกค้า
                 </label>
-                <select
-                  class="form-select form-select-sm"
-                  aria-label="กรุณาเลือกยูสเซอร์"
-                  id="depositMemberID"
-                >
-                  <option value="99dev100001" selected>99dev100001</option>
-                  <option value="99dev100002">99dev100002</option>
-                  <option value="99dev100004">99dev100004</option>
-                  <option value="99dev100009">99dev100009</option>
-                </select>
-                <div id="emailHelp" class="form-text mt-0 mb-2">
+                <CInputGroup>
+                  <CInputGroupText>
+                    <CIcon :icon="ic.cilPin" />
+                  </CInputGroupText>
+                  <CFormSelect
+                    id="withdrawWebAgent"
+                    size="sm"
+                    v-model="dataWithdraw.web_agent_id"
+                    @change="getMemberList($event.target.value)"
+                  >
+                    <option value="">กรุณาเลือกเว็บ</option>
+                    <option
+                      v-for="option in optWebAgent"
+                      :key="option._id"
+                      :value="option._id"
+                    >
+                      {{ option.name }}
+                    </option>
+                  </CFormSelect>
+                </CInputGroup>
+              </div>
+              <div class="mb-1">
+                <label for="withdrawMemberID" class="form-label mb-1">
+                  * ยูสเซอร์ลูกค้า
+                </label>
+                <CInputGroup>
+                  <CInputGroupText id="basic-addon1">
+                    <CIcon :icon="ic.cilGroup" />
+                  </CInputGroupText>
+                  <CFormSelect
+                    id="withdrawMemberID"
+                    size="sm"
+                    v-model="dataWithdraw.memb_id"
+                  >
+                    <option value="">กรุณาเลือกยูสเซอร์</option>
+                    <option
+                      v-for="option in optMemberList"
+                      :key="option._id"
+                      :value="option._id"
+                    >
+                      {{ option.username }} ({{ option.profile.name }}
+                      {{ option.profile.surename }})
+                    </option>
+                  </CFormSelect>
+                </CInputGroup>
+                <div class="form-text mt-0 mb-2">
                   สามารถค้นหาด้วย: ยูส, เบอร์โทร, ชื่อ
                 </div>
               </div>
               <div class="mb-1">
-                <label for="depositDateTime" class="form-label mb-1">
-                  *วันเวลาที่ทำรายการ
+                <label for="withdrawAmount" class="form-label mb-1">
+                  * ยอดเงิน
                 </label>
-                <input
-                  type="date"
-                  class="form-control form-control-sm"
-                  id="depositDateTime"
-                />
-              </div>
-              <div class="mb-1">
-                <label for="depositAmount" class="form-label mb-1">
-                  *ยอดเงิน
-                </label>
-                <input
-                  type="number"
-                  class="form-control form-control-sm"
-                  id="depositAmount"
-                />
+                <CInputGroup>
+                  <CInputGroupText>
+                    <CIcon :icon="ic.cilCash" />
+                  </CInputGroupText>
+                  <CFormInput
+                    type="number"
+                    id="withdrawAmount"
+                    v-model="dataWithdraw.amount"
+                  />
+                  <CInputGroupText> ฿ </CInputGroupText>
+                </CInputGroup>
               </div>
               <hr class="mb-2" />
               <div class="mb-1">
@@ -1222,14 +1267,29 @@
                     class="form-control form-control-sm"
                     placeholder="Leave a comment here"
                     id="floatingTextarea1"
-                    style="height: 100px"
+                    style="height: 90px"
+                    v-model="dataWithdraw.description"
                   ></textarea>
                   <label for="floatingTextarea2">หมายเหตุ</label>
                 </div>
               </div>
               <hr />
+              <CAlert
+                color="danger"
+                variant="solid"
+                class="py-2"
+                :visible="dataWithdraw.errorVisible"
+              >
+                <CIcon :icon="ic.cilWarning" />
+
+                {{ dataWithdraw.errorMessage }}
+              </CAlert>
               <div class="text-end">
-                <CButton color="success" class="ms-1 text-light">
+                <CButton
+                  color="success"
+                  class="ms-1 text-light"
+                  @click="submitWithdraw()"
+                >
                   <CIcon :icon="ic.cilCheckCircle" />
                   ตกลง
                 </CButton>
@@ -1505,13 +1565,6 @@
                   <div class="fw-lighter lh-1 small">
                     {{ convertDate(dataManageTransaction.request_date) }}
                   </div>
-                  <!-- <span class="fw-bolder lh-1">
-                    {{ convertTime(dataManageTransaction.request_date) }}
-                  </span>
-                  <br />
-                  <span class="fw-lighter small">
-                    {{ convertDate(dataManageTransaction.request_date) }}
-                  </span> -->
                 </div>
               </li>
             </ul>
@@ -1818,11 +1871,9 @@ import {
   cilCog,
 } from '@coreui/icons'
 
+import { mapActions, mapGetters } from 'vuex'
 import { CDatePicker } from '@coreui/vue-pro'
 import moment from 'moment'
-
-import avatar from '@/assets/images/avatars/owner/02.png'
-import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'Transection',
@@ -1834,7 +1885,6 @@ export default {
     return {
       picked: new Date(),
       bankingVisible: true,
-      avatar: avatar,
       tabPaneActiveKey: 1,
       visibleSearch: false,
       visibleBank: true,
@@ -1878,6 +1928,17 @@ export default {
         errorVisible: false,
         errorMessage: '',
       },
+      dataWithdraw: {
+        web_agent_id: '',
+        account_withdraw: '',
+        memb_id: '',
+        transaction_date: Date(),
+        transaction_time: Date(),
+        amount: '0',
+        description: '',
+        errorVisible: false,
+        errorMessage: '',
+      },
 
       totalPage1: 1,
       activePage1: 1,
@@ -1894,9 +1955,12 @@ export default {
       dataManageTransaction: {},
 
       // list of select elements
+      optWebAgent: [],
       optMemberList: [],
-      optDepositWebAgent: [],
       optBankDeposit: [],
+      optBankWithdraw: [],
+
+      // icons
       ic: {
         cilCash,
         cilLoopCircular,
@@ -1938,8 +2002,8 @@ export default {
         .post('panel/getprefix', {})
         .then((response) => {
           if (response.data.status == 200) {
-            this.optDepositWebAgent = response.data.result_perfix
-            console.log(this.optDepositWebAgent)
+            this.optWebAgent = response.data.result_perfix
+            console.log(this.optWebAgent)
           } else if (
             response.data.status == 502 ||
             response.data.status == 503
@@ -2020,6 +2084,36 @@ export default {
           console.log('call api - panel/getbanktrnsaction : error' + error)
         })
     },
+    async getWebWithdraw(webID) {
+      await this.$http
+        .post('panel/getbanktrnsaction', {
+          agent_id: webID,
+          type: 'withdraw',
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.optBankWithdraw = response.data.result
+            console.log(this.optBankWithdraw)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - panel/getbanktrnsaction : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('call api - panel/getbanktrnsaction : error' + error)
+        })
+    },
     async submitDeposit() {
       await this.$http
         .post('panel/deposit', {
@@ -2033,9 +2127,14 @@ export default {
           if (response.data.status == 200) {
             console.log(response.data.message + ' : ' + response.data.result)
             this.mdDeposit = false
+
             // clear data
+            this.dataDeposit.memb_id = ''
             this.dataDeposit.amount = '0'
             this.dataDeposit.description = ''
+            this.dataDeposit.account_withdraw = ''
+            this.isBonusDeposit = true
+
             this.dataDeposit.errorVisible = false
             this.dataDeposit.errorMessage = ''
           } else if (
@@ -2060,6 +2159,56 @@ export default {
           this.dataDeposit.errorVisible = true
           this.dataDeposit.errorMessage = error
           console.log('call api - panel/deposit : error' + error)
+        })
+        .finally(() => {
+          this.onClicktabPaneActive(this.tabPaneActiveKey)
+        })
+    },
+    async submitWithdraw() {
+      await this.$http
+        .post('panel/withdraw', {
+          account_withdraw: this.dataWithdraw.account_withdraw,
+          memb_id: this.dataWithdraw.memb_id,
+          transaction_date: moment().format(),
+          amount: this.dataWithdraw.amount,
+          description: this.dataWithdraw.description,
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            console.log(response.data.message + ' : ' + response.data.result)
+            this.mdWithdraw = false
+
+            // clear data
+            this.dataWithdraw.memb_id = ''
+            this.dataWithdraw.amount = '0'
+            this.dataWithdraw.description = ''
+            this.dataWithdraw.account_withdraw = ''
+            this.isBonusWithdraw = true
+
+            this.dataWithdraw.errorVisible = false
+            this.dataWithdraw.errorMessage = ''
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            this.dataWithdraw.errorVisible = true
+            this.dataWithdraw.errorMessage = response.data.message
+            console.log(
+              'call api - panel/withdraw : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          this.dataWithdraw.errorVisible = true
+          this.dataWithdraw.errorMessage = error
+          console.log('call api - panel/withdraw : error' + error)
         })
         .finally(() => {
           this.onClicktabPaneActive(this.tabPaneActiveKey)
@@ -2184,7 +2333,7 @@ export default {
             // this.errApproveVisible = true
             // this.errApproveMessage = response.data.message
             this.errManageTransacVisible = true
-            this.errApproveMessage = response.data.message
+            this.errManageTransacMessage = response.data.message
             console.log(
               'call api - panel/updatetransaction : status = ' +
                 response.data.status +
@@ -2254,14 +2403,24 @@ export default {
       window.open(_route.href)
     },
     clickDeposit() {
-      this.mdDeposit = !this.mdDeposit
-      if (this.optDepositWebAgent.length != 0) {
+      if (this.optWebAgent.length != 0) {
         if (!this.dataDeposit.web_agent_id) {
-          this.dataDeposit.web_agent_id = this.optDepositWebAgent[0]._id
+          this.dataDeposit.web_agent_id = this.optWebAgent[0]._id
         }
         this.getWebDeposit(this.dataDeposit.web_agent_id)
         this.getMemberList(this.dataDeposit.web_agent_id)
       }
+      this.mdDeposit = !this.mdDeposit
+    },
+    clickWithdraw() {
+      if (this.optWebAgent.length != 0) {
+        if (!this.dataWithdraw.web_agent_id) {
+          this.dataWithdraw.web_agent_id = this.optWebAgent[0]._id
+        }
+        this.getWebWithdraw(this.dataWithdraw.web_agent_id)
+        this.getMemberList(this.dataWithdraw.web_agent_id)
+      }
+      this.mdWithdraw = !this.mdWithdraw
     },
     getDate(event, checkIn, checkOut) {
       console.log(event)
@@ -2315,21 +2474,31 @@ export default {
     },
     checkLockedTransacByMe(_locked) {
       if (!_locked) return false
-      if (_locked.lock_by == this.user.username) return true
+      if (
+        _locked.lock_by == this.user.username &&
+        _locked.lock_status == 'lock'
+      )
+        return true
       else {
         return false
       }
     },
     // convert functions
     getImgAvatar(role, avatar) {
-      const img = require('../../assets/images/avatars/' + role + '/' + avatar)
-      return img
+      try {
+        return require('../../assets/images/avatars/' + role + '/' + avatar)
+      } catch (err) {
+        return require('../../assets/images/error-404-01.png')
+      }
     },
     getBankIMG(bankCode) {
-      let img = require('../../assets/images/banking/th/smooth-corner/' +
-        bankCode +
-        '.png')
-      return img
+      try {
+        return require('../../assets/images/banking/th/smooth-corner/' +
+          bankCode +
+          '.png')
+      } catch (error) {
+        return require('../../assets/images/error-404-01.png')
+      }
     },
     convertDate(value) {
       var myDate = new Date(value)
@@ -2471,7 +2640,7 @@ export default {
     }
     this.getWebPrefixList()
     // test modal popup
-    // this.mdClickSameJob = true
+    // this.mdWithdraw = true
   },
   setup() {
     return {

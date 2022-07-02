@@ -138,7 +138,9 @@
                     variant="ghost"
                     size="sm"
                     @click="
-                      navigateToNewTab('/member/list/99dev/' + member._id)
+                      navigateToNewTab(
+                        '/member/list/' + member.prefix + '/' + member._id,
+                      )
                     "
                   >
                     <CIcon :icon="ic.cilExternalLink" class="small" />
@@ -199,7 +201,7 @@ export default {
     // api
     async getMemberList() {
       await this.$http
-        .post('member/getallmember', {
+        .post('panel/getallmember', {
           agent_id: '629e381cb4839cabb5622da1',
           domain_name: 'https://www.banpong888.com',
         })

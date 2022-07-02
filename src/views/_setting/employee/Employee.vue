@@ -805,7 +805,7 @@ export default {
     },
     async getAllEmployee() {
       await this.$http
-        .post('panel/getallemployee')
+        .post('panel/getallemployee', {})
         .then((response) => {
           if (response.data.status == 200) {
             this.employees.listOfEmp = response.data.result.emp
@@ -984,7 +984,11 @@ export default {
       }
     },
     getImgAvatar(role, img) {
-      return require('../../../assets/images/avatars/' + role + '/' + img)
+      try {
+        return require('../../../assets/images/avatars/' + role + '/' + img)
+      } catch (err) {
+        console.log(err)
+      }
     },
     addEmpShown() {
       this.addEmp.agent_id = '629e381cb4839cabb5622da1'

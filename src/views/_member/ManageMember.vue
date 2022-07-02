@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="visiblePage">
     <CCard>
       <CCardBody>
         <CCard>
@@ -53,6 +53,15 @@
               </CCol>
               <CCol class="text-end">
                 <CButton
+                  color="dark"
+                  class="ms-1 text-light"
+                  size="sm"
+                  v-if="tabPaneActiveKey === 1"
+                >
+                  <CIcon :icon="ic.cilUserPlus" />
+                  สร้าง
+                </CButton>
+                <CButton
                   color="success"
                   class="ms-1 text-light"
                   size="sm"
@@ -72,449 +81,6 @@
             >
               <CCardText>
                 <CRow>
-                  <CCol xl="6" class="px-1">
-                    <CCard class="border-secondary mb-1">
-                      <CCardHeader>
-                        <CRow>
-                          <CCol> ข้อมูลพื้นฐาน </CCol>
-                          <CCol class="text-end">
-                            <CButton
-                              color="danger"
-                              class="ms-1 text-light"
-                              size="sm"
-                            >
-                              <CIcon :icon="ic.cilBan" />
-                              แบลลิส
-                            </CButton>
-                          </CCol>
-                        </CRow>
-                      </CCardHeader>
-                      <CCardBody>
-                        <CCardText class="small">
-                          <CRow>
-                            <CCol>
-                              <div
-                                class="d-inline-flex align-items-center mb-2"
-                              >
-                                <span class="me-2 small fw-semibold">
-                                  * เปิดใช้งาน
-                                </span>
-                                <CFormSwitch
-                                  id="formSwitchCheckChecked"
-                                  v-model="memberProfile.status"
-                                />
-                              </div>
-                            </CCol>
-                          </CRow>
-                          <CRow class="mb-2">
-                            <CCol md="6">
-                              <div>
-                                <label for="cPrefix" class="form-label mb-0">
-                                  Prefix *
-                                </label>
-                                <select
-                                  id="cPrefix"
-                                  class="form-select"
-                                  aria-label="Prefix"
-                                  disabled
-                                  v-model="memberProfile.web_id"
-                                >
-                                  <option value="0">กรุณาเลือก</option>
-                                  <option value="629e381cb4839cabb5622da1">
-                                    banpong888
-                                  </option>
-                                </select>
-                              </div>
-                            </CCol>
-                            <CCol md="6">
-                              <div>
-                                <label for="cUsername" class="form-label mb-0">
-                                  Username
-                                </label>
-                                <CInputGroup>
-                                  <CInputGroupText id="basic-cUsername">
-                                    <CIcon :icon="ic.cilShieldAlt" />
-                                  </CInputGroupText>
-                                  <CFormInput
-                                    id="cUsername"
-                                    disabled
-                                    v-model="memberProfile.pd.username"
-                                  />
-                                </CInputGroup>
-                              </div>
-                            </CCol>
-                          </CRow>
-                          <CRow class="mb-2">
-                            <CCol md="6">
-                              <div>
-                                <label for="cFName" class="form-label mb-0">
-                                  ชื่อ *
-                                </label>
-                                <CFormInput
-                                  type="text"
-                                  id="cFName"
-                                  v-model="memberProfile.name"
-                                />
-                              </div>
-                            </CCol>
-                            <CCol md="6">
-                              <div>
-                                <label for="cLName" class="form-label mb-0">
-                                  นามสกุล
-                                </label>
-                                <CFormInput
-                                  type="text"
-                                  id="cLName"
-                                  v-model="memberProfile.surename"
-                                />
-                              </div>
-                            </CCol>
-                          </CRow>
-                          <CRow class="mb-2">
-                            <CCol md="6">
-                              <div>
-                                <label for="cBirthday" class="form-label mb-0">
-                                  วันเกิดลูกค้า
-                                </label>
-                                <CInputGroup>
-                                  <CInputGroupText id="basic-cBirthday">
-                                    <CIcon :icon="ic.cilBirthdayCake" />
-                                  </CInputGroupText>
-                                  <CFormInput
-                                    type="date"
-                                    id="cBirthday"
-                                    aria-label="วันเกิดลูกค้า"
-                                    aria-describedby="basic-cBirthday"
-                                    v-model="memberProfile.birthday_date"
-                                  />
-                                </CInputGroup>
-                              </div>
-                            </CCol>
-                            <CCol md="6">
-                              <div>
-                                <label for="cStatus" class="form-label mb-0">
-                                  สถานะลูกค้า
-                                </label>
-                                <CInputGroup>
-                                  <CInputGroupText
-                                    id="basic-cStatus"
-                                    class="px-2"
-                                  >
-                                    <CImage
-                                      fluid
-                                      :src="imgStatus.correct"
-                                      width="22"
-                                    />
-                                  </CInputGroupText>
-                                  <CFormSelect
-                                    size="sm"
-                                    v-model="memberProfile.status_id"
-                                  >
-                                    <option value="">สามารถเลือกได้</option>
-                                    <option
-                                      v-for="option in optStatus"
-                                      :key="option._id"
-                                      :value="option.status"
-                                    >
-                                      {{ option.status_th }}
-                                    </option>
-                                  </CFormSelect>
-                                </CInputGroup>
-                              </div>
-                            </CCol>
-                          </CRow>
-                          <CRow class="mb-2">
-                            <CCol md="6">
-                              <div>
-                                <label
-                                  for="cApplyMethod"
-                                  class="form-label mb-0"
-                                >
-                                  ช่องทางการสมัคร
-                                </label>
-                                <CFormSelect
-                                  size="sm"
-                                  v-model="memberProfile.channel"
-                                >
-                                  <option value="">สามารถเลือกได้</option>
-                                  <option
-                                    v-for="option in optChannel"
-                                    :key="option._id"
-                                    :value="option.channel"
-                                  >
-                                    {{ option.channel }}
-                                  </option>
-                                </CFormSelect>
-                              </div>
-                            </CCol>
-                            <CCol md="6">
-                              <div>
-                                <label for="cSpecial" class="form-label mb-0">
-                                  สิทธิพิเศษ
-                                </label>
-                                <CInputGroup>
-                                  <CInputGroupText
-                                    id="basic-cStatus"
-                                    class="px-2"
-                                  >
-                                    <CImage
-                                      fluid
-                                      :src="
-                                        require('../../assets/images/privilege/normal.png')
-                                      "
-                                      width="22"
-                                    />
-                                  </CInputGroupText>
-                                  <CFormSelect
-                                    size="sm"
-                                    v-model="memberProfile.privilege"
-                                  >
-                                    <option value="">สามารถเลือกได้</option>
-                                    <option
-                                      v-for="option in optPrivilege"
-                                      :key="option._id"
-                                      :value="option.privilege_name"
-                                    >
-                                      {{ option.privilege_name }}
-                                    </option>
-                                  </CFormSelect>
-                                </CInputGroup>
-                              </div>
-                            </CCol>
-                          </CRow>
-                          <CRow class="mb-2">
-                            <CCol md="6">
-                              <div>
-                                <label for="cRegisIP" class="form-label mb-0">
-                                  ยูสเซอร์แนะนำ
-                                </label>
-                                <CFormInput
-                                  type="text"
-                                  id="cRegisIP"
-                                  v-model="memberProfile.user_reference"
-                                />
-                              </div>
-                            </CCol>
-                            <CCol md="6">
-                              <div>
-                                <label for="cPartner" class="form-label mb-0">
-                                  พาร์ทเนอร์
-                                </label>
-                                <select
-                                  id="cPartner"
-                                  class="form-select text-muted"
-                                  aria-label="พาร์ทเนอร์"
-                                  disabled
-                                >
-                                  <option selected>ยังไม่พร้อมใช้งาน</option>
-                                </select>
-                              </div>
-                            </CCol>
-                          </CRow>
-                          <CRow class="mb-2">
-                            <CCol md="6">
-                              <div>
-                                <label for="cPhone" class="form-label mb-0">
-                                  เบอร์โทร *
-                                  <small>
-                                    <small class="text-muted">
-                                      (สำหรับเข้าสู่ระบบ)
-                                    </small>
-                                  </small>
-                                </label>
-                                <CInputGroup>
-                                  <CInputGroupText id="basic-cPhone">
-                                    <CIcon :icon="ic.cilPhone" />
-                                  </CInputGroupText>
-                                  <CFormInput
-                                    id="cPhone"
-                                    placeholder="06123456xx"
-                                    aria-label="เบอร์โทรลูกค้า"
-                                    aria-describedby="basic-cPhone"
-                                    required
-                                    v-model="memberProfile.tel"
-                                  />
-                                </CInputGroup>
-                              </div>
-                            </CCol>
-                            <CCol md="6">
-                              <div>
-                                <label for="cRegisIP" class="form-label mb-0">
-                                  Register IP
-                                </label>
-                                <CFormInput
-                                  type="text"
-                                  id="cRegisIP"
-                                  placeholder="IP Address"
-                                  v-model="memberProfile.register_ip"
-                                />
-                              </div>
-                            </CCol>
-                          </CRow>
-                          <CRow class="mb-2">
-                            <CCol>
-                              <div>
-                                <label for="cNote" class="form-label mb-0">
-                                  หมายเหตุ
-                                </label>
-                                <CFormTextarea
-                                  id="cNote"
-                                  rows="2"
-                                  text="Must be 8-20 words long."
-                                  v-model="memberProfile.note"
-                                ></CFormTextarea>
-                              </div>
-                            </CCol>
-                          </CRow>
-                          <hr />
-                          <CRow class="mb-2">
-                            <CCol md="6">
-                              <div>
-                                <label for="cPin" class="form-label mb-0">
-                                  PIN *
-                                </label>
-                                <CInputGroup>
-                                  <CFormInput
-                                    :type="memberProfile.pinType"
-                                    id="cPin"
-                                    placeholder="1234"
-                                    aria-label="PIN"
-                                    aria-describedby="basic-cPin"
-                                    v-model="memberProfile.pin"
-                                  />
-                                  <CButton
-                                    type="button"
-                                    color="secondary"
-                                    variant="outline"
-                                    @click="showPwd"
-                                  >
-                                    <CIcon :icon="ic.cilLockLocked" />
-                                  </CButton>
-                                </CInputGroup>
-                              </div>
-                            </CCol>
-                            <CCol md="6">
-                              <div>
-                                <label
-                                  for="cPromotion"
-                                  class="form-label mb-0"
-                                ></label>
-                                <CFormSwitch
-                                  size="lg"
-                                  label="เปิด/ปิดโปรฯ"
-                                  id="cPromotion"
-                                  disabled
-                                />
-                              </div>
-                            </CCol>
-                          </CRow>
-                          <CRow class="mb-2">
-                            <CCol>
-                              <div>
-                                <label for="cUrl" class="form-label mb-0">
-                                  URL
-                                  <small>
-                                    <small class="text-muted">
-                                      (สำหรับเข้าสู่ระบบ)
-                                    </small>
-                                  </small>
-                                </label>
-                                <CInputGroup>
-                                  <CFormInput
-                                    type="text"
-                                    id="cUrl"
-                                    placeholder="http://xxxx.com/login/06123456xx"
-                                    aria-label="URL"
-                                    aria-describedby="basic-cUrl"
-                                    class="text-muted border-secondary"
-                                    v-model="memberProfile.web_url"
-                                    disabled
-                                  />
-                                  <CButton
-                                    type="button"
-                                    color="secondary"
-                                    variant="outline"
-                                    id="button-cUrl"
-                                  >
-                                    <CIcon :icon="ic.cilCopy" />
-                                  </CButton>
-                                </CInputGroup>
-                              </div>
-                            </CCol>
-                          </CRow>
-                          <hr />
-                          <CRow class="mb-2">
-                            <CCol md="6">
-                              <div>
-                                <label for="cPhone" class="form-label mb-0">
-                                  เบอร์ติดต่อ
-                                </label>
-                                <CInputGroup>
-                                  <CInputGroupText id="basic-cPhone">
-                                    <CIcon :icon="ic.cilPhone" />
-                                  </CInputGroupText>
-                                  <CFormInput
-                                    id="cPhone"
-                                    aria-label="เบอร์โทรลูกค้า"
-                                    aria-describedby="basic-cPhone"
-                                    v-model="memberProfile.mobile_number"
-                                  />
-                                </CInputGroup>
-                              </div>
-                            </CCol>
-                            <CCol md="6">
-                              <div>
-                                <label for="cLineID" class="form-label mb-0">
-                                  ไลน์ไอดี
-                                  <small>
-                                    <small class="text-muted">
-                                      (Line ID)
-                                    </small>
-                                  </small>
-                                </label>
-                                <CInputGroup>
-                                  <CInputGroupText id="basic-cLineID">
-                                    <CIcon :icon="ic.cibLine" />
-                                  </CInputGroupText>
-                                  <CFormInput
-                                    id="cLineID"
-                                    placeholder="cus.id.xxx"
-                                    aria-label="cus.id.xxx"
-                                    aria-describedby="basic-cLineID"
-                                    v-model="memberProfile.line_id"
-                                  />
-                                  <CInputGroupText id="basic-LinkLineID">
-                                    <CIcon :icon="ic.cilLink" />
-                                  </CInputGroupText>
-                                </CInputGroup>
-                              </div>
-                            </CCol>
-                          </CRow>
-                          <CRow class="mb-2">
-                            <CCol>
-                              <div>
-                                <label for="cEmail" class="form-label mb-0">
-                                  Email
-                                </label>
-                                <CInputGroup>
-                                  <CInputGroupText id="basic-cEmail">
-                                    <CIcon :icon="ic.cilEnvelopeOpen" />
-                                  </CInputGroupText>
-                                  <CFormInput
-                                    id="cEmail"
-                                    placeholder="email@tttAIP.com"
-                                    aria-label="อีเมลลูกค้า"
-                                    aria-describedby="basic-cEmail"
-                                    v-model="memberProfile.email"
-                                  />
-                                </CInputGroup>
-                              </div>
-                            </CCol>
-                          </CRow>
-                        </CCardText>
-                      </CCardBody>
-                    </CCard>
-                  </CCol>
                   <CCol xl="6" class="px-1">
                     <CCard class="border-secondary p-0 mb-1">
                       <CCardHeader>
@@ -827,10 +393,458 @@
                                 size="lg"
                                 label="ข้ามการตรวจสอบชื่อจากธนาคาร"
                                 id="cSkipCheckName"
+                                disabled
                               />
                             </div>
                           </CCol>
                         </CRow>
+                      </CCardBody>
+                    </CCard>
+                  </CCol>
+                  <CCol xl="6" class="px-1">
+                    <CCard class="border-secondary mb-1">
+                      <CCardHeader>
+                        <CRow>
+                          <CCol> ข้อมูลพื้นฐาน </CCol>
+                          <CCol class="text-end">
+                            <CButton
+                              color="danger"
+                              class="ms-1 text-light"
+                              size="sm"
+                            >
+                              <CIcon :icon="ic.cilBan" />
+                              แบลลิส
+                            </CButton>
+                          </CCol>
+                        </CRow>
+                      </CCardHeader>
+                      <CCardBody>
+                        <CCardText class="small">
+                          <CRow>
+                            <CCol>
+                              <div
+                                class="d-inline-flex align-items-center mb-2"
+                              >
+                                <span class="me-2 small fw-semibold">
+                                  * เปิดใช้งาน
+                                </span>
+                                <CFormSwitch
+                                  id="formSwitchCheckChecked"
+                                  v-model="memberProfile.status"
+                                  @change="onchgStatusSwich"
+                                />
+                              </div>
+                            </CCol>
+                          </CRow>
+                          <CRow class="mb-2">
+                            <CCol md="6">
+                              <div>
+                                <label for="cPrefix" class="form-label mb-0">
+                                  Prefix *
+                                </label>
+                                <select
+                                  id="cPrefix"
+                                  class="form-select"
+                                  aria-label="Prefix"
+                                  disabled
+                                  v-model="memberProfile.web_id"
+                                >
+                                  <option value="0">กรุณาเลือก</option>
+                                  <option value="629e381cb4839cabb5622da1">
+                                    banpong888
+                                  </option>
+                                </select>
+                              </div>
+                            </CCol>
+                            <CCol md="6">
+                              <div>
+                                <label for="cUsername" class="form-label mb-0">
+                                  Username
+                                </label>
+                                <CInputGroup>
+                                  <CInputGroupText id="basic-cUsername">
+                                    <CIcon :icon="ic.cilShieldAlt" />
+                                  </CInputGroupText>
+                                  <CFormInput
+                                    id="cUsername"
+                                    disabled
+                                    v-model="memberProfile.pd.username"
+                                  />
+                                </CInputGroup>
+                              </div>
+                            </CCol>
+                          </CRow>
+                          <CRow class="mb-2">
+                            <CCol md="6">
+                              <div>
+                                <label for="cFName" class="form-label mb-0">
+                                  ชื่อ *
+                                </label>
+                                <CFormInput
+                                  type="text"
+                                  id="cFName"
+                                  v-model="memberProfile.name"
+                                />
+                              </div>
+                            </CCol>
+                            <CCol md="6">
+                              <div>
+                                <label for="cLName" class="form-label mb-0">
+                                  นามสกุล
+                                </label>
+                                <CFormInput
+                                  type="text"
+                                  id="cLName"
+                                  v-model="memberProfile.surename"
+                                />
+                              </div>
+                            </CCol>
+                          </CRow>
+                          <CRow class="mb-2">
+                            <CCol md="6">
+                              <div>
+                                <label for="cBirthday" class="form-label mb-0">
+                                  วันเกิดลูกค้า
+                                </label>
+                                <CInputGroup>
+                                  <CInputGroupText id="basic-cBirthday">
+                                    <CIcon :icon="ic.cilBirthdayCake" />
+                                  </CInputGroupText>
+                                  <CFormInput
+                                    type="date"
+                                    id="cBirthday"
+                                    aria-label="วันเกิดลูกค้า"
+                                    aria-describedby="basic-cBirthday"
+                                    v-model="memberProfile.birthday_date"
+                                  />
+                                </CInputGroup>
+                              </div>
+                            </CCol>
+                            <CCol md="6">
+                              <div>
+                                <label for="cStatus" class="form-label mb-0">
+                                  สถานะลูกค้า
+                                </label>
+                                <CInputGroup>
+                                  <CInputGroupText
+                                    id="basic-cStatus"
+                                    class="px-2"
+                                  >
+                                    <CImage
+                                      fluid
+                                      :src="memberProfile.status_img"
+                                      width="22"
+                                    />
+                                  </CInputGroupText>
+                                  <CFormSelect
+                                    size="sm"
+                                    v-model="memberProfile.status_id"
+                                    @change="onchgStatus($event.target.value)"
+                                  >
+                                    <option
+                                      v-for="option in optStatus"
+                                      :key="option._id"
+                                      :value="option.status"
+                                    >
+                                      {{ option.status_th }}
+                                    </option>
+                                  </CFormSelect>
+                                </CInputGroup>
+                              </div>
+                            </CCol>
+                          </CRow>
+                          <CRow class="mb-2">
+                            <CCol md="6">
+                              <div>
+                                <label
+                                  for="cApplyMethod"
+                                  class="form-label mb-0"
+                                >
+                                  ช่องทางการสมัคร
+                                </label>
+                                <CFormSelect
+                                  size="sm"
+                                  v-model="memberProfile.channel"
+                                >
+                                  <option value="">สามารถเลือกได้</option>
+                                  <option
+                                    v-for="option in optChannel"
+                                    :key="option._id"
+                                    :value="option.channel"
+                                  >
+                                    {{ option.channel }}
+                                  </option>
+                                </CFormSelect>
+                              </div>
+                            </CCol>
+                            <CCol md="6">
+                              <div>
+                                <label for="cSpecial" class="form-label mb-0">
+                                  สิทธิพิเศษ
+                                </label>
+                                <CInputGroup>
+                                  <CInputGroupText
+                                    id="basic-cStatus"
+                                    class="px-2"
+                                  >
+                                    <CImage
+                                      fluid
+                                      :src="memberProfile.privilege_img"
+                                      width="22"
+                                    />
+                                  </CInputGroupText>
+                                  <CFormSelect
+                                    size="sm"
+                                    v-model="memberProfile.privilege"
+                                    @change="
+                                      onchgPrivilege($event.target.value)
+                                    "
+                                  >
+                                    <option value="">สามารถเลือกได้</option>
+                                    <option
+                                      v-for="option in optPrivilege"
+                                      :key="option._id"
+                                      :value="option.privilege_id"
+                                    >
+                                      {{ option.privilege_name }}
+                                    </option>
+                                  </CFormSelect>
+                                </CInputGroup>
+                              </div>
+                            </CCol>
+                          </CRow>
+                          <CRow class="mb-2">
+                            <CCol md="6">
+                              <div>
+                                <label for="cRegisIP" class="form-label mb-0">
+                                  ยูสเซอร์แนะนำ
+                                </label>
+                                <CFormInput
+                                  type="text"
+                                  id="cRegisIP"
+                                  v-model="memberProfile.user_reference"
+                                />
+                              </div>
+                            </CCol>
+                            <CCol md="6">
+                              <div>
+                                <label for="cPartner" class="form-label mb-0">
+                                  พาร์ทเนอร์
+                                </label>
+                                <select
+                                  id="cPartner"
+                                  class="form-select text-muted"
+                                  aria-label="พาร์ทเนอร์"
+                                  disabled
+                                >
+                                  <option selected>ยังไม่พร้อมใช้งาน</option>
+                                </select>
+                              </div>
+                            </CCol>
+                          </CRow>
+                          <CRow class="mb-2">
+                            <CCol md="6">
+                              <div>
+                                <label for="cPhone" class="form-label mb-0">
+                                  เบอร์โทร *
+                                  <small>
+                                    <small class="text-muted">
+                                      (สำหรับเข้าสู่ระบบ)
+                                    </small>
+                                  </small>
+                                </label>
+                                <CInputGroup>
+                                  <CInputGroupText id="basic-cPhone">
+                                    <CIcon :icon="ic.cilPhone" />
+                                  </CInputGroupText>
+                                  <CFormInput
+                                    id="cPhone"
+                                    placeholder="06123456xx"
+                                    aria-label="เบอร์โทรลูกค้า"
+                                    aria-describedby="basic-cPhone"
+                                    required
+                                    v-model="memberProfile.tel"
+                                  />
+                                </CInputGroup>
+                              </div>
+                            </CCol>
+                            <CCol md="6">
+                              <div>
+                                <label for="cRegisIP" class="form-label mb-0">
+                                  Register IP
+                                </label>
+                                <CFormInput
+                                  type="text"
+                                  id="cRegisIP"
+                                  placeholder="IP Address"
+                                  v-model="memberProfile.register_ip"
+                                  readonly
+                                />
+                              </div>
+                            </CCol>
+                          </CRow>
+                          <CRow class="mb-2">
+                            <CCol>
+                              <div>
+                                <label for="cNote" class="form-label mb-0">
+                                  หมายเหตุ
+                                </label>
+                                <CFormTextarea
+                                  id="cNote"
+                                  rows="2"
+                                  text="Must be 8-20 words long."
+                                  v-model="memberProfile.note"
+                                ></CFormTextarea>
+                              </div>
+                            </CCol>
+                          </CRow>
+                          <hr />
+                          <CRow class="mb-2">
+                            <CCol md="6">
+                              <div>
+                                <label for="cPin" class="form-label mb-0">
+                                  PIN *
+                                </label>
+                                <CInputGroup>
+                                  <CFormInput
+                                    :type="memberProfile.pinType"
+                                    id="cPin"
+                                    placeholder="1234"
+                                    aria-label="PIN"
+                                    aria-describedby="basic-cPin"
+                                    v-model="memberProfile.pin"
+                                  />
+                                  <CButton
+                                    type="button"
+                                    color="secondary"
+                                    variant="outline"
+                                    @mousedown="showPwd"
+                                    @mouseup="showPwd"
+                                  >
+                                    <CIcon :icon="ic.cilLockLocked" />
+                                  </CButton>
+                                </CInputGroup>
+                              </div>
+                            </CCol>
+                            <CCol md="6">
+                              <div>
+                                <label
+                                  for="cPromotion"
+                                  class="form-label mb-0"
+                                ></label>
+                                <CFormSwitch
+                                  size="lg"
+                                  label="เปิด/ปิดโปรฯ"
+                                  id="cPromotion"
+                                  disabled
+                                />
+                              </div>
+                            </CCol>
+                          </CRow>
+                          <CRow class="mb-2">
+                            <CCol>
+                              <div>
+                                <label for="cUrl" class="form-label mb-0">
+                                  URL
+                                  <small>
+                                    <small class="text-muted">
+                                      (สำหรับเข้าสู่ระบบ)
+                                    </small>
+                                  </small>
+                                </label>
+                                <CInputGroup>
+                                  <CFormInput
+                                    type="text"
+                                    id="cUrl"
+                                    placeholder="http://xxxx.com/login/06123456xx"
+                                    aria-label="URL"
+                                    aria-describedby="basic-cUrl"
+                                    class="text-muted border-secondary"
+                                    v-model="memberProfile.web_url"
+                                    disabled
+                                  />
+                                  <CButton
+                                    type="button"
+                                    color="secondary"
+                                    variant="outline"
+                                    id="button-cUrl"
+                                  >
+                                    <CIcon :icon="ic.cilCopy" />
+                                  </CButton>
+                                </CInputGroup>
+                              </div>
+                            </CCol>
+                          </CRow>
+                          <hr />
+                          <CRow class="mb-2">
+                            <CCol md="6">
+                              <div>
+                                <label for="cPhone" class="form-label mb-0">
+                                  เบอร์ติดต่อ
+                                </label>
+                                <CInputGroup>
+                                  <CInputGroupText id="basic-cPhone">
+                                    <CIcon :icon="ic.cilPhone" />
+                                  </CInputGroupText>
+                                  <CFormInput
+                                    id="cPhone"
+                                    aria-label="เบอร์โทรลูกค้า"
+                                    aria-describedby="basic-cPhone"
+                                    v-model="memberProfile.mobile_number"
+                                  />
+                                </CInputGroup>
+                              </div>
+                            </CCol>
+                            <CCol md="6">
+                              <div>
+                                <label for="cLineID" class="form-label mb-0">
+                                  ไลน์ไอดี
+                                  <small>
+                                    <small class="text-muted">
+                                      (Line ID)
+                                    </small>
+                                  </small>
+                                </label>
+                                <CInputGroup>
+                                  <CInputGroupText id="basic-cLineID">
+                                    <CIcon :icon="ic.cibLine" />
+                                  </CInputGroupText>
+                                  <CFormInput
+                                    id="cLineID"
+                                    placeholder="cus.id.xxx"
+                                    aria-label="cus.id.xxx"
+                                    aria-describedby="basic-cLineID"
+                                    v-model="memberProfile.line_id"
+                                  />
+                                  <CInputGroupText id="basic-LinkLineID">
+                                    <CIcon :icon="ic.cilLink" />
+                                  </CInputGroupText>
+                                </CInputGroup>
+                              </div>
+                            </CCol>
+                          </CRow>
+                          <CRow class="mb-2">
+                            <CCol>
+                              <div>
+                                <label for="cEmail" class="form-label mb-0">
+                                  Email
+                                </label>
+                                <CInputGroup>
+                                  <CInputGroupText id="basic-cEmail">
+                                    <CIcon :icon="ic.cilEnvelopeOpen" />
+                                  </CInputGroupText>
+                                  <CFormInput
+                                    id="cEmail"
+                                    placeholder="email@tttAIP.com"
+                                    aria-label="อีเมลลูกค้า"
+                                    aria-describedby="basic-cEmail"
+                                    v-model="memberProfile.email"
+                                  />
+                                </CInputGroup>
+                              </div>
+                            </CCol>
+                          </CRow>
+                        </CCardText>
                       </CCardBody>
                     </CCard>
                   </CCol>
@@ -1084,11 +1098,48 @@
       </CCardFooter>
     </CCard>
   </div>
+  <div v-else>
+    <CAlert color="danger" class="text-center">
+      <CAlertHeading>
+        <CIcon size="xxl" :icon="ic.cilWarning" />
+        เกิดข้อผิดพลาด
+      </CAlertHeading>
+      <p>ไม่พบข้อมูลที่ท่านกำลังดำเนินการในระบบ</p>
+      <hr />
+      <p class="small mb-0 fw-lighter">
+        กรุณาติดต่อผู้ดูแลระบบ หรือดำเนินการทำรายการนี้ใหม่อีกครั้งภายหลัง
+      </p>
+    </CAlert>
+  </div>
+
+  <!-- Toaster popup -->
+  <CToaster placement="top-end">
+    <CToast
+      v-for="toast in toasts"
+      :key="toast._id"
+      :delay="10000"
+      :class="'bg-' + toast.color + ' border-' + toast.color"
+    >
+      <CToastHeader closeButton>
+        <span class="me-auto fw-bolder fs-5 lh-sm text-dark">
+          <CIcon
+            size="lg"
+            :icon="toast.color == 'success' ? ic.cilThumbUp : ic.cilThumbDown"
+            class="me-1 text-black"
+          />
+          {{ toast.title }}
+        </span>
+        <!-- <small>7 min ago</small> -->
+      </CToastHeader>
+      <CToastBody>
+        {{ toast.content }}
+      </CToastBody>
+    </CToast>
+  </CToaster>
 </template>
 
 <script>
 import { imgBankSmoothSet as imgBank } from '@/assets/images/banking/th/smooth-corner'
-import { imgStatus as imgStatus } from '@/assets/images/status'
 import avatar from '@/assets/images/avatars/owner/02.png'
 
 import moment from 'moment'
@@ -1112,13 +1163,21 @@ import {
   cilMagnifyingGlass,
   cilBank,
   cilContact,
+  cilUserPlus,
+  cilThumbUp,
+  cilThumbDown,
+  cilWarning,
 } from '@coreui/icons'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'ManageMember',
   comments: { CIcon },
   data() {
     return {
+      toasts: [],
+      visiblePage: true,
+
       avatar: avatar,
       tabPaneActiveKey: 1,
       webSite: 0,
@@ -1126,6 +1185,7 @@ export default {
       memberProfile: {
         status: false,
         status_id: '',
+        status_img: '',
         username: '',
         line_id: '',
         tel: '',
@@ -1140,11 +1200,13 @@ export default {
         register_ip: '',
         user_reference: '',
         privilege: '',
+        privilege_img: '',
         email: '',
         mobile_number: '',
         channel: '',
         channel_id: '',
         note: '',
+        bank_img: '',
         banking_account: {
           bank_id: '',
           bank_acct: '',
@@ -1182,18 +1244,12 @@ export default {
         update_date: '',
         update_by: '',
       },
+      optWebAgent: [],
       optChannel: [],
       optPrivilege: [],
       optStatus: [],
       optBanking: [],
-      optShownBankAcct: [
-        { value: 0, text: '0213832833 (ttb Auto)', selected: true },
-        { value: 1, text: '4732291820 (ttb VIP1)', selected: false },
-        { value: 2, text: '6678738476 (kbank VIP2)', selected: true },
-        { value: 3, text: '7782736621 (ttb Junior Auto)', selected: false },
-        { value: 4, text: '6674625517 (scb Auto)', selected: false },
-        { value: 5, text: '5894882912 (scb VIP1)', selected: true },
-      ],
+      // optShownBankAcct: [],
       ic: {
         cilShieldAlt,
         cilSave,
@@ -1212,15 +1268,85 @@ export default {
         cilMagnifyingGlass,
         cilBank,
         cilContact,
+        cilUserPlus,
+        cilThumbUp,
+        cilThumbDown,
+        cilWarning,
       },
     }
   },
   methods: {
-    async getMemberProfile() {
+    ...mapActions({
+      tokenExpired: 'auth/tokenExpired',
+    }),
+    navigateTo(route) {
+      // navigateToNewTab('/member/list/99dev/' + member._id)
+      this.$router.push(route)
+    },
+    createToast(_color, _title, _content) {
+      this.toasts.push({
+        title: _title,
+        content: _content,
+        color: _color,
+      })
+    },
+
+    // api
+    async getWebPrefixList() {
+      await this.$http
+        .post('panel/getprefix', {})
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.optWebAgent = response.data.result_perfix
+            let agent_id = null
+            for (let i = 0; i < this.optWebAgent.length; i++) {
+              if (this.optWebAgent[i].name == this.webSite) {
+                agent_id = this.optWebAgent[i]._id
+                break
+              }
+            }
+            if (agent_id) {
+              this.getMemberProfile(agent_id, this.memberID)
+            } else {
+              // open elements after get member success
+              this.visiblePage = false
+              this.createToast(
+                'danger',
+                'การดำเนินการ',
+                'ไม่พบข้อมูล Agent web ที่ตรงกับระบบ',
+              )
+            }
+
+            console.log(this.optWebAgent)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            // open elements after get member success
+            this.visiblePage = false
+            console.log(
+              'call api - panel/getprefix : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          // open elements after get member success
+          this.visiblePage = false
+          console.log('call api - panel/getprefix : error' + error)
+        })
+    },
+    async getMemberProfile(_web, _member) {
       await this.$http
         .post('panel/getprofileuser', {
-          agent_id: '629e381cb4839cabb5622da1',
-          user_id: this.memberID,
+          agent_id: _web,
+          user_id: _member,
         })
         .then((response) => {
           if (response.data.status == 200) {
@@ -1231,12 +1357,13 @@ export default {
               this.memberProfile.status = false
             }
             this.memberProfile.status_id = mem.status
+            this.onchgStatus(this.memberProfile.status_id)
             this.memberProfile.username = mem.username
             this.memberProfile.line_id = mem.line_id
             this.memberProfile.tel = mem.tel
             this.memberProfile.web_id = mem.web_id
             this.memberProfile.web_name = mem.web_name
-            this.memberProfile.web_url = mem.url + '/login/' + mem.tel
+            this.memberProfile.web_url = mem.url_login
             this.memberProfile.name = mem.name
             this.memberProfile.surename = mem.surename
             this.memberProfile.birthday_date = mem.birthday_date
@@ -1244,6 +1371,7 @@ export default {
             this.memberProfile.register_ip = mem.register_ip
             this.memberProfile.user_reference = mem.user_reference
             this.memberProfile.privilege = mem.privilege
+            this.onchgPrivilege(this.memberProfile.privilege)
             this.memberProfile.email = mem.email
             this.memberProfile.mobile_number = mem.mobile_number
             this.memberProfile.channel = mem.channel
@@ -1294,6 +1422,13 @@ export default {
             this.memberProfile.update_date = mem.update_date
             this.memberProfile.update_by = mem.update_by
           } else {
+            // open elements after get member success
+            this.visiblePage = false
+            this.createToast(
+              'danger',
+              'การดำเนินการ',
+              'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + response.data.message,
+            )
             console.log(
               'call api - panel/deposit : status = ' +
                 response.data.status +
@@ -1303,6 +1438,13 @@ export default {
           }
         })
         .catch((error) => {
+          // open elements after get member success
+          this.visiblePage = false
+          this.createToast(
+            'danger',
+            'การดำเนินการ',
+            'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + error,
+          )
           console.log('call api - panel/getprofileuser : error' + error)
         })
     },
@@ -1310,8 +1452,6 @@ export default {
       await this.$http
         .post('panel/getchannel', {})
         .then((response) => {
-          console.log('getConfChannel')
-          console.log(response)
           if (response.data.status == 200) {
             this.optChannel = response.data.channel
             console.log(this.optChannel)
@@ -1332,8 +1472,6 @@ export default {
       await this.$http
         .post('panel/getprivilege', {})
         .then((response) => {
-          console.log('getConfPrivilege')
-          console.log(response)
           if (response.data.status == 200) {
             this.optPrivilege = response.data.privilege
             console.log(this.optPrivilege)
@@ -1390,6 +1528,71 @@ export default {
           console.log('call api - panel/getbanking : error' + error)
         })
     },
+
+    // functions
+    onchgBanking(_id) {
+      this.memberProfile.bank_img = ''
+      let bank_code = null
+      for (let i = 0; i < this.optAllBank.length; i++) {
+        if (this.optAllBank[i]._id == _id) {
+          bank_code = this.optAllBank[i].bankcode
+          break
+        }
+      }
+      if (bank_code) {
+        try {
+          this.memberProfile.bank_img = require('../../assets/images/banking/th/smooth-corner/' +
+            bank_code +
+            '.png')
+        } catch (err) {
+          console.log(err)
+        }
+      }
+    },
+    onchgPrivilege(_id) {
+      this.memberProfile.privilege_img = ''
+      let privilege = null
+      for (let i = 0; i < this.optPrivilege.length; i++) {
+        if (
+          this.optPrivilege[i].privilege_id == _id ||
+          this.optPrivilege[i].privilege_name == _id
+        ) {
+          privilege = this.optPrivilege[i].privilege_name
+          break
+        }
+      }
+      if (privilege) {
+        try {
+          this.memberProfile.privilege_img = require('../../assets/images/privilege/' +
+            privilege +
+            '.png')
+        } catch (err) {
+          console.log(err)
+        }
+      }
+    },
+    onchgStatus(_status) {
+      this.memberProfile.status_img = ''
+      if (_status) {
+        try {
+          this.memberProfile.status_img = require('../../assets/images/status/' +
+            _status +
+            '.png')
+        } catch (err) {
+          console.log(err)
+        }
+      }
+    },
+    onchgStatusSwich() {
+      this.memberProfile.status = !this.memberProfile.status
+      if (this.memberProfile.status == true) {
+        this.memberProfile.status_id = 'active'
+        this.onchgStatus('active')
+      } else {
+        this.memberProfile.status_id = 'suspend'
+        this.onchgStatus('suspend')
+      }
+    },
     showPwd() {
       if (this.memberProfile.pinType == 'password') {
         this.memberProfile.pinType = 'text'
@@ -1410,7 +1613,8 @@ export default {
     this.getConfChannel()
     this.getConfStatus()
     this.getConfPrivilege()
-    this.getMemberProfile()
+    this.getWebPrefixList() // + getMemberProfile
+    // this.getMemberProfile()
   },
   created() {
     ;(this.memberID = this.$route.params.memberID),
@@ -1419,7 +1623,6 @@ export default {
   setup() {
     return {
       imgBank,
-      imgStatus,
     }
   },
 }

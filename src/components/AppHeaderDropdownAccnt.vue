@@ -57,12 +57,10 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 
-import avatar from '@/assets/images/avatars/owner/02.png'
 export default {
   name: 'AppHeaderDropdownAccnt',
   setup() {
     return {
-      avatar: avatar,
       itemsCount: 42,
     }
   },
@@ -84,7 +82,11 @@ export default {
     },
     getImgAvatar(role, img) {
       if (role && img)
-        return require('../assets/images/avatars/' + role + '/' + img)
+        try {
+          return require('../assets/images/avatars/' + role + '/' + img)
+        } catch (err) {
+          console.log(err)
+        }
     },
   },
   computed: {

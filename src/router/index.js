@@ -11,11 +11,11 @@ const routes = [
     component: DefaultLayout,
     redirect: '/dashboard',
     children: [
-      // {
-      //   path: '/demo',
-      //   name: 'Demo',
-      //   component: () => import('@/views/Demo.vue'),
-      // },
+      {
+        path: '/demo',
+        name: 'Demo',
+        component: () => import('@/views/Demo.vue'),
+      },
       {
         path: '/dashboard',
         name: 'Dashboard',

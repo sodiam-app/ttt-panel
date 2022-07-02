@@ -93,6 +93,44 @@ export default {
     async atttoken({ commit, state }, token) {
       if (token) {
         commit('SET_TOKEN', token)
+        try {
+          // get member profile
+          await mainAxios
+            .post('panel/getmyprofile', {})
+            .then((response) => {
+              if (response.data.status == 200) {
+                //
+                commit('SET_USER', response.data.result.profile_employee)
+                commit('SET_ROLE', response.data.result.profile_employee.role)
+                commit(
+                  'SET_STATUS',
+                  response.data.result.profile_employee.status,
+                )
+              } else if (
+                response.data.status == 502 ||
+                response.data.status == 503
+              ) {
+                this.tokenExpired().then(() => {
+                  this.$router.push('/pages/login')
+                })
+              } else {
+                commit('SET_TOKEN', null)
+                console.log(
+                  'call api - panel/getmyprofile : status = ' +
+                    response.data.status +
+                    ', message = ' +
+                    response.data.message,
+                )
+              }
+            })
+            .catch((error) => {
+              commit('SET_TOKEN', null)
+              console.log('call api - panel/getmyprofile : error' + error)
+            })
+        } catch (err) {
+          commit('SET_TOKEN', null)
+          console.log(err)
+        }
       }
       if (!state.token) {
         return

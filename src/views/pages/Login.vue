@@ -19,7 +19,7 @@
                     </CInputGroupText>
                     <CFormInput
                       placeholder="Username"
-                      autocomplete="username"
+                      autocomplete="current-username"
                       v-model="form.username"
                     />
                   </CInputGroup>
@@ -69,7 +69,9 @@
                 </CForm>
               </CCardBody>
             </CCard>
-            <CCard class="text-white bg-secondary py-5" style="width: 44%">
+            <CCard
+              class="text-white bg-secondary py-5 d-none d-lg-block d-xl-block d-xxl-block"
+            >
               <CCardBody class="text-center">
                 <div>
                   <!-- <h2>เข้าสู่ระบบด้วย QR-Code</h2> -->
@@ -77,12 +79,12 @@
                   <CImage rounded :src="imgLogin" class="img-fluid" alt="" />
                 </div>
                 <hr />
-                <h4>
+                <h5>
                   <CBadge color="dark" shape="rounded-pill">
                     <CIcon :icon="cilSmile" />
                     บริการด้วยใจ ห่วงใยทุกคน
                   </CBadge>
-                </h4>
+                </h5>
               </CCardBody>
             </CCard>
           </CCardGroup>

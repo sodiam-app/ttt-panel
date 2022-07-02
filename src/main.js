@@ -17,12 +17,19 @@ import CIcon from '@coreui/icons-vue'
 import { iconsSet as icons } from '@/assets/icons'
 import DocsCallout from '@/components/DocsCallout'
 import DocsExample from '@/components/DocsExample'
+import timeago from 'vue-timeago3'
+const timeagoOptions = {
+  converterOptions: {
+    includeSeconds: false,
+    locale: 'th',
+  },
+}
 
-store.dispatch('auth/attempt', {
-  user: JSON.parse(localStorage.getItem('user')),
-  role: localStorage.getItem('role'),
-  status: localStorage.getItem('status'),
-})
+// store.dispatch('auth/attempt', {
+//   user: JSON.parse(localStorage.getItem('user')),
+//   role: localStorage.getItem('role'),
+//   status: localStorage.getItem('status'),
+// })
 
 store.dispatch('auth/atttoken', localStorage.getItem('token')).then(() => {
   const app = createApp(App)
@@ -30,10 +37,12 @@ store.dispatch('auth/atttoken', localStorage.getItem('token')).then(() => {
   app.use(router)
   app.use(CoreuiVuePro)
   app.use(VueAxios, mainAxios)
+  app.use(timeago, timeagoOptions)
   app.provide('icons', icons)
   app.component('CIcon', CIcon)
   app.component('DocsCallout', DocsCallout)
   app.component('DocsExample', DocsExample)
+  // app.component('TimeAgo', TimeAgo)
 
   app.mount('#app')
 })
