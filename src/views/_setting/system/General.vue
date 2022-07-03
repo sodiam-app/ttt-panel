@@ -649,10 +649,6 @@ export default {
     },
 
     // functions
-    async startupGetConfig() {
-      await this.getWebPrefixList()
-      await this.getWebConfig()
-    },
     addAmount() {
       if (this.withdraw_amount_select != '0') {
         this.dataConf.withdraw_amount_select.push(
@@ -667,11 +663,14 @@ export default {
     },
     removeAmount(_index) {
       this.dataConf.withdraw_amount_select.splice(_index, 1)
-      this.dataConf.withdraw_amount_select.sort()
+      this.dataConf.withdraw_amount_select.sort((a, b) => a - b)
     },
   },
   mounted() {
-    this.startupGetConfig()
+    // this.startupGetConfig()
+    this.getWebPrefixList().then(() => {
+      this.getWebConfig()
+    })
   },
   setup() {
     return {

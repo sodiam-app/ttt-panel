@@ -840,7 +840,7 @@ export default {
           if (response.data.status == 200) {
             this.optWebAgent = response.data.result_perfix
             this.dataMember.agent_id = this.optWebAgent[0]._id
-            this.getWebDeposit(this.dataMember.agent_id)
+            // this.getWebDeposit(this.dataMember.agent_id)
             console.log(this.optWebAgent)
           } else if (
             response.data.status == 502 ||
@@ -1128,10 +1128,7 @@ export default {
     },
     onchgStatusSwich() {
       this.dataMember.status = !this.dataMember.status
-      if (this.dataMember.status == true) {
-        this.dataMember.status_id = 'active'
-        this.onchgStatus('active')
-      } else {
+      if (this.dataMember.status == false) {
         this.dataMember.status_id = 'suspend'
         this.onchgStatus('suspend')
       }
@@ -1145,7 +1142,9 @@ export default {
     },
   },
   mounted() {
-    this.getWebPrefixList()
+    this.getWebPrefixList().then(() => {
+      this.getWebDeposit(this.dataMember.agent_id)
+    })
     this.getConfPrivilege()
     this.getConfChannel()
     this.getConfStatus()

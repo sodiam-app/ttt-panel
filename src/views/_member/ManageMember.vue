@@ -1298,25 +1298,6 @@ export default {
         .then((response) => {
           if (response.data.status == 200) {
             this.optWebAgent = response.data.result_perfix
-            let agent_id = null
-            for (let i = 0; i < this.optWebAgent.length; i++) {
-              if (this.optWebAgent[i].name == this.webSite) {
-                agent_id = this.optWebAgent[i]._id
-                break
-              }
-            }
-            if (agent_id) {
-              this.getMemberProfile(agent_id, this.memberID)
-            } else {
-              // open elements after get member success
-              this.visiblePage = false
-              this.createToast(
-                'danger',
-                'การดำเนินการ',
-                'ไม่พบข้อมูล Agent web ที่ตรงกับระบบ',
-              )
-            }
-
             console.log(this.optWebAgent)
           } else if (
             response.data.status == 502 ||
@@ -1337,7 +1318,6 @@ export default {
           }
         })
         .catch((error) => {
-          // open elements after get member success
           this.visiblePage = false
           console.log('call api - panel/getprefix : error' + error)
         })
@@ -1391,22 +1371,25 @@ export default {
               mem.banking_account.bank_code
             this.memberProfile.banking_account.bank_status =
               mem.banking_account.bank_status
-            this.memberProfile.financial.deposit_first_time_amount =
-              mem.financial.deposit_first_time_amount.toFixed(2)
+            this.memberProfile.financial.deposit_first_time_amount = Number(
+              mem.financial.deposit_first_time_amount,
+            ).toFixed(2)
             this.memberProfile.financial.deposit_first_time =
               mem.financial.deposit_first_time
             this.memberProfile.financial.deposit_count =
               mem.financial.deposit_count
-            this.memberProfile.financial.deposit_total_amount =
-              mem.financial.deposit_total_amount.toFixed(2)
+            this.memberProfile.financial.deposit_total_amount = Number(
+              mem.financial.deposit_total_amount,
+            ).toFixed(2)
             this.memberProfile.financial.withdraw_first_time =
               mem.financial.withdraw_first_time
             this.memberProfile.financial.withdraw_count =
               mem.financial.withdraw_count
-            this.memberProfile.financial.withdraw_total_amount =
-              mem.financial.withdraw_total_amount.toFixed(2)
+            this.memberProfile.financial.withdraw_total_amount = Number(
+              mem.financial.withdraw_total_amount,
+            ).toFixed(2)
             this.memberProfile.pd.username = mem.pd.username
-            this.memberProfile.pd.credit = mem.pd.credit.toFixed(2)
+            this.memberProfile.pd.credit = Number(mem.pd.credit).toFixed(2)
             this.memberProfile.pd.currency = mem.pd.currency
             this.memberProfile.pd.hdp = mem.pd.hdp
             this.memberProfile.pd.mixParlay = mem.pd.mixParlay
@@ -1613,8 +1596,27 @@ export default {
     this.getConfChannel()
     this.getConfStatus()
     this.getConfPrivilege()
-    this.getWebPrefixList() // + getMemberProfile
-    // this.getMemberProfile()
+    this.getWebPrefixList().then(() => {
+      let agent_id = null
+      for (let i = 0; i < this.optWebAgent.length; i++) {
+        if (this.optWebAgent[i].name == this.webSite) {
+          agent_id = this.optWebAgent[i]._id
+          break
+        }
+      }
+      if (agent_id) {
+        this.getMemberProfile(agent_id, this.memberID)
+      } else {
+        // open elements after get member success
+        this.visiblePage = false
+        this.createToast(
+          'danger',
+          'การดำเนินการ',
+          'ไม่พบข้อมูล Agent web ที่ตรงกับระบบ',
+        )
+      }
+    })
+    // this next
   },
   created() {
     ;(this.memberID = this.$route.params.memberID),
