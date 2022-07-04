@@ -954,7 +954,7 @@ export default {
         .then((response) => {
           if (response.data.status == 200) {
             this.optAllBank = response.data.result.banking
-            console.log(this.optShownBankAcct)
+            console.log(this.optAllBank)
           } else if (
             response.data.status == 502 ||
             response.data.status == 503
