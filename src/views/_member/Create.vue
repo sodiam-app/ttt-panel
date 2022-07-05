@@ -393,7 +393,7 @@
                             <option
                               v-for="option in optChannel"
                               :key="option._id"
-                              :value="option.channel"
+                              :value="option.channel_id"
                             >
                               {{ option.channel }}
                             </option>
