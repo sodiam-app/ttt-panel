@@ -1,7 +1,8 @@
 <template>
-  <div>
+  <div>ยังไม่พร้อมใช้งาน</div>
+  <div v-if="false">
     <WidgetsStatsA />
-    <CRow>
+    <CRow></CRow>
       <CCol :md="12">
         <CCard class="mb-4">
           <CCardBody>
