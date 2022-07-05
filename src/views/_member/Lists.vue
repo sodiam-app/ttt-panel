@@ -9,16 +9,26 @@
               รายชื่อลูกค้า
             </strong>
           </CCol>
-          <CCol sm="3" class="text-end mt-1">
-            <CInputGroup class="flex-nowrap" size="sm">
+          <CCol sm="2">
+            <CFormSelect @change="onchgPrefix($event.target.value)">
+              <option
+                v-for="option in optWebAgent"
+                :key="option._id"
+                :value="option._id"
+              >
+                {{ option.name }}
+              </option>
+            </CFormSelect>
+          </CCol>
+          <CCol sm="2" class="text-end">
+            <CInputGroup class="flex-nowrap">
               <CFormInput
                 placeholder="ค้นหา: ยูส, เบอร์โทร, ชื่อ"
                 aria-describedby="addon-lSearchMember"
-                class="border-dark"
               />
               <CButton
                 type="button"
-                color="dark"
+                color="secondary"
                 variant="outline"
                 id="button-lSearchMember"
               >
@@ -174,10 +184,14 @@ export default {
   comments: {},
   data() {
     return {
+      currentWebAgent: '',
+
       listOfMember: [],
       totalPage: 1,
       activePage: 1,
       runNumber: 1,
+
+      optWebAgent: [],
     }
   },
   setup() {
@@ -199,11 +213,39 @@ export default {
       window.open(_route.href)
     },
     // api
-    async getMemberList() {
+    async getWebPrefixList() {
+      await this.$http
+        .post('panel/getprefix', {})
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.optWebAgent = response.data.result_perfix
+            this.currentWebAgent = this.optWebAgent[0]._id
+            console.log(this.optWebAgent)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - panel/getprefix : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('call api - panel/getprefix : error' + error)
+        })
+    },
+    async getMemberList(_agent_id) {
       await this.$http
         .post('panel/getallmember', {
-          agent_id: '629e381cb4839cabb5622da1',
-          domain_name: 'https://www.banpong888.com',
+          agent_id: _agent_id,
+          domain_name: '',
         })
         .then((response) => {
           if (response.data.status == 200) {
@@ -290,9 +332,15 @@ export default {
         return 'secondary'
       }
     },
+    onchgPrefix(_id) {
+      this.currentWebAgent = _id
+      this.getMemberList(_id)
+    },
   },
   mounted() {
-    this.getMemberList()
+    this.getWebPrefixList().then(() => {
+      this.getMemberList(this.currentWebAgent)
+    })
   },
 }
 </script>

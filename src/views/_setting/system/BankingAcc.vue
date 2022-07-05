@@ -258,6 +258,7 @@
                     variant="outline"
                     shape="rounded-pill"
                     class="float-end"
+                    @click="clickAddBankAuto"
                   >
                     <CIcon :icon="ic.cilPlus" />
                     เพิ่ม
@@ -265,7 +266,11 @@
                 </CCardBody>
               </CCard>
               <!-- ไม่พบรายการฝาก -->
-              <CAlert color="warning" v-if="false">
+              <CAlert
+                color="danger"
+                class="py-2 text-center"
+                v-if="dataBankAutoDepositSetting.length == 0"
+              >
                 <CIcon size="lg" :icon="ic.cilWarning" />
                 ไม่พบข้อมูลบัญชีฝากที่ถูกตั้งค่าไว้
               </CAlert>
@@ -524,7 +529,11 @@
                 </CCardBody>
               </CCard>
               <!-- ไม่พบรายการฝาก -->
-              <CAlert color="warning" v-if="false">
+              <CAlert
+                color="danger"
+                class="py-2 text-center"
+                v-if="dataBankAutoWithdrawSetting.length == 0"
+              >
                 <CIcon size="lg" :icon="ic.cilWarning" />
                 ไม่พบข้อมูลบัญชีถอนที่ถูกตั้งค่าไว้
               </CAlert>
@@ -1182,6 +1191,184 @@
     </CModalBody>
   </CModal>
 
+  <!-- ----- -->
+  <!-- เพิ่ม Bank Auto Tranfer :: Deposit -->
+  <!-- ------ -->
+  <CModal
+    backdrop="static"
+    :visible="mdBankAutoDeposit"
+    @close="
+      () => {
+        mdBankAutoDeposit = false
+      }
+    "
+  >
+    <CModalHeader>
+      <CModalTitle class="fw-lighter">
+        <strong>
+          <span class="h5">
+            <CIcon size="lg" :icon="ic.cilTerminal" />
+            เพิ่มบัญชีทำงานออโต้
+          </span>
+        </strong>
+      </CModalTitle>
+    </CModalHeader>
+    <CModalBody class="m-0 p-0">
+      <CCard>
+        <CCardBody class="pt-2">
+          <CCardText>
+            <div class="mb-2">
+              <label class="form-label mb-0"> ธนาคาร * </label>
+              <CInputGroup>
+                <CInputGroupText>
+                  <CImage fluid :src="confAutoBankSetup.bank_img" width="22" />
+                </CInputGroupText>
+                <CFormSelect
+                  v-model="confAutoBankSetup.bank_code"
+                  @change="
+                    onchgBankingAutoConf($event.target.value),
+                      getBankAutoTranfer($event.target.value)
+                  "
+                >
+                  <option
+                    v-for="option in optDepositActivated"
+                    :key="option._id"
+                    :value="option.bankcode"
+                  >
+                    {{ option.banknameth }}
+                  </option>
+                </CFormSelect>
+              </CInputGroup>
+            </div>
+            <!-- ::SCB:: - Bank Auto Transfer (Deposit) -->
+            <div v-if="confAutoBankSetup.bank_code == 'scb'">
+              <div class="mb-2">
+                <label class="form-label mb-0"> บัญชีฝาก * </label>
+                <CFormSelect v-model="conf_deposit_scb._id">
+                  <option value="">กรุณาเลือกบัญชี</option>
+                  <option
+                    v-for="option in optBankAutoTransfer"
+                    :key="option._id"
+                    :value="option.bank_id"
+                  >
+                    {{ option.bank_account }} ({{ option.account_name }})
+                  </option>
+                </CFormSelect>
+              </div>
+              <div class="mb-2">
+                <CRow class="mb-2">
+                  <CCol md="6">
+                    <div>
+                      <label for="cFName" class="form-label mb-0">
+                        Username *
+                      </label>
+                      <CFormInput
+                        type="text"
+                        id="cFName"
+                        v-model="conf_deposit_scb.bank_auto_config.username"
+                      />
+                    </div>
+                  </CCol>
+                  <CCol md="6">
+                    <div>
+                      <label for="cLName" class="form-label mb-0">
+                        Password *
+                      </label>
+                      <CInputGroup>
+                        <CFormInput
+                          type="password"
+                          id="cLName"
+                          v-model="conf_deposit_scb.bank_auto_config.password"
+                        />
+                        <CButton
+                          type="button"
+                          color="secondary"
+                          class="border-secondary"
+                          variant="outline"
+                        >
+                          <CIcon :icon="ic.cilLockLocked" />
+                        </CButton>
+                      </CInputGroup>
+                    </div>
+                  </CCol>
+                </CRow>
+              </div>
+              <div class="mb-2">
+                <label for="cLName" class="form-label mb-0"> โน้ต </label>
+                <CFormTextarea
+                  rows="2"
+                  text="สามารถระบุได้"
+                  v-model="conf_deposit_scb.bank_auto_config.note"
+                ></CFormTextarea>
+              </div>
+              <div class="mb-2">
+                <label for="cFName" class="form-label mb-0">
+                  QR Code
+                  <span class="small text-muted">
+                    (สำหรับแสดงที่หน้าจอลูกค้า)
+                  </span>
+                </label>
+                <div class="clearfix mb-2">
+                  <CImage
+                    align="center"
+                    class="border"
+                    height="150"
+                    rounded
+                    :src="conf_deposit_scb.bank_auto_config.qr_code"
+                  />
+                </div>
+                <div>
+                  <CButton
+                    color="dark"
+                    size="sm"
+                    shape="rounded-pill"
+                    variant="outline"
+                    @click="$refs.fileInputSCBDP.click()"
+                  >
+                    <CIcon :icon="ic.cilCloudUpload" />
+                    อัพโหลด
+                  </CButton>
+                  <input
+                    style="display: none"
+                    type="file"
+                    class="form-control form-control-sm"
+                    ref="fileInputSCBDP"
+                    @change="pickFileAddAutoTransfer('DP', 'scb')"
+                  />
+                </div>
+              </div>
+            </div>
+            <!-- ::Other:: - Bank Auto Tranfer (Deposit) -->
+            <!-- ... -->
+            <!-- ... -->
+            <hr />
+            <div class="d-flex justify-content-end">
+              <div>
+                <CButton size="sm" color="success" class="ms-1 text-light">
+                  <CIcon :icon="ic.cilCheckCircle" />
+                  ยืนยัน
+                </CButton>
+                <CButton
+                  size="sm"
+                  color="secondary"
+                  class="text-light ms-1"
+                  @click="
+                    () => {
+                      mdBankAutoDeposit = false
+                    }
+                  "
+                >
+                  <CIcon :icon="ic.cilXCircle" />
+                  ปิด
+                </CButton>
+              </div>
+            </div>
+          </CCardText>
+        </CCardBody>
+      </CCard>
+    </CModalBody>
+  </CModal>
+
   <!-- Toaster popup -->
   <CToaster placement="top-end">
     <CToast
@@ -1240,6 +1427,7 @@ import {
   cilLibraryAdd,
   cilSave,
   cilCloudUpload,
+  cilTerminal,
 } from '@coreui/icons'
 
 import avatar from '@/assets/images/avatars/owner/02.png'
@@ -1258,6 +1446,8 @@ export default {
 
       mdAddBank: false,
       mdEditBank: false,
+      mdBankAutoDeposit: false,
+      mdBankAutoWithdraw: false,
 
       currentWebAgent: '',
       dataAllBankSetting: [],
@@ -1285,94 +1475,91 @@ export default {
         status: 'active',
         type: 'deposit',
       },
-      dataBankAutoDepositSetting: [
-        {
-          flagShow: false,
-          flagEdit: false,
-          bank: {
-            _id: '62a76285b4839cabb5622daa',
-            bank_id: '62ae1de41fa4c734108a7763',
-            bank_account: '222222222',
-            account_name: 'นาย4506 45056',
-            bank_name_th: 'ธนาคารเกียรตินาคินภัทร',
-            bank_name_en: 'kkp',
-            bank_code: 'kkp',
-            description: '',
-            bank_status: 'active',
-            type: 'deposit',
-            sub_type: 'deposit',
-            memb_bank: null,
-            bank_auto_status: 'active',
-            bank_auto_config: {
-              username: 'natkingsize2',
-              password: '12345678',
-              note: 'บัญชีฝากหลัก',
-              qr_code: '',
-            },
-            sms_auto_status: 'inactive',
-            sms_auto_config: null,
-            privilege: null,
-          },
+      dataBankAutoDepositSetting: [],
+      dataBankAutoWithdrawSetting: [],
+
+      confAutoBankSetup: {
+        bank_code: '',
+        bank_img: '',
+        req_type: '',
+      },
+      conf_deposit_scb: {
+        _id: '',
+        agent_id: this.currentWebAgent,
+        bank_auto_status: 'active',
+        bank_auto_config: {
+          username: '',
+          password: '',
+          note: '',
+          qr_code: '',
         },
-        {
-          flagShow: false,
-          flagEdit: false,
-          bank: {
-            _id: '62a76285b4839cabb5622daa',
-            bank_id: '62ae1de41fa4c734108a7763',
-            bank_account: '0993848273',
-            account_name: 'สมใจ จริงจริง',
-            bank_name_th: 'ธนาคารกสิกรไทย',
-            bank_name_en: 'kbank',
-            bank_code: 'kbank',
-            description: '',
-            bank_status: 'active',
-            type: 'deposit',
-            sub_type: 'deposit',
-            memb_bank: null,
-            bank_auto_status: 'suspend',
-            bank_auto_config: {
-              username: 'natkingsize2',
-              password: '12345678',
-              note: 'จดข้อมูล',
-              qr_code: '',
-            },
-            sms_auto_status: 'inactive',
-            sms_auto_config: null,
-            privilege: null,
-          },
+        status: '',
+        type: 'deposit',
+      },
+      conf_withdraw_ttb: {
+        _id: '',
+        agent_id: this.currentWebAgent,
+        bank_auto_status: 'active',
+        bank_auto_config: {
+          username: '',
+          password: '',
+          note: '',
+          push_bullet: '',
         },
-      ],
-      dataBankAutoWithdrawSetting: [
+        status: '',
+        type: 'withdraw',
+      },
+
+      // bankup: [
+      //   {
+      //     flagShow: false,
+      //     flagEdit: false,
+      //     bank: {
+      //       _id: '62a76285b4839cabb5622daa',
+      //       bank_id: '62ae1de41fa4c734108a7763',
+      //       bank_account: '0938884717',
+      //       account_name: 'สมหมาย ใจหมา',
+      //       bank_name_th: 'ธนาคารทหารไทยธนชาติ',
+      //       bank_name_en: 'ttb',
+      //       bank_code: 'ttb',
+      //       description: '',
+      //       bank_status: 'active',
+      //       type: 'withdraw',
+      //       sub_type: 'withdraw',
+      //       memb_bank: null,
+      //       bank_auto_status: 'active',
+      //       bank_auto_config: {
+      //         username: 'paponwut.wut',
+      //         password: '009398477',
+      //         note: 'บัญชีถอนตัวหลัก',
+      //         push_bullet: 'SMS1',
+      //       },
+      //       sms_auto_status: 'inactive',
+      //       sms_auto_config: null,
+      //       privilege: null,
+      //     },
+      //   },
+      // ],
+
+      optDepositActivated: [
         {
-          flagShow: false,
-          flagEdit: false,
-          bank: {
-            _id: '62a76285b4839cabb5622daa',
-            bank_id: '62ae1de41fa4c734108a7763',
-            bank_account: '0938884717',
-            account_name: 'สมหมาย ใจหมา',
-            bank_name_th: 'ธนาคารทหารไทยธนชาติ',
-            bank_name_en: 'ttb',
-            bank_code: 'ttb',
-            description: '',
-            bank_status: 'active',
-            type: 'withdraw',
-            sub_type: 'withdraw',
-            memb_bank: null,
-            bank_auto_status: 'active',
-            bank_auto_config: {
-              username: 'paponwut.wut',
-              password: '009398477',
-              note: 'บัญชีถอนตัวหลัก',
-              push_bullet: 'SMS1',
-            },
-            sms_auto_status: 'inactive',
-            sms_auto_config: null,
-            privilege: null,
-          },
+          _id: null,
+          banknameth: 'ธนาคารไทยพาณิชย์',
+          banknameen: 'scb',
+          bankcode: 'scb',
+          status: 'active',
         },
       ],
+      optWithdrawActivated: [
+        {
+          _id: null,
+          banknameth: 'ธนาคารทหารไทยธนชาต',
+          banknameen: 'ttb',
+          bankcode: 'ttb',
+          status: 'active',
+        },
+      ],
+      optBankAutoTransfer: [],
 
       optWebAgent: [],
       optAllBank: [],
@@ -1471,6 +1658,7 @@ export default {
         cilLibraryAdd,
         cilSave,
         cilCloudUpload,
+        cilTerminal,
       },
     }
   },
@@ -1572,6 +1760,37 @@ export default {
         })
         .catch((error) => {
           console.log('call api - panel/getallbanksetting : error' + error)
+        })
+    },
+    async getBankAutoTranfer(_bankcode) {
+      await this.$http
+        .post('panel/getbankautotranfer', {
+          agent_id: this.currentWebAgent,
+          bank_code: _bankcode,
+          type: this.confAutoBankSetup.req_type,
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.optBankAutoTransfer = response.data.result
+            console.log(this.optBankAutoTransfer)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - panel/getbankautotranfer : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('call api - panel/getbankautotranfer : error' + error)
         })
     },
 
@@ -1687,6 +1906,16 @@ export default {
         }
       }
     },
+    onchgBankingAutoConf(_bank_code) {
+      this.confAutoBankSetup.bank_img = ''
+      try {
+        this.confAutoBankSetup.bank_img = require('../../../assets/images/banking/th/smooth-corner/' +
+          _bank_code +
+          '.png')
+      } catch (err) {
+        console.log(err)
+      }
+    },
     onchgBankingEdit(_id) {
       this.dataEditBank.bank_img = ''
       let bank_code = null
@@ -1778,10 +2007,65 @@ export default {
         this.$emit('input', file[0])
       }
     },
+    pickFileAddAutoTransfer(_type, _bank) {
+      let input = this.$refs.fileInputSCBDP
+      let file = input.files
+      if (file && file[0]) {
+        let reader = new FileReader()
+        reader.onload = (e) => {
+          this.previewImage = e.target.result
+          // DP - SCB
+          if (_type == 'DP' && _bank == 'scb') {
+            this.conf_deposit_scb.bank_auto_config.qr_code = reader.result
+          }
+        }
+        reader.readAsDataURL(file[0])
+        this.$emit('input', file[0])
+      }
+    },
+
+    // Bank Auto - Deposit
+    clickAddBankAuto() {
+      this.confAutoBankSetup.req_type = 'deposit'
+      this.confAutoBankSetup.bank_code = this.optDepositActivated[0].bankcode
+      this.onchgBankingAutoConf(this.confAutoBankSetup.bank_code)
+      this.getBankAutoTranfer(this.confAutoBankSetup.bank_code).then(() => {
+        console.log('Started')
+      })
+      this.mdBankAutoDeposit = true
+    },
   },
   mounted() {
     this.getWebPrefixList().then(() => {
-      this.getAllBankSetting()
+      this.getAllBankSetting().then(() => {
+        this.dataBankAutoDepositSetting = []
+        this.dataBankAutoWithdrawSetting = []
+        for (let i = 0; i < this.dataAllBankSetting.length; i++) {
+          if (
+            this.dataAllBankSetting[i].bank_auto_config == 'active' ||
+            this.dataAllBankSetting[i].bank_auto_config == 'suspend'
+          ) {
+            let _tempData = {
+              flagShow: false,
+              flagEdit: false,
+              bank: this.dataAllBankSetting[i],
+            }
+
+            // บัญชีฝาก
+            if (this.dataAllBankSetting[i].type == 'deposit') {
+              this.dataBankAutoDepositSetting.push(_tempData)
+            }
+
+            // บัญชีถอน
+            if (this.dataAllBankSetting[i].type == 'withdraw') {
+              this.dataBankAutoWithdrawSetting.push(_tempData)
+            }
+          }
+        }
+        // Mockup
+        // this.mdEditBank = true
+        this.clickAddBankAuto()
+      })
     })
     this.getAllBank()
 
@@ -1791,6 +2075,7 @@ export default {
 
     // Mockup
     // this.mdEditBank = true
+    // this.clickAddBankAuto()
   },
   setup() {
     return {

@@ -210,8 +210,12 @@
                         เว็บไซต์ *
                       </label>
                       <CFormSelect size="sm" v-model="addEmp.agent_id" required>
-                        <option value="629e381cb4839cabb5622da1">
-                          banpong888
+                        <option
+                          v-for="option in optWebAgent"
+                          :key="option._id"
+                          :value="option._id"
+                        >
+                          {{ option.name }}
                         </option>
                       </CFormSelect>
                     </div>
@@ -705,6 +709,7 @@ export default {
   data() {
     return {
       // Data
+      currentWebAgent: '',
       tmpRoleMyself: 'manager',
       employees: {
         listOfEmp: [],
@@ -712,7 +717,7 @@ export default {
         activePage: 1,
       },
       addEmp: {
-        agent_id: '629e381cb4839cabb5622da1',
+        agent_id: this.currentWebAgent,
         username: '',
         password: '',
         tel: '',
@@ -725,7 +730,7 @@ export default {
         pwdType: 'password',
       },
       editEmp: {
-        agent_id: '629e381cb4839cabb5622da1',
+        agent_id: this.currentWebAgent,
         _id: '',
         username: '',
         password: '',
@@ -739,6 +744,7 @@ export default {
         pwdType: 'password',
       },
       optRole: [],
+      optWebAgent: [],
       // Controls
       avatar1: avatar1,
       avatar2: avatar2,
@@ -777,6 +783,34 @@ export default {
       this.$router.push(route)
     },
     // api
+    async getWebPrefixList() {
+      await this.$http
+        .post('panel/getprefix', {})
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.optWebAgent = response.data.result_perfix
+            this.currentWebAgent = this.optWebAgent[0]._id
+            console.log(this.optWebAgent)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - panel/getprefix : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('call api - panel/getprefix : error' + error)
+        })
+    },
     async getRoleStaff() {
       await this.$http
         .post('panel/getrole', {})
@@ -1025,8 +1059,13 @@ export default {
     },
   },
   mounted() {
-    this.getRoleStaff()
-    this.getAllEmployee()
+    this.getRoleStaff().then(() => {
+      this.getWebPrefixList().then(() => {
+        this.getAllEmployee().then(() => {
+          console.log('Started')
+        })
+      })
+    })
   },
 }
 </script>
