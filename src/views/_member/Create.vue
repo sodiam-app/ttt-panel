@@ -924,7 +924,6 @@ export default {
         .then((response) => {
           if (response.data.status == 200) {
             this.optStatus = response.data.result_status
-            this.onchgStatus(this.optStatus[0].status)
             console.log(this.optStatus)
           } else if (
             response.data.status == 502 ||
@@ -1024,7 +1023,27 @@ export default {
     async addMember() {
       await this.$http
         .post('panel/createuser', {
-          status: 'active',
+          body: {
+            agent_id: this.dataMember.agent_id,
+            username: this.dataMember.username,
+            password: this.dataMember.password,
+            tel: this.dataMember.tel,
+            mobile_number: this.dataMember.mobile_number,
+            pin: this.dataMember.pin,
+            line_id: this.dataMember.line_id,
+            name: this.dataMember.name,
+            email: this.dataMember.email,
+            surename: this.dataMember.surename,
+            birthday: this.dataMember.birthday,
+            channel: this.dataMember.channel,
+            privilege: this.dataMember.privilege,
+            remark: this.dataMember.remark,
+            register_ip: this.dataMember.register_ip,
+            user_reference: this.dataMember.user_reference,
+            bank_id: this.dataMember.bank_id,
+            bank_acct: this.dataMember.bank_account,
+            status: this.dataMember.status_id,
+          },
         })
         .then((response) => {
           if (response.data.status == 200) {
@@ -1147,7 +1166,9 @@ export default {
     })
     this.getConfPrivilege()
     this.getConfChannel()
-    this.getConfStatus()
+    this.getConfStatus().then(() => {
+      this.onchgStatus(this.dataMember.status_id)
+    })
     this.getAllBank()
     this.dataMember.pin = Math.floor(1000 + Math.random() * 9000) + ''
   },
