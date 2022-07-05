@@ -484,40 +484,6 @@
                       </div>
                     </CTableDataCell>
                     <CTableDataCell class="text-center">
-                      <!-- <CButtonGroup role="group" size="sm">
-                        <CButton
-                          color="success"
-                          variant="outline"
-                          @click.prevent="
-                            submitApprove(
-                              history._id,
-                              history.Checked,
-                              history.type,
-                            )
-                          "
-                        >
-                          <CIcon :icon="ic.cilCheckAlt" size="sm" />
-                          <div class="lh-1 mb-1">
-                            <small>อนุมัติ</small>
-                          </div>
-                        </CButton>
-                        <CButton
-                          color="danger"
-                          variant="outline"
-                          @click.prevent="
-                            submitTransactionStatus(
-                              history._id,
-                              'cancel',
-                              history.type,
-                            )
-                          "
-                        >
-                          <CIcon :icon="ic.cilX" size="sm" />
-                          <div class="lh-1 mb-1">
-                            <small>ปฏิเสธ</small>
-                          </div>
-                        </CButton>
-                      </CButtonGroup> -->
                       <CButtonGroup role="group" size="sm">
                         <CButton
                           color="info"
@@ -540,7 +506,10 @@
                         class="p-0"
                         @click="
                           navigateToNewTap(
-                            '/member/list/99dev/' + history.memb_id,
+                            '/member/list/' +
+                              history.web_aka +
+                              '/' +
+                              history.memb_id,
                           )
                         "
                         >{{ history.memb_username }}
@@ -733,7 +702,10 @@
                         class="p-0"
                         @click="
                           navigateToNewTap(
-                            '/member/list/99dev/' + historylasted.memb_id,
+                            '/member/list/' +
+                              historylasted.web_aka +
+                              '/' +
+                              historylasted.memb_id,
                           )
                         "
                         >{{ historylasted.memb_username }}
@@ -1406,7 +1378,10 @@
                   class="p-0"
                   @click="
                     navigateToNewTap(
-                      '/member/list/99dev/' + dataConfirmApprove.memb_id,
+                      '/member/list/' +
+                        dataConfirmApprove.web_aka +
+                        '/' +
+                        dataConfirmApprove.memb_id,
                     )
                   "
                 >
@@ -1585,7 +1560,10 @@
                   class="p-0"
                   @click="
                     navigateToNewTap(
-                      '/member/list/99dev/' + dataManageTransaction.memb_id,
+                      '/member/list/' +
+                        dataManageTransaction.web_aka +
+                        '/' +
+                        dataManageTransaction.memb_id,
                     )
                   "
                 >

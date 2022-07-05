@@ -1,6 +1,6 @@
 <template>
   <div class="mb-3">
-    <CAccordion :active-item-key="1" always-open>
+    <CAccordion :active-item-key="2" always-open>
       <CAccordionItem :item-key="1">
         <CAccordionHeader>
           <CIcon :icon="ic.cilBank" class="me-1" /> บัญชีธนาคาร
@@ -270,47 +270,105 @@
                 ไม่พบข้อมูลบัญชีฝากที่ถูกตั้งค่าไว้
               </CAlert>
               <!-- Demo account 1-->
-              <CCard class="mb-1 border-success">
+              <CCard
+                v-for="(depositBankAuto, index) in dataBankAutoDepositSetting"
+                :key="depositBankAuto._id"
+                class="mb-1 border-success"
+              >
                 <CCardHeader>
                   <div class="d-flex justify-content-between align-self-end">
                     <CImage
                       fluid
-                      :src="getBankIMG('ttb')"
+                      :src="getBankIMG(depositBankAuto.bank.bank_code)"
                       width="30"
                       class="ms-1 me-1"
                     />
                     <div class="align-self-center">
                       <span class="fs-6">
-                        <CIcon class="text-success" :icon="ic.cilSun" />
-                        <!-- <CSpinner size="sm" color="success" variant="grow" /> -->
-                        บัญชีที่ 1
+                        <CIcon
+                          :class="
+                            depositBankAuto.bank.bank_auto_status == 'active'
+                              ? 'text-success'
+                              : 'text-secondary'
+                          "
+                          :icon="
+                            depositBankAuto.bank.bank_auto_status == 'active'
+                              ? ic.cilSun
+                              : ic.cilMoon
+                          "
+                        />
+                        บัญชีที่ {{ index + 1 }}
+                      </span>
+                      <span
+                        class="small font-monospace"
+                        v-if="!depositBankAuto.flagShow"
+                      >
+                        ({{ depositBankAuto.bank.bank_account }})
                       </span>
                     </div>
                     <div>
+                      <span v-if="depositBankAuto.flagShow">
+                        <CButton
+                          size="sm"
+                          color="warning"
+                          variant="outline"
+                          class="ms-1"
+                          @click="
+                            depositBankAuto.flagEdit = !depositBankAuto.flagEdit
+                          "
+                          v-if="depositBankAuto.flagEdit == false"
+                        >
+                          <CIcon size="sm" :icon="ic.cilColorBorder" />
+                        </CButton>
+                        <CButton
+                          size="sm"
+                          color="success"
+                          class="ms-1"
+                          @click="
+                            depositBankAuto.flagEdit = !depositBankAuto.flagEdit
+                          "
+                          v-else
+                        >
+                          <CIcon size="sm" :icon="ic.cilSave" />
+                        </CButton>
+                        <CButton size="sm" color="danger" class="ms-1">
+                          <CIcon size="sm" :icon="ic.cilTrash" />
+                        </CButton>
+                      </span>
                       <CButton
                         size="sm"
-                        color="warning"
-                        variant="outline"
-                        class="ms-1"
+                        color="light"
+                        class="ms-3"
+                        @click="
+                          depositBankAuto.flagShow = !depositBankAuto.flagShow
+                        "
                       >
-                        <CIcon size="sm" :icon="ic.cilColorBorder" />
-                      </CButton>
-                      <CButton size="sm" color="danger" class="ms-1">
-                        <CIcon size="sm" :icon="ic.cilTrash" />
-                      </CButton>
-                      <CButton size="sm" color="light" class="ms-1">
-                        <CIcon size="sm" :icon="ic.cilFullscreenExit" />
+                        <CIcon
+                          size="sm"
+                          :icon="ic.cilFullscreenExit"
+                          v-if="depositBankAuto.flagShow"
+                        />
+                        <CIcon size="sm" :icon="ic.cilFullscreen" v-else />
                       </CButton>
                     </div>
                   </div>
                 </CCardHeader>
                 <CListGroup flush>
-                  <CListGroupItem class="small">
+                  <CListGroupItem class="small" v-if="depositBankAuto.flagShow">
                     <CRow>
                       <CCol>
                         <div class="d-inline-flex align-items-center mb-2">
                           <span class="me-2 fw-semibold"> เปิดใช้งาน </span>
-                          <CFormSwitch id="formSwitchCheckChecked" checked />
+                          <CFormSwitch
+                            id="formSwitchCheckChecked"
+                            :checked="checkedBankAutoSetting(depositBankAuto)"
+                            @change="
+                              onchgBankAutoDepositSetting(
+                                depositBankAuto.bank._id,
+                              )
+                            "
+                            :disabled="!depositBankAuto.flagEdit"
+                          />
                         </div>
                       </CCol>
                     </CRow>
@@ -323,7 +381,7 @@
                           <CFormInput
                             type="text"
                             id="cFName"
-                            value="0984938392"
+                            v-model="depositBankAuto.bank.bank_account"
                             disabled
                           />
                         </div>
@@ -336,7 +394,7 @@
                           <CFormInput
                             type="text"
                             id="cLName"
-                            value="สมหมาย ใจหมา"
+                            v-model="depositBankAuto.bank.account_name"
                             disabled
                           />
                         </div>
@@ -351,7 +409,10 @@
                           <CFormInput
                             type="text"
                             id="cFName"
-                            value="natkingsize2"
+                            v-model="
+                              depositBankAuto.bank.bank_auto_config.username
+                            "
+                            :disabled="!depositBankAuto.flagEdit"
                           />
                         </div>
                       </CCol>
@@ -364,12 +425,16 @@
                             <CFormInput
                               type="password"
                               id="cLName"
-                              value="abc1234@5456"
+                              v-model="
+                                depositBankAuto.bank.bank_auto_config.password
+                              "
+                              :disabled="!depositBankAuto.flagEdit"
                             />
                             <CButton
                               type="button"
                               color="secondary"
-                              variant="outline"
+                              class="border-secondary"
+                              :disabled="!depositBankAuto.flagEdit"
                             >
                               <CIcon :icon="ic.cilLockLocked" />
                             </CButton>
@@ -390,164 +455,32 @@
                             <CImage
                               align="center"
                               class="border"
+                              height="150"
                               rounded
                               :src="
-                                require('../../../assets/images/qr-demo-001.png')
+                                depositBankAuto.bank.bank_auto_config.qr_code
                               "
-                              height="150"
                             />
                           </div>
                           <div>
-                            <CFormInput type="file" size="sm" id="formFileSm" />
-                          </div>
-                        </div>
-                      </CCol>
-                      <CCol md="6">
-                        <div>
-                          <label for="cLName" class="form-label mb-0">
-                            โน้ต
-                          </label>
-                          <CFormTextarea
-                            rows="2"
-                            text="สามารถระบุได้"
-                          ></CFormTextarea>
-                        </div>
-                      </CCol>
-                    </CRow>
-                  </CListGroupItem>
-                  <CListGroupItem>ตัวเลือกอื่น ๆ</CListGroupItem>
-                </CListGroup>
-              </CCard>
-              <!-- Demo account 2-->
-              <CCard class="mb-1 border-success">
-                <CCardHeader>
-                  <div class="d-flex justify-content-between">
-                    <CImage
-                      fluid
-                      :src="getBankIMG('scb')"
-                      width="30"
-                      class="ms-1 me-1"
-                    />
-                    <div class="align-self-center">
-                      <span class="fs-6">
-                        <CIcon class="text-secondary" :icon="ic.cilMoon" />
-                        <!-- <CSpinner size="sm" color="success" variant="grow" /> -->
-                        บัญชีที่ 2
-                      </span>
-                    </div>
-                    <div>
-                      <CButton
-                        size="sm"
-                        color="warning"
-                        variant="outline"
-                        class="ms-1"
-                      >
-                        <CIcon size="sm" :icon="ic.cilColorBorder" />
-                      </CButton>
-                      <CButton size="sm" color="danger" class="ms-1">
-                        <CIcon size="sm" :icon="ic.cilTrash" />
-                      </CButton>
-                      <CButton size="sm" color="light" class="ms-1">
-                        <CIcon size="sm" :icon="ic.cilFullscreenExit" />
-                      </CButton>
-                    </div>
-                  </div>
-                </CCardHeader>
-                <CListGroup flush>
-                  <CListGroupItem class="small">
-                    <CRow>
-                      <CCol>
-                        <div class="d-inline-flex align-items-center mb-2">
-                          <span class="me-2 fw-semibold"> เปิดใช้งาน </span>
-                          <CFormSwitch id="formSwitchCheckChecked" />
-                        </div>
-                      </CCol>
-                    </CRow>
-                    <CRow class="mb-2">
-                      <CCol md="6">
-                        <div>
-                          <label for="cFName" class="form-label mb-0">
-                            เลขที่บัญชี
-                          </label>
-                          <CFormInput
-                            type="text"
-                            id="cFName"
-                            value="1092938872"
-                            disabled
-                          />
-                        </div>
-                      </CCol>
-                      <CCol md="6">
-                        <div>
-                          <label for="cLName" class="form-label mb-0">
-                            ชื่อบัญชี
-                          </label>
-                          <CFormInput
-                            type="text"
-                            id="cLName"
-                            value="หญิงใหญ่ ใครหรอ"
-                            disabled
-                          />
-                        </div>
-                      </CCol>
-                    </CRow>
-                    <CRow class="mb-2">
-                      <CCol md="6">
-                        <div>
-                          <label for="cFName" class="form-label mb-0">
-                            Username *
-                          </label>
-                          <CFormInput
-                            type="text"
-                            id="cFName"
-                            value="natkingsize2"
-                          />
-                        </div>
-                      </CCol>
-                      <CCol md="6">
-                        <div>
-                          <label for="cLName" class="form-label mb-0">
-                            Password *
-                          </label>
-                          <CInputGroup>
-                            <CFormInput
-                              type="password"
-                              id="cLName"
-                              value="abc1234@5456"
-                            />
                             <CButton
-                              type="button"
-                              color="secondary"
+                              color="dark"
+                              size="sm"
+                              shape="rounded-pill"
                               variant="outline"
+                              @click="$refs.fileInput.click()"
+                              :disabled="!depositBankAuto.flagEdit"
                             >
-                              <CIcon :icon="ic.cilLockLocked" />
+                              <CIcon :icon="ic.cilCloudUpload" />
+                              อัพโหลด
                             </CButton>
-                          </CInputGroup>
-                        </div>
-                      </CCol>
-                    </CRow>
-                    <CRow class="mb-2">
-                      <CCol md="6">
-                        <div>
-                          <label for="cFName" class="form-label mb-0">
-                            QR Code
-                            <span class="small text-muted">
-                              (สำหรับแสดงที่หน้าจอลูกค้า)
-                            </span>
-                          </label>
-                          <div class="clearfix mb-2">
-                            <CImage
-                              align="center"
-                              class="border"
-                              rounded
-                              :src="
-                                require('../../../assets/images/qr-demo-001.png')
-                              "
-                              height="150"
+                            <input
+                              style="display: none"
+                              type="file"
+                              class="form-control form-control-sm"
+                              ref="fileInput"
+                              @change="pickFile"
                             />
-                          </div>
-                          <div>
-                            <CFormInput type="file" size="sm" id="formFileSm" />
                           </div>
                         </div>
                       </CCol>
@@ -557,14 +490,16 @@
                             โน้ต
                           </label>
                           <CFormTextarea
-                            rows="2"
+                            rows="3"
                             text="สามารถระบุได้"
+                            v-model="depositBankAuto.bank.bank_auto_config.note"
+                            :disabled="!depositBankAuto.flagEdit"
                           ></CFormTextarea>
                         </div>
                       </CCol>
                     </CRow>
                   </CListGroupItem>
-                  <CListGroupItem>ตัวเลือกอื่น ๆ</CListGroupItem>
+                  <!-- <CListGroupItem>ตัวเลือกอื่น ๆ</CListGroupItem> -->
                 </CListGroup>
               </CCard>
             </CCol>
@@ -594,46 +529,110 @@
                 ไม่พบข้อมูลบัญชีถอนที่ถูกตั้งค่าไว้
               </CAlert>
               <!-- Demo account 1-->
-              <CCard class="mb-1 border-danger">
+              <CCard
+                v-for="(withdrawBankAuto, index) in dataBankAutoWithdrawSetting"
+                :key="withdrawBankAuto._id"
+                class="mb-1 border-danger"
+              >
                 <CCardHeader>
                   <div class="d-flex justify-content-between align-self-end">
                     <CImage
                       fluid
-                      :src="getBankIMG('ttb')"
+                      :src="getBankIMG(withdrawBankAuto.bank.bank_code)"
                       width="30"
                       class="ms-1 me-1"
                     />
                     <div class="align-self-center">
                       <span class="fs-6">
-                        <CIcon class="text-success" :icon="ic.cilSun" />
-                        บัญชีที่ 1
+                        <CIcon
+                          :class="
+                            withdrawBankAuto.bank.bank_auto_status == 'active'
+                              ? 'text-success'
+                              : 'text-secondary'
+                          "
+                          :icon="
+                            withdrawBankAuto.bank.bank_auto_status == 'active'
+                              ? ic.cilSun
+                              : ic.cilMoon
+                          "
+                        />
+                        บัญชีที่ {{ index + 1 }}
+                      </span>
+                      <span
+                        class="small font-monospace"
+                        v-if="!withdrawBankAuto.flagShow"
+                      >
+                        ({{ withdrawBankAuto.bank.bank_account }})
                       </span>
                     </div>
                     <div>
+                      <span v-if="withdrawBankAuto.flagShow">
+                        <CButton
+                          size="sm"
+                          color="warning"
+                          variant="outline"
+                          class="ms-1"
+                          @click="
+                            withdrawBankAuto.flagEdit =
+                              !withdrawBankAuto.flagEdit
+                          "
+                          v-if="withdrawBankAuto.flagEdit == false"
+                        >
+                          <CIcon size="sm" :icon="ic.cilColorBorder" />
+                        </CButton>
+                        <CButton
+                          size="sm"
+                          color="success"
+                          class="ms-1"
+                          @click="
+                            withdrawBankAuto.flagEdit =
+                              !withdrawBankAuto.flagEdit
+                          "
+                          v-else
+                        >
+                          <CIcon size="sm" :icon="ic.cilSave" />
+                        </CButton>
+                        <CButton size="sm" color="danger" class="ms-1">
+                          <CIcon size="sm" :icon="ic.cilTrash" />
+                        </CButton>
+                      </span>
                       <CButton
                         size="sm"
-                        color="warning"
-                        variant="outline"
-                        class="ms-1"
+                        color="light"
+                        class="ms-3"
+                        @click="
+                          withdrawBankAuto.flagShow = !withdrawBankAuto.flagShow
+                        "
                       >
-                        <CIcon size="sm" :icon="ic.cilColorBorder" />
-                      </CButton>
-                      <CButton size="sm" color="danger" class="ms-1">
-                        <CIcon size="sm" :icon="ic.cilTrash" />
-                      </CButton>
-                      <CButton size="sm" color="light" class="ms-1">
-                        <CIcon size="sm" :icon="ic.cilFullscreenExit" />
+                        <CIcon
+                          size="sm"
+                          :icon="ic.cilFullscreenExit"
+                          v-if="withdrawBankAuto.flagShow"
+                        />
+                        <CIcon size="sm" :icon="ic.cilFullscreen" v-else />
                       </CButton>
                     </div>
                   </div>
                 </CCardHeader>
                 <CListGroup flush>
-                  <CListGroupItem class="small">
+                  <CListGroupItem
+                    class="small"
+                    v-if="withdrawBankAuto.flagShow"
+                  >
                     <CRow>
                       <CCol>
                         <div class="d-inline-flex align-items-center mb-2">
                           <span class="me-2 fw-semibold"> เปิดใช้งาน </span>
-                          <CFormSwitch id="formSwitchCheckChecked" checked />
+                          <CFormSwitch
+                            id="formSwitchCheckChecked"
+                            :checked="checkedBankAutoSetting(withdrawBankAuto)"
+                            @change="
+                              onchgBankAutoWithdrawSetting(
+                                withdrawBankAuto.bank._id,
+                              )
+                            "
+                            :disabled="!withdrawBankAuto.flagEdit"
+                          />
                         </div>
                       </CCol>
                     </CRow>
@@ -646,7 +645,7 @@
                           <CFormInput
                             type="text"
                             id="cFName"
-                            value="0984938392"
+                            v-model="withdrawBankAuto.bank.bank_account"
                             disabled
                           />
                         </div>
@@ -659,7 +658,7 @@
                           <CFormInput
                             type="text"
                             id="cLName"
-                            value="สมหมาย ใจหมา"
+                            v-model="withdrawBankAuto.bank.account_name"
                             disabled
                           />
                         </div>
@@ -674,7 +673,10 @@
                           <CFormInput
                             type="text"
                             id="cFName"
-                            value="natkingsize2"
+                            v-model="
+                              withdrawBankAuto.bank.bank_auto_config.username
+                            "
+                            :disabled="!withdrawBankAuto.flagEdit"
                           />
                         </div>
                       </CCol>
@@ -687,12 +689,16 @@
                             <CFormInput
                               type="password"
                               id="cLName"
-                              value="abc1234@5456"
+                              v-model="
+                                withdrawBankAuto.bank.bank_auto_config.password
+                              "
+                              :disabled="!withdrawBankAuto.flagEdit"
                             />
                             <CButton
                               type="button"
                               color="secondary"
-                              variant="outline"
+                              class="border-secondary"
+                              :disabled="!withdrawBankAuto.flagEdit"
                             >
                               <CIcon :icon="ic.cilLockLocked" />
                             </CButton>
@@ -709,7 +715,12 @@
                               (สำหรับใช้งาน OTP)
                             </span>
                           </label>
-                          <CFormSelect aria-label="Large select example">
+                          <CFormSelect
+                            v-model="
+                              withdrawBankAuto.bank.bank_auto_config.push_bullet
+                            "
+                            :disabled="!withdrawBankAuto.flagEdit"
+                          >
                             <option value="SMS1">SMS1</option>
                             <option value="SMS2">SMS2</option>
                             <option value="DEMO01">DEMO01</option>
@@ -722,14 +733,18 @@
                             โน้ต
                           </label>
                           <CFormTextarea
-                            rows="2"
+                            rows="3"
                             text="สามารถระบุได้"
+                            v-model="
+                              withdrawBankAuto.bank.bank_auto_config.note
+                            "
+                            :disabled="!withdrawBankAuto.flagEdit"
                           ></CFormTextarea>
                         </div>
                       </CCol>
                     </CRow>
                   </CListGroupItem>
-                  <CListGroupItem>ตัวเลือกอื่น ๆ</CListGroupItem>
+                  <!-- <CListGroupItem>ตัวเลือกอื่น ๆ</CListGroupItem> -->
                 </CListGroup>
               </CCard>
             </CCol>
@@ -810,7 +825,7 @@
                       </CInputGroupText>
                       <CFormSelect
                         v-model="dataAddBank.bank_id"
-                        @change="onchgBanking($event.target.value)"
+                        @change="onchgBankingAdd($event.target.value)"
                       >
                         <option value="">กรุณาเลือกธนาคาร</option>
                         <option
@@ -871,7 +886,7 @@
                           </CInputGroupText>
                           <CFormSelect
                             v-model="dataAddBank.memb_bank"
-                            @change="onchgBankingMember($event.target.value)"
+                            @change="onchgBankingMemberAdd($event.target.value)"
                           >
                             <option value="all">ทั้งหมด</option>
                             <option
@@ -926,7 +941,7 @@
             <div class="text-end">
               <CButton size="sm" color="success" class="ms-1 text-light">
                 <CIcon :icon="ic.cilCheckCircle" />
-                ยืนยัน
+                เพิ่มบัญชี
               </CButton>
               <CButton
                 size="sm"
@@ -1019,7 +1034,7 @@
                       </CInputGroupText>
                       <CFormSelect
                         v-model="dataEditBank.bank_id"
-                        @change="onchgBanking($event.target.value)"
+                        @change="onchgBankingEdit($event.target.value)"
                       >
                         <option value="">กรุณาเลือกธนาคาร</option>
                         <option
@@ -1080,7 +1095,9 @@
                           </CInputGroupText>
                           <CFormSelect
                             v-model="dataEditBank.memb_bank"
-                            @change="onchgBankingMember($event.target.value)"
+                            @change="
+                              onchgBankingMemberEdit($event.target.value)
+                            "
                           >
                             <option value="all">ทั้งหมด</option>
                             <option
@@ -1221,6 +1238,8 @@ import {
   cilCreditCard,
   cilContact,
   cilLibraryAdd,
+  cilSave,
+  cilCloudUpload,
 } from '@coreui/icons'
 
 import avatar from '@/assets/images/avatars/owner/02.png'
@@ -1234,6 +1253,7 @@ export default {
   },
   data() {
     return {
+      previewImage: null,
       toasts: [],
 
       mdAddBank: false,
@@ -1265,6 +1285,94 @@ export default {
         status: 'active',
         type: 'deposit',
       },
+      dataBankAutoDepositSetting: [
+        {
+          flagShow: false,
+          flagEdit: false,
+          bank: {
+            _id: '62a76285b4839cabb5622daa',
+            bank_id: '62ae1de41fa4c734108a7763',
+            bank_account: '222222222',
+            account_name: 'นาย4506 45056',
+            bank_name_th: 'ธนาคารเกียรตินาคินภัทร',
+            bank_name_en: 'kkp',
+            bank_code: 'kkp',
+            description: '',
+            bank_status: 'active',
+            type: 'deposit',
+            sub_type: 'deposit',
+            memb_bank: null,
+            bank_auto_status: 'active',
+            bank_auto_config: {
+              username: 'natkingsize2',
+              password: '12345678',
+              note: 'บัญชีฝากหลัก',
+              qr_code: '',
+            },
+            sms_auto_status: 'inactive',
+            sms_auto_config: null,
+            privilege: null,
+          },
+        },
+        {
+          flagShow: false,
+          flagEdit: false,
+          bank: {
+            _id: '62a76285b4839cabb5622daa',
+            bank_id: '62ae1de41fa4c734108a7763',
+            bank_account: '0993848273',
+            account_name: 'สมใจ จริงจริง',
+            bank_name_th: 'ธนาคารกสิกรไทย',
+            bank_name_en: 'kbank',
+            bank_code: 'kbank',
+            description: '',
+            bank_status: 'active',
+            type: 'deposit',
+            sub_type: 'deposit',
+            memb_bank: null,
+            bank_auto_status: 'suspend',
+            bank_auto_config: {
+              username: 'natkingsize2',
+              password: '12345678',
+              note: 'จดข้อมูล',
+              qr_code: '',
+            },
+            sms_auto_status: 'inactive',
+            sms_auto_config: null,
+            privilege: null,
+          },
+        },
+      ],
+      dataBankAutoWithdrawSetting: [
+        {
+          flagShow: false,
+          flagEdit: false,
+          bank: {
+            _id: '62a76285b4839cabb5622daa',
+            bank_id: '62ae1de41fa4c734108a7763',
+            bank_account: '0938884717',
+            account_name: 'สมหมาย ใจหมา',
+            bank_name_th: 'ธนาคารทหารไทยธนชาติ',
+            bank_name_en: 'ttb',
+            bank_code: 'ttb',
+            description: '',
+            bank_status: 'active',
+            type: 'withdraw',
+            sub_type: 'withdraw',
+            memb_bank: null,
+            bank_auto_status: 'active',
+            bank_auto_config: {
+              username: 'paponwut.wut',
+              password: '009398477',
+              note: 'บัญชีถอนตัวหลัก',
+              push_bullet: 'SMS1',
+            },
+            sms_auto_status: 'inactive',
+            sms_auto_config: null,
+            privilege: null,
+          },
+        },
+      ],
 
       optWebAgent: [],
       optAllBank: [],
@@ -1361,6 +1469,8 @@ export default {
         cilCreditCard,
         cilContact,
         cilLibraryAdd,
+        cilSave,
+        cilCloudUpload,
       },
     }
   },
@@ -1535,7 +1645,7 @@ export default {
         return 'ทั้งหมด'
       }
     },
-    onchgBanking(_id) {
+    onchgBankingAdd(_id) {
       this.dataAddBank.bank_img = ''
       let bank_code = null
       for (let i = 0; i < this.optAllBank.length; i++) {
@@ -1554,7 +1664,7 @@ export default {
         }
       }
     },
-    onchgBankingMember(_id) {
+    onchgBankingMemberAdd(_id) {
       this.dataAddBank.memb_bank_img = ''
       let bank_code = null
       for (let i = 0; i < this.optAllBank.length; i++) {
@@ -1577,6 +1687,97 @@ export default {
         }
       }
     },
+    onchgBankingEdit(_id) {
+      this.dataEditBank.bank_img = ''
+      let bank_code = null
+      for (let i = 0; i < this.optAllBank.length; i++) {
+        if (this.optAllBank[i]._id == _id) {
+          bank_code = this.optAllBank[i].bankcode
+          break
+        }
+      }
+      if (bank_code) {
+        try {
+          this.dataEditBank.bank_img = require('../../../assets/images/banking/th/smooth-corner/' +
+            bank_code +
+            '.png')
+        } catch (err) {
+          console.log(err)
+        }
+      }
+    },
+    onchgBankingMemberEdit(_id) {
+      this.dataEditBank.memb_bank_img = ''
+      let bank_code = null
+      for (let i = 0; i < this.optAllBank.length; i++) {
+        if (this.optAllBank[i]._id == _id) {
+          bank_code = this.optAllBank[i].bankcode
+          break
+        }
+      }
+      if (bank_code || _id == 'all') {
+        try {
+          if (_id == 'all') {
+            this.dataEditBank.memb_bank_img = require('../../../assets/images/banking/th/smooth-corner/all.png')
+          } else {
+            this.dataEditBank.memb_bank_img = require('../../../assets/images/banking/th/smooth-corner/' +
+              bank_code +
+              '.png')
+          }
+        } catch (err) {
+          console.log(err)
+        }
+      }
+    },
+    checkedBankAutoSetting(opj) {
+      if (opj.bank.bank_auto_status == 'active') {
+        return true
+      } else {
+        return false
+      }
+    },
+    onchgBankAutoDepositSetting(_id) {
+      for (let i = 0; i < this.dataBankAutoDepositSetting.length; i++) {
+        if (this.dataBankAutoDepositSetting[i].bank._id == _id) {
+          if (
+            this.dataBankAutoDepositSetting[i].bank.bank_auto_status == 'active'
+          ) {
+            this.dataBankAutoDepositSetting[i].bank.bank_auto_status = 'suspend'
+          } else {
+            this.dataBankAutoDepositSetting[i].bank.bank_auto_status = 'active'
+          }
+        }
+      }
+    },
+    onchgBankAutoWithdrawSetting(_id) {
+      for (let i = 0; i < this.dataBankAutoWithdrawSetting.length; i++) {
+        if (this.dataBankAutoWithdrawSetting[i].bank._id == _id) {
+          if (
+            this.dataBankAutoWithdrawSetting[i].bank.bank_auto_status ==
+            'active'
+          ) {
+            this.dataBankAutoWithdrawSetting[i].bank.bank_auto_status =
+              'suspend'
+          } else {
+            this.dataBankAutoWithdrawSetting[i].bank.bank_auto_status = 'active'
+          }
+        }
+      }
+    },
+    pickFile() {
+      let input = this.$refs.fileInput
+      let file = input.files
+      if (file && file[0]) {
+        let reader = new FileReader()
+        reader.onload = (e) => {
+          this.previewImage = e.target.result
+          this.dataBankAutoDepositSetting[0].bank.bank_auto_config.qr_code =
+            reader.result
+        }
+        reader.readAsDataURL(file[0])
+        this.$emit('input', file[0])
+      }
+    },
   },
   mounted() {
     this.getWebPrefixList().then(() => {
@@ -1586,6 +1787,7 @@ export default {
 
     // Setup
     this.dataAddBank.memb_bank_img = require('../../../assets/images/banking/th/smooth-corner/all.png')
+    this.dataEditBank.memb_bank_img = require('../../../assets/images/banking/th/smooth-corner/all.png')
 
     // Mockup
     // this.mdEditBank = true
