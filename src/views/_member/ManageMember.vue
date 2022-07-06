@@ -57,6 +57,7 @@
                   class="ms-1 text-light"
                   size="sm"
                   v-if="tabPaneActiveKey === 1"
+                  @click="navigateTo('/member/create')"
                 >
                   <CIcon :icon="ic.cilUserPlus" />
                   สร้าง
@@ -66,6 +67,7 @@
                   class="ms-1 text-light"
                   size="sm"
                   v-if="tabPaneActiveKey === 1"
+                  disabled
                 >
                   <CIcon :icon="ic.cilSave" />
                   บันทึก
@@ -91,7 +93,7 @@
                               color="info"
                               class="ms-1 text-light"
                               size="sm"
-                              @click="getMemberProfile"
+                              @click="getMemberProfile(webAgentID, memberID)"
                             >
                               <CIcon :icon="ic.cilReload" />
                               รีโหลด
@@ -411,9 +413,10 @@
                               color="danger"
                               class="ms-1 text-light"
                               size="sm"
+                              disabled
                             >
                               <CIcon :icon="ic.cilBan" />
-                              แบลลิส
+                              แบลคลิส
                             </CButton>
                           </CCol>
                         </CRow>
@@ -761,7 +764,7 @@
                                     aria-describedby="basic-cUrl"
                                     class="text-muted border-secondary"
                                     v-model="memberProfile.web_url"
-                                    disabled
+                                    readonly
                                   />
                                   <CButton
                                     type="button"
@@ -857,7 +860,8 @@
               aria-labelledby="home-tab"
               :visible="tabPaneActiveKey === 2"
             >
-              <CCardText>
+              <CCardText v-if="true"> ยังไม่พร้อมใช้งาน </CCardText>
+              <CCardText v-else>
                 <CRow>
                   <CCol class="text-end px-1 mb-1">
                     <CForm
@@ -1180,7 +1184,10 @@ export default {
 
       avatar: avatar,
       tabPaneActiveKey: 1,
-      webSite: 0,
+
+      webSite: '',
+      webAgentID: 0,
+
       memberID: 0,
       memberProfile: {
         status: false,
@@ -1343,7 +1350,7 @@ export default {
             this.memberProfile.tel = mem.tel
             this.memberProfile.web_id = mem.web_id
             this.memberProfile.web_name = mem.web_name
-            this.memberProfile.web_url = mem.url_login
+            this.memberProfile.web_url = mem.url + '/' + mem.tel
             this.memberProfile.name = mem.name
             this.memberProfile.surename = mem.surename
             this.memberProfile.birthday_date = mem.birthday_date
@@ -1601,6 +1608,7 @@ export default {
       for (let i = 0; i < this.optWebAgent.length; i++) {
         if (this.optWebAgent[i].name == this.webSite) {
           agent_id = this.optWebAgent[i]._id
+          this.webAgentID = this.optWebAgent[i]._id
           break
         }
       }
