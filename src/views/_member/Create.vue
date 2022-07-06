@@ -1047,7 +1047,7 @@ export default {
         })
         .then((response) => {
           if (response.data.status == 200) {
-            this.navigateToNewTab(
+            this.navigateTo(
               '/member/list/' +
                 response.data.web_name +
                 '/' +
