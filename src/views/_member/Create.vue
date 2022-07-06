@@ -1049,9 +1049,9 @@ export default {
           if (response.data.status == 200) {
             this.navigateTo(
               '/member/list/' +
-                response.data.web_name +
+                response.data.result.web_name +
                 '/' +
-                response.data.user_id,
+                response.data.result._id,
             )
           } else if (
             response.data.status == 502 ||
