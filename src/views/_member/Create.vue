@@ -1041,7 +1041,7 @@ export default {
             register_ip: this.dataMember.register_ip,
             user_reference: this.dataMember.user_reference,
             bank_id: this.dataMember.bank_id,
-            bank_acct: this.dataMember.bank_account,
+            bank_acct: this.dataMember.bank_acct,
             status: this.dataMember.status_id,
           },
         })

@@ -1208,7 +1208,7 @@
         <strong>
           <span class="h5">
             <CIcon size="lg" :icon="ic.cilTerminal" />
-            เพิ่มบัญชีทำงานออโต้
+            เพิ่มบัญชีฝากทำงานออโต้
           </span>
         </strong>
       </CModalTitle>
@@ -1230,6 +1230,7 @@
                       getBankAutoTranfer($event.target.value)
                   "
                 >
+                  <option value="">กรุณาเลือกธนาคาร</option>
                   <option
                     v-for="option in optDepositActivated"
                     :key="option._id"
@@ -1240,8 +1241,23 @@
                 </CFormSelect>
               </CInputGroup>
             </div>
+            <div>
+              <CAlert
+                color="danger"
+                class="py-2 text-center"
+                v-if="confAutoBankSetup.errVisible"
+              >
+                <CIcon size="lg" :icon="ic.cilWarning" />
+                {{ confAutoBankSetup.errMessage }}
+              </CAlert>
+            </div>
             <!-- ::SCB:: - Bank Auto Transfer (Deposit) -->
-            <div v-if="confAutoBankSetup.bank_code == 'scb'">
+            <div
+              v-if="
+                confAutoBankSetup.bank_code == 'scb' &&
+                optBankAutoTransfer.length != 0
+              "
+            >
               <div class="mb-2">
                 <label class="form-label mb-0"> บัญชีฝาก * </label>
                 <CFormSelect v-model="conf_deposit_scb._id">
@@ -1482,6 +1498,8 @@ export default {
         bank_code: '',
         bank_img: '',
         req_type: '',
+        errVisible: false,
+        errMessage: '',
       },
       conf_deposit_scb: {
         _id: '',
@@ -1781,6 +1799,13 @@ export default {
               this.navigateTo('/pages/login')
             })
           } else {
+            this.createToast(
+              'danger',
+              'การดำเนินการ',
+              'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + response.data.message,
+            )
+            this.confAutoBankSetup.errVisible = true
+            this.confAutoBankSetup.errMessage = response.data.message
             console.log(
               'call api - panel/getbankautotranfer : status = ' +
                 response.data.status +
@@ -1790,6 +1815,13 @@ export default {
           }
         })
         .catch((error) => {
+          this.createToast(
+            'danger',
+            'การดำเนินการ',
+            'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + error,
+          )
+          this.confAutoBankSetup.errVisible = true
+          this.confAutoBankSetup.errMessage = error
           console.log('call api - panel/getbankautotranfer : error' + error)
         })
     },
@@ -2025,14 +2057,29 @@ export default {
     },
 
     // Bank Auto - Deposit
-    clickAddBankAuto() {
-      this.confAutoBankSetup.req_type = 'deposit'
-      this.confAutoBankSetup.bank_code = this.optDepositActivated[0].bankcode
-      this.onchgBankingAutoConf(this.confAutoBankSetup.bank_code)
-      this.getBankAutoTranfer(this.confAutoBankSetup.bank_code).then(() => {
-        console.log('Started')
-      })
-      this.mdBankAutoDeposit = true
+    clickAddBankAuto(_type) {
+      if (_type == 'deposit') {
+        this.optBankAutoTransfer = []
+        this.confAutoBankSetup.req_type = 'deposit'
+        this.confAutoBankSetup.bank_code = ''
+        this.confAutoBankSetup.bank_img = ''
+        this.conf_deposit_scb._id = ''
+        this.conf_deposit_scb.bank_auto_status = 'active'
+        this.conf_deposit_scb.bank_auto_config.username = ''
+        this.conf_deposit_scb.bank_auto_config.password = ''
+        this.conf_deposit_scb.bank_auto_config.note = ''
+        this.conf_deposit_scb.bank_auto_config.push_bullet = ''
+        this.conf_deposit_scbstatus = ''
+        this.conf_deposit_scb.type = 'deposit'
+        this.mdBankAutoDeposit = true
+      } else if (_type == 'withdraw') {
+        // ...
+      }
+      // this.confAutoBankSetup.bank_code = this.optDepositActivated[0].bankcode
+      // this.onchgBankingAutoConf(this.confAutoBankSetup.bank_code)
+      // this.getBankAutoTranfer(this.confAutoBankSetup.bank_code).then(() => {
+      //   console.log('Started')
+      // })
     },
   },
   mounted() {
@@ -2064,7 +2111,7 @@ export default {
         }
         // Mockup
         // this.mdEditBank = true
-        this.clickAddBankAuto()
+        this.clickAddBankAuto('deposit')
       })
     })
     this.getAllBank()
