@@ -1,6 +1,6 @@
 <template>
   <div class="mb-3">
-    <CAccordion :active-item-key="2" always-open>
+    <CAccordion :active-item-key="1" always-open>
       <CAccordionItem :item-key="1">
         <CAccordionHeader>
           <CIcon :icon="ic.cilBank" class="me-1" /> บัญชีธนาคาร
@@ -9,7 +9,10 @@
           <div class="d-flex justify-content-between mb-1">
             <div class="d-inline-flex align-items-end">
               <span class="me-2 fw-semibold"> * เฉพาะสถานะเปิดใช้งาน </span>
-              <CFormSwitch id="formSwitchCheckChecked" />
+              <CFormSwitch
+                id="formSwitchCheckChecked"
+                v-model="visibleOfActiveBank"
+              />
             </div>
             <CButton color="primary" size="sm" @click="mdAddBank = !mdAddBank">
               <CIcon :icon="ic.cilPlus" />
@@ -56,6 +59,11 @@
                     <CTableRow
                       v-for="(bank, index) in dataAllBankSetting"
                       :key="bank._id"
+                      v-show="
+                        visibleOfActiveBank == false ||
+                        (visibleOfActiveBank == true &&
+                          bank.bank_status == 'active')
+                      "
                     >
                       <CTableHeaderCell scope="row" class="text-center">
                         {{ index + 1 }}.
@@ -224,7 +232,7 @@
                           variant="outline"
                           size="sm"
                           class="me-1"
-                          @click="mdEditBank = true"
+                          @click="clickShowEdit(bank._id)"
                         >
                           <CIcon :icon="ic.cilColorBorder" class="small" />
                           แก้ไข
@@ -258,7 +266,7 @@
                     variant="outline"
                     shape="rounded-pill"
                     class="float-end"
-                    @click="clickAddBankAuto"
+                    @click="clickAddBankAuto('deposit')"
                   >
                     <CIcon :icon="ic.cilPlus" />
                     เพิ่ม
@@ -330,13 +338,26 @@
                           color="success"
                           class="ms-1"
                           @click="
-                            depositBankAuto.flagEdit = !depositBankAuto.flagEdit
+                            actUpdateBankAuto(
+                              depositBankAuto.bank.bank_auto_status,
+                              depositBankAuto,
+                            )
                           "
                           v-else
                         >
                           <CIcon size="sm" :icon="ic.cilSave" />
                         </CButton>
-                        <CButton size="sm" color="danger" class="ms-1">
+                        <CButton
+                          size="sm"
+                          color="danger"
+                          class="ms-1"
+                          @click="
+                            clickDeleteBankOrBankAuto(
+                              'bankAuto',
+                              depositBankAuto,
+                            )
+                          "
+                        >
                           <CIcon size="sm" :icon="ic.cilTrash" />
                         </CButton>
                       </span>
@@ -522,6 +543,7 @@
                     variant="outline"
                     shape="rounded-pill"
                     class="float-end"
+                    @click="clickAddBankAuto('withdraw')"
                   >
                     <CIcon :icon="ic.cilPlus" />
                     เพิ่ม
@@ -594,14 +616,26 @@
                           color="success"
                           class="ms-1"
                           @click="
-                            withdrawBankAuto.flagEdit =
-                              !withdrawBankAuto.flagEdit
+                            actUpdateBankAuto(
+                              withdrawBankAuto.bank.bank_auto_status,
+                              withdrawBankAuto,
+                            )
                           "
                           v-else
                         >
                           <CIcon size="sm" :icon="ic.cilSave" />
                         </CButton>
-                        <CButton size="sm" color="danger" class="ms-1">
+                        <CButton
+                          size="sm"
+                          color="danger"
+                          class="ms-1"
+                          @click="
+                            clickDeleteBankOrBankAuto(
+                              'bankAuto',
+                              withdrawBankAuto,
+                            )
+                          "
+                        >
                           <CIcon size="sm" :icon="ic.cilTrash" />
                         </CButton>
                       </span>
@@ -730,9 +764,14 @@
                             "
                             :disabled="!withdrawBankAuto.flagEdit"
                           >
-                            <option value="SMS1">SMS1</option>
-                            <option value="SMS2">SMS2</option>
-                            <option value="DEMO01">DEMO01</option>
+                            <option value="">กรุณาเลือก</option>
+                            <option
+                              v-for="option in optPushBullet"
+                              :key="option._id"
+                              :value="option._id"
+                            >
+                              {{ option.name }}
+                            </option>
                           </CFormSelect>
                         </div>
                       </CCol>
@@ -795,7 +834,11 @@
                 <CCol>
                   <div class="d-inline-flex align-items-center mb-2">
                     <span class="me-2 fw-semibold"> เปิดใช้งาน * </span>
-                    <CFormSwitch id="formSwitchCheckChecked" checked />
+                    <CFormSwitch
+                      id="formSwitchCheckChecked"
+                      :checked="checkedStatusBank(dataAddBank.status)"
+                      @change="onchgStatusAddBank(dataAddBank.status)"
+                    />
                   </div>
                 </CCol>
               </CRow>
@@ -859,7 +902,11 @@
                       <CInputGroupText>
                         <CIcon :icon="ic.cilCreditCard" />
                       </CInputGroupText>
-                      <CFormInput type="text" id="cFName" />
+                      <CFormInput
+                        type="text"
+                        id="cFName"
+                        v-model="dataAddBank.bank_account_number"
+                      />
                     </CInputGroup>
                   </div>
                 </CCol>
@@ -872,7 +919,11 @@
                       <CInputGroupText>
                         <CIcon :icon="ic.cilContact" />
                       </CInputGroupText>
-                      <CFormInput type="text" id="cLName" />
+                      <CFormInput
+                        type="text"
+                        id="cLName"
+                        v-model="dataAddBank.bank_account_name"
+                      />
                     </CInputGroup>
                   </div>
                 </CCol>
@@ -948,7 +999,12 @@
             </div>
             <hr />
             <div class="text-end">
-              <CButton size="sm" color="success" class="ms-1 text-light">
+              <CButton
+                size="sm"
+                color="success"
+                class="ms-1 text-light"
+                @click="actInsertBank()"
+              >
                 <CIcon :icon="ic.cilCheckCircle" />
                 เพิ่มบัญชี
               </CButton>
@@ -1000,14 +1056,32 @@
         <CCardBody>
           <CCardText>
             <div>
-              <CRow>
-                <CCol>
-                  <div class="d-inline-flex align-items-center mb-2">
-                    <span class="me-2 fw-semibold"> เปิดใช้งาน * </span>
-                    <CFormSwitch id="formSwitchCheckChecked" checked />
-                  </div>
-                </CCol>
-              </CRow>
+              <!-- <CAlert color="warning" class="align-items-center">
+                <CIcon :icon="ic.cilWarning" />
+                <div>ไม่สามารถแก้ไข "สถานะการใช้งาน" และ "ประเภทบัญชีได้"</div>
+                <div>เนื่องจากมีการตั้งค่า Bank Auto หรือ SMS Auto ไว้</div>
+              </CAlert> -->
+              <CAlert
+                color="warning"
+                class="py-2 text-center"
+                v-show="
+                  dataEditBank.bank_auto_config || dataEditBank.sms_auto_config
+                "
+              >
+                <CIcon size="lg" :icon="ic.cilWarning" />
+                <span>
+                  ไม่สามารถ "ประเภทบัญชี" ได้, เนื่องจากบัญชีนี้มีการตั้งค่า
+                  Bank Auto หรือ SMS Auto ไว้
+                </span>
+              </CAlert>
+              <div class="d-inline-flex align-items-center mb-2">
+                <span class="me-2 fw-semibold"> เปิดใช้งาน * </span>
+                <CFormSwitch
+                  id="formSwitchCheckChecked"
+                  :checked="checkedStatusBank(dataEditBank.status)"
+                  @change="onchgStatusEditBank(dataEditBank.status)"
+                />
+              </div>
               <hr class="mt-0 mb-2" />
               <CRow>
                 <CCol md="6" class="mb-2">
@@ -1025,7 +1099,13 @@
                       >
                         <CIcon :icon="ic.cibDiscover" />
                       </CInputGroupText>
-                      <CFormSelect v-model="dataEditBank.type">
+                      <CFormSelect
+                        v-model="dataEditBank.type"
+                        :disabled="
+                          dataEditBank.bank_auto_config ||
+                          dataEditBank.sms_auto_config
+                        "
+                      >
                         <option value="deposit">ฝาก</option>
                         <option value="withdraw">ถอน</option>
                       </CFormSelect>
@@ -1068,7 +1148,11 @@
                       <CInputGroupText>
                         <CIcon :icon="ic.cilCreditCard" />
                       </CInputGroupText>
-                      <CFormInput type="text" id="cFName" />
+                      <CFormInput
+                        type="text"
+                        id="cFName"
+                        v-model="dataEditBank.bank_account_number"
+                      />
                     </CInputGroup>
                   </div>
                 </CCol>
@@ -1081,7 +1165,11 @@
                       <CInputGroupText>
                         <CIcon :icon="ic.cilContact" />
                       </CInputGroupText>
-                      <CFormInput type="text" id="cLName" />
+                      <CFormInput
+                        type="text"
+                        id="cLName"
+                        v-model="dataEditBank.bank_account_name"
+                      />
                     </CInputGroup>
                   </div>
                 </CCol>
@@ -1160,15 +1248,30 @@
             <hr />
             <div class="d-flex justify-content-between">
               <div>
-                <CButton size="sm" color="danger" class="ms-1 text-light">
+                <CButton
+                  size="sm"
+                  color="danger"
+                  class="ms-1 text-light"
+                  @click="
+                    () => {
+                      mdEditBank = false
+                      clickDeleteBankOrBankAuto('bank', dataEditBank._id)
+                    }
+                  "
+                >
                   <CIcon :icon="ic.cilTrash" />
                   ลบ
                 </CButton>
               </div>
               <div>
-                <CButton size="sm" color="success" class="ms-1 text-light">
+                <CButton
+                  size="sm"
+                  color="success"
+                  class="ms-1 text-light"
+                  @click="actUpdateBank()"
+                >
                   <CIcon :icon="ic.cilCheckCircle" />
-                  ยืนยัน
+                  บันทึก
                 </CButton>
                 <CButton
                   size="sm"
@@ -1176,7 +1279,7 @@
                   class="text-light ms-1"
                   @click="
                     () => {
-                      mdEditBank = false
+                      prepareBankSetting(), (mdEditBank = false)
                     }
                   "
                 >
@@ -1208,7 +1311,11 @@
         <strong>
           <span class="h5">
             <CIcon size="lg" :icon="ic.cilTerminal" />
-            เพิ่มบัญชีฝากทำงานออโต้
+            เพิ่มบัญชี
+            <CBadge color="success" shape="rounded-pill" class="py-1"
+              >ฝาก</CBadge
+            >
+            ออโต้
           </span>
         </strong>
       </CModalTitle>
@@ -1265,7 +1372,7 @@
                   <option
                     v-for="option in optBankAutoTransfer"
                     :key="option._id"
-                    :value="option.bank_id"
+                    :value="option._id"
                   >
                     {{ option.bank_account }} ({{ option.account_name }})
                   </option>
@@ -1360,7 +1467,13 @@
             <hr />
             <div class="d-flex justify-content-end">
               <div>
-                <CButton size="sm" color="success" class="ms-1 text-light">
+                <CButton
+                  size="sm"
+                  color="success"
+                  class="ms-1 text-light"
+                  v-if="optBankAutoTransfer.length != 0"
+                  @click="actInsertBankAuto('deposit')"
+                >
                   <CIcon :icon="ic.cilCheckCircle" />
                   ยืนยัน
                 </CButton>
@@ -1382,6 +1495,255 @@
           </CCardText>
         </CCardBody>
       </CCard>
+    </CModalBody>
+  </CModal>
+
+  <!-- ----- -->
+  <!-- เพิ่ม Bank Auto Tranfer :: Withdraw -->
+  <!-- ------ -->
+  <CModal
+    backdrop="static"
+    :visible="mdBankAutoWithdraw"
+    @close="
+      () => {
+        mdBankAutoWithdraw = false
+      }
+    "
+  >
+    <CModalHeader>
+      <CModalTitle class="fw-lighter">
+        <strong>
+          <span class="h5">
+            <CIcon size="lg" :icon="ic.cilTerminal" />
+            เพิ่มบัญชี
+            <CBadge color="danger" shape="rounded-pill" class="py-1"
+              >ถอน</CBadge
+            >
+            ออโต้
+          </span>
+        </strong>
+      </CModalTitle>
+    </CModalHeader>
+    <CModalBody class="m-0 p-0">
+      <CCard>
+        <CCardBody class="pt-2">
+          <CCardText>
+            <div class="mb-2">
+              <label class="form-label mb-0"> ธนาคาร * </label>
+              <CInputGroup>
+                <CInputGroupText>
+                  <CImage fluid :src="confAutoBankSetup.bank_img" width="22" />
+                </CInputGroupText>
+                <CFormSelect
+                  v-model="confAutoBankSetup.bank_code"
+                  @change="
+                    onchgBankingAutoConf($event.target.value),
+                      getBankAutoTranfer($event.target.value)
+                  "
+                >
+                  <option value="">กรุณาเลือกธนาคาร</option>
+                  <option
+                    v-for="option in optWithdrawActivated"
+                    :key="option._id"
+                    :value="option.bankcode"
+                  >
+                    {{ option.banknameth }}
+                  </option>
+                </CFormSelect>
+              </CInputGroup>
+            </div>
+            <div>
+              <CAlert
+                color="danger"
+                class="py-2 text-center"
+                v-if="confAutoBankSetup.errVisible"
+              >
+                <CIcon size="lg" :icon="ic.cilWarning" />
+                {{ confAutoBankSetup.errMessage }}
+              </CAlert>
+            </div>
+            <!-- ::TTB:: - Bank Auto Transfer (Deposit) -->
+            <div
+              v-if="
+                confAutoBankSetup.bank_code == 'ttb' &&
+                optBankAutoTransfer.length != 0
+              "
+            >
+              <div class="mb-2">
+                <label class="form-label mb-0"> บัญชีถอน * </label>
+                <CFormSelect v-model="conf_withdraw_ttb._id">
+                  <option value="">กรุณาเลือกบัญชี</option>
+                  <option
+                    v-for="option in optBankAutoTransfer"
+                    :key="option._id"
+                    :value="option._id"
+                  >
+                    {{ option.bank_account }} ({{ option.account_name }})
+                  </option>
+                </CFormSelect>
+              </div>
+              <div class="mb-2">
+                <CRow class="mb-2">
+                  <CCol md="6">
+                    <div>
+                      <label for="cFName" class="form-label mb-0">
+                        Username *
+                      </label>
+                      <CFormInput
+                        type="text"
+                        id="cFName"
+                        v-model="conf_withdraw_ttb.bank_auto_config.username"
+                      />
+                    </div>
+                  </CCol>
+                  <CCol md="6">
+                    <div>
+                      <label for="cLName" class="form-label mb-0">
+                        Password *
+                      </label>
+                      <CInputGroup>
+                        <CFormInput
+                          type="password"
+                          id="cLName"
+                          v-model="conf_withdraw_ttb.bank_auto_config.password"
+                        />
+                        <CButton
+                          type="button"
+                          color="secondary"
+                          class="border-secondary"
+                          variant="outline"
+                        >
+                          <CIcon :icon="ic.cilLockLocked" />
+                        </CButton>
+                      </CInputGroup>
+                    </div>
+                  </CCol>
+                </CRow>
+              </div>
+              <div class="mb-2">
+                <label for="cLName" class="form-label mb-0"> โน้ต </label>
+                <CFormTextarea
+                  rows="2"
+                  text="สามารถระบุได้"
+                  v-model="conf_withdraw_ttb.bank_auto_config.note"
+                ></CFormTextarea>
+              </div>
+              <div class="mb-2">
+                <div>
+                  <label for="cLName" class="form-label mb-0">
+                    SMS Device *
+                    <span class="small text-muted"> (สำหรับใช้งาน OTP) </span>
+                  </label>
+                  <CFormSelect
+                    v-model="conf_withdraw_ttb.bank_auto_config.push_bullet"
+                  >
+                    <option value="">กรุณาเลือก</option>
+                    <option
+                      v-for="option in optPushBullet"
+                      :key="option._id"
+                      :value="option._id"
+                    >
+                      {{ option.name }}
+                    </option>
+                  </CFormSelect>
+                </div>
+              </div>
+            </div>
+            <!-- ::Other:: - Bank Auto Tranfer (Deposit) -->
+            <!-- ... -->
+            <!-- ... -->
+            <hr />
+            <div class="d-flex justify-content-end">
+              <div>
+                <CButton
+                  size="sm"
+                  color="success"
+                  class="ms-1 text-light"
+                  v-if="optBankAutoTransfer.length != 0"
+                  @click="actInsertBankAuto('withdraw')"
+                >
+                  <CIcon :icon="ic.cilCheckCircle" />
+                  ยืนยัน
+                </CButton>
+                <CButton
+                  size="sm"
+                  color="secondary"
+                  class="text-light ms-1"
+                  @click="
+                    () => {
+                      mdBankAutoWithdraw = false
+                    }
+                  "
+                >
+                  <CIcon :icon="ic.cilXCircle" />
+                  ปิด
+                </CButton>
+              </div>
+            </div>
+          </CCardText>
+        </CCardBody>
+      </CCard>
+    </CModalBody>
+  </CModal>
+
+  <!-- ----- -->
+  <!-- Confirm Delete Bank / Bank Auto -->
+  <!-- ------ -->
+  <CModal
+    alignment="center"
+    size="sm"
+    :visible="mdDeleteBank"
+    @close="
+      () => {
+        mdDeleteBank = false
+      }
+    "
+  >
+    <CModalHeader class="pb-2">
+      <CModalTitle>
+        <CIcon size="lg" :icon="ic.cilWarning" />
+        กรุณายืนยันการลบข้อมูล
+      </CModalTitle>
+    </CModalHeader>
+    <CModalBody>
+      <div class="d-grid gap-2 d-flex justify-content-center">
+        <CButton
+          color="danger"
+          class="me-2"
+          @click="actUpdateBankAuto('inactive', dataDeleteBankAoto)"
+          v-if="dataDeleteBankAoto"
+        >
+          <CIcon :icon="ic.cilCheckCircle" />
+          ยืนยัน
+        </CButton>
+        <CButton
+          color="danger"
+          class="me-2"
+          @click="
+            () => {
+              mdDeleteBank = false
+              actDeleteBank(dataDeleteBank)
+            }
+          "
+          v-if="dataDeleteBank"
+        >
+          <CIcon :icon="ic.cilCheckCircle" />
+          ยืนยัน
+        </CButton>
+        <CButton
+          color="secondary"
+          @click="
+            () => {
+              dataDeleteBankAoto = null
+              dataDeleteBank = null
+              mdDeleteBank = false
+            }
+          "
+        >
+          <CIcon :icon="ic.cilXCircle" />
+          ยกเลิก
+        </CButton>
+      </div>
     </CModalBody>
   </CModal>
 
@@ -1464,11 +1826,16 @@ export default {
       mdEditBank: false,
       mdBankAutoDeposit: false,
       mdBankAutoWithdraw: false,
+      mdDeleteBank: false,
+
+      dataDeleteBankAoto: null,
+      dataDeleteBank: null,
 
       currentWebAgent: '',
+      visibleOfActiveBank: false,
       dataAllBankSetting: [],
       dataAddBank: {
-        agent_id: this.currentWebAgent,
+        agent_id: '',
         bank_id: '',
         bank_img: '',
         bank_account_number: '',
@@ -1476,11 +1843,13 @@ export default {
         memb_bank: 'all',
         memb_bank_img: '',
         description: '',
+        privilege: '',
         status: 'active',
         type: 'deposit',
       },
       dataEditBank: {
-        agent_id: this.currentWebAgent,
+        _id: '',
+        agent_id: '',
         bank_id: '',
         bank_img: '',
         bank_account_number: '',
@@ -1488,8 +1857,13 @@ export default {
         memb_bank: 'all',
         memb_bank_img: '',
         description: '',
+        privilege: '',
         status: 'active',
         type: 'deposit',
+        bank_auto_status: null,
+        bank_auto_config: null,
+        sms_auto_status: null,
+        sms_auto_config: null,
       },
       dataBankAutoDepositSetting: [],
       dataBankAutoWithdrawSetting: [],
@@ -1503,7 +1877,7 @@ export default {
       },
       conf_deposit_scb: {
         _id: '',
-        agent_id: this.currentWebAgent,
+        agent_id: '',
         bank_auto_status: 'active',
         bank_auto_config: {
           username: '',
@@ -1516,7 +1890,7 @@ export default {
       },
       conf_withdraw_ttb: {
         _id: '',
-        agent_id: this.currentWebAgent,
+        agent_id: '',
         bank_auto_status: 'active',
         bank_auto_config: {
           username: '',
@@ -1527,37 +1901,6 @@ export default {
         status: '',
         type: 'withdraw',
       },
-
-      // bankup: [
-      //   {
-      //     flagShow: false,
-      //     flagEdit: false,
-      //     bank: {
-      //       _id: '62a76285b4839cabb5622daa',
-      //       bank_id: '62ae1de41fa4c734108a7763',
-      //       bank_account: '0938884717',
-      //       account_name: 'สมหมาย ใจหมา',
-      //       bank_name_th: 'ธนาคารทหารไทยธนชาติ',
-      //       bank_name_en: 'ttb',
-      //       bank_code: 'ttb',
-      //       description: '',
-      //       bank_status: 'active',
-      //       type: 'withdraw',
-      //       sub_type: 'withdraw',
-      //       memb_bank: null,
-      //       bank_auto_status: 'active',
-      //       bank_auto_config: {
-      //         username: 'paponwut.wut',
-      //         password: '009398477',
-      //         note: 'บัญชีถอนตัวหลัก',
-      //         push_bullet: 'SMS1',
-      //       },
-      //       sms_auto_status: 'inactive',
-      //       sms_auto_config: null,
-      //       privilege: null,
-      //     },
-      //   },
-      // ],
 
       optDepositActivated: [
         {
@@ -1581,6 +1924,7 @@ export default {
 
       optWebAgent: [],
       optAllBank: [],
+      optPushBullet: [],
       optPrivilegeAdd: [
         {
           value: 0,
@@ -1754,6 +2098,7 @@ export default {
         })
     },
     async getAllBankSetting() {
+      this.dataAllBankSetting = []
       await this.$http
         .post('panel/getallbanksetting', { agent_id: this.currentWebAgent })
         .then((response) => {
@@ -1800,7 +2145,7 @@ export default {
             })
           } else {
             this.createToast(
-              'danger',
+              'warning',
               'การดำเนินการ',
               'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + response.data.message,
             )
@@ -1816,7 +2161,7 @@ export default {
         })
         .catch((error) => {
           this.createToast(
-            'danger',
+            'warning',
             'การดำเนินการ',
             'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + error,
           )
@@ -1825,8 +2170,431 @@ export default {
           console.log('call api - panel/getbankautotranfer : error' + error)
         })
     },
+    async getPushBullet() {
+      await this.$http
+        .post('panel/getpushbulletsetting', {
+          agent_id: this.currentWebAgent,
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.optPushBullet = response.data.result
+            console.log(this.optPushBullet)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - panel/getpushbulletsetting : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('call api - panel/getpushbulletsetting : error' + error)
+        })
+    },
+    async actInsertBank() {
+      let memberbank = ''
+      if (this.dataAddBank.memb_bank != 'all') {
+        memberbank = this.dataAddBank.memb_bank
+      }
+      await this.$http
+        .post('panel/insertbank', {
+          agent_id: this.currentWebAgent,
+          bank_id: this.dataAddBank.bank_id,
+          bank_account_number: this.dataAddBank.bank_account_number,
+          bank_account_name: this.dataAddBank.bank_account_name,
+          memb_bank: memberbank,
+          description: this.dataAddBank.description,
+          privilege: this.dataAddBank.privilege,
+          status: this.dataAddBank.status,
+          type: this.dataAddBank.type,
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.prepareBankSetting()
+            this.createToast(
+              'success',
+              'การดำเนินการ',
+              'เพิ่มบัญชีธนาคารเรียบร้อย',
+            )
+
+            // reset data type
+            this.dataAddBank.agent_id = ''
+            this.dataAddBank.bank_id = ''
+            this.dataAddBank.bank_img = ''
+            this.dataAddBank.bank_account_name = ''
+            this.dataAddBank.bank_account_number = ''
+            this.dataAddBank.memb_bank = 'all'
+            this.dataAddBank.memb_bank_img = ''
+            this.dataAddBank.description = ''
+            this.dataAddBank.privilege = ''
+            this.dataAddBank.status = 'active'
+            this.dataAddBank.type = 'deposit'
+            // close modal
+            this.mdAddBank = false
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            this.createToast(
+              'danger',
+              'การดำเนินการ',
+              'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + response.data.message,
+            )
+            console.log(
+              'call api - panel/insertbank : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          this.createToast(
+            'danger',
+            'การดำเนินการ',
+            'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + error,
+          )
+          console.log('call api - panel/insertbank : error' + error)
+        })
+    },
+    async actUpdateBank() {
+      let memberbank = ''
+      if (this.dataEditBank.memb_bank != 'all') {
+        memberbank = this.dataEditBank.memb_bank
+      }
+      await this.$http
+        .post('panel/updatebank', {
+          _id: this.dataEditBank._id,
+          agent_id: this.currentWebAgent,
+          bank_id: this.dataEditBank.bank_id,
+          bank_account_number: this.dataEditBank.bank_account_number,
+          bank_account_name: this.dataEditBank.bank_account_name,
+          memb_bank: memberbank,
+          description: this.dataEditBank.description,
+          privilege: this.dataEditBank.privilege,
+          status: this.dataEditBank.status,
+          type: this.dataEditBank.type,
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            if (
+              this.dataEditBank.status == 'inactive' &&
+              this.dataEditBank.bank_auto_status == 'active'
+            ) {
+              let _bank = null
+              for (let i = 0; i < this.dataAllBankSetting.length; i++) {
+                if (this.dataAllBankSetting[i]._id == this.dataEditBank._id) {
+                  _bank = { bank: this.dataAllBankSetting[i] }
+                  break
+                }
+              }
+              if (_bank) {
+                this.actUpdateBankAuto('suspend', _bank).finally(() => {
+                  this.prepareBankSetting()
+                })
+              }
+            } else {
+              this.getAllBankSetting()
+            }
+
+            this.createToast(
+              'success',
+              'การดำเนินการ',
+              'แก้ไขบัญชีธนาคารเรียบร้อย',
+            )
+
+            this.mdEditBank = false
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            this.createToast(
+              'danger',
+              'การดำเนินการ',
+              'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + response.data.message,
+            )
+            console.log(
+              'call api - panel/updatebank : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          this.createToast(
+            'danger',
+            'การดำเนินการ',
+            'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + error,
+          )
+          console.log('call api - panel/updatebank : error' + error)
+        })
+    },
+    async actDeleteBank(_id) {
+      let delBank = null
+      for (let i = 0; i < this.dataAllBankSetting.length; i++) {
+        if (this.dataAllBankSetting[i]._id == _id) {
+          delBank = this.dataAllBankSetting[i]
+          break
+        }
+      }
+      console.log(delBank)
+      if (delBank) {
+        let memberbank = ''
+        if (delBank.memb_bank != 'all' && delBank.memb_bank != null) {
+          memberbank = delBank.memb_bank.memb_bank_id
+        }
+        await this.$http
+          .post('panel/updatebank', {
+            agent_id: this.currentWebAgent,
+            _id: _id,
+            bank_id: delBank.bank_id,
+            bank_account_number: delBank.bank_account_number,
+            bank_account_name: delBank.bank_account_name,
+            memb_bank: memberbank,
+            description: delBank.description,
+            privilege: delBank.privilege,
+            status: 'delete',
+            type: delBank.type,
+          })
+          .then((response) => {
+            this.prepareBankSetting()
+            if (response.data.status == 200) {
+              this.createToast(
+                'success',
+                'การดำเนินการ',
+                'ลบบัญชีธนาคารเรียบร้อย',
+              )
+              this.dataDeleteBank = null
+              this.dataDeleteBankAoto = null
+            } else if (
+              response.data.status == 502 ||
+              response.data.status == 503
+            ) {
+              this.tokenExpired().then(() => {
+                this.navigateTo('/pages/login')
+              })
+            } else {
+              this.createToast(
+                'danger',
+                'การดำเนินการ',
+                'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + response.data.message,
+              )
+              console.log(
+                'call api - panel/updatebank : status = ' +
+                  response.data.status +
+                  ', message = ' +
+                  response.data.message,
+              )
+            }
+          })
+          .catch((error) => {
+            this.createToast(
+              'danger',
+              'การดำเนินการ',
+              'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + error,
+            )
+            console.log('call api - panel/updatebank : error' + error)
+          })
+      } else {
+        this.createToast(
+          'danger',
+          'การดำเนินการ',
+          'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ไม่พบ _id นี้ในระบบ',
+        )
+      }
+    },
+    async actInsertBankAuto(_type) {
+      let _id = null
+      let bank_auto_status = null
+      let bank_auto_config = null
+
+      if (_type == 'withdraw' && this.confAutoBankSetup.bank_code == 'ttb') {
+        _id = this.conf_withdraw_ttb._id
+        bank_auto_status = this.conf_withdraw_ttb.bank_auto_status
+        bank_auto_config = this.conf_withdraw_ttb.bank_auto_config
+        console.log('conf_withdraw_ttb', this.conf_withdraw_ttb)
+      }
+
+      if (_type == 'deposit' && this.confAutoBankSetup.bank_code == 'scb') {
+        _id = this.conf_deposit_scb._id
+        bank_auto_status = this.conf_deposit_scb.bank_auto_status
+        bank_auto_config = this.conf_deposit_scb.bank_auto_config
+        console.log('conf_deposit_scb', this.conf_deposit_scb)
+      }
+
+      if (_id) {
+        await this.$http
+          .post('panel/updatebankautotranfer', {
+            _id: _id,
+            agent_id: this.currentWebAgent,
+            bank_auto_status: bank_auto_status,
+            bank_auto_config: bank_auto_config,
+          })
+          .then((response) => {
+            if (response.data.status == 200) {
+              this.prepareBankSetting()
+              this.createToast(
+                'success',
+                'การดำเนินการ',
+                'เพิ่มบัญชีธนาคารสำหรับทำระบบออโต้เรียบร้อย',
+              )
+              this.mdBankAutoDeposit = false
+              this.mdBankAutoWithdraw = false
+            } else if (
+              response.data.status == 502 ||
+              response.data.status == 503
+            ) {
+              this.tokenExpired().then(() => {
+                this.navigateTo('/pages/login')
+              })
+            } else {
+              this.createToast(
+                'danger',
+                'การดำเนินการ',
+                'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + response.data.message,
+              )
+              console.log(
+                'call api - panel/updatebankautotranfer : status = ' +
+                  response.data.status +
+                  ', message = ' +
+                  response.data.message,
+              )
+            }
+          })
+          .catch((error) => {
+            this.createToast(
+              'danger',
+              'การดำเนินการ',
+              'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + error,
+            )
+            console.log(
+              'call api - panel/updatebankautotranfer : error' + error,
+            )
+          })
+      } else {
+        this.createToast(
+          'danger',
+          'การดำเนินการ',
+          'ไม่สามารถดำเนินการได้ กรุณาตรวจสอบข้อมูล และดำเนินการอีกครั้ง',
+        )
+      }
+    },
+    async actUpdateBankAuto(_action, _objBank) {
+      await this.$http
+        .post('panel/updatebankautotranfer', {
+          _id: _objBank.bank._id,
+          agent_id: this.currentWebAgent,
+          bank_auto_status: _action,
+          bank_auto_config: _objBank.bank.bank_auto_config,
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            // this.prepareBankSetting()
+            if (_action != 'inactive') {
+              _objBank.flagEdit = false
+            }
+            if (_action == 'inactive' && _objBank.bank.type == 'deposit') {
+              const index = this.dataBankAutoDepositSetting.indexOf(_objBank)
+              if (index > -1) {
+                this.dataBankAutoDepositSetting.splice(index, 1)
+              }
+            }
+            if (_action == 'inactive' && _objBank.bank.type == 'withdraw') {
+              const index = this.dataBankAutoWithdrawSetting.indexOf(_objBank)
+              if (index > -1) {
+                this.dataBankAutoWithdrawSetting.splice(index, 1)
+              }
+            }
+
+            this.mdDeleteBank = false
+            this.dataDeleteBankAoto = null
+            this.dataDeleteBank = null
+            this.createToast(
+              'success',
+              'การดำเนินการ',
+              'ปรับปรุงบัญชีสำหรับทำระบบออโต้เรียบร้อย',
+            )
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            this.createToast(
+              'danger',
+              'การดำเนินการ',
+              'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + response.data.message,
+            )
+            console.log(
+              'call api - panel/updatebankautotranfer : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          this.createToast(
+            'danger',
+            'การดำเนินการ',
+            'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + error,
+          )
+          console.log('call api - panel/updatebankautotranfer : error' + error)
+        })
+    },
 
     // functions
+    prepareBankSetting() {
+      this.getAllBankSetting().then(() => {
+        this.dataBankAutoDepositSetting = []
+        this.dataBankAutoWithdrawSetting = []
+        for (let i = 0; i < this.dataAllBankSetting.length; i++) {
+          if (
+            this.dataAllBankSetting[i].bank_auto_status == 'active' ||
+            this.dataAllBankSetting[i].bank_auto_status == 'suspend'
+          ) {
+            let _tempData = {
+              flagShow: false,
+              flagEdit: false,
+              bank: this.dataAllBankSetting[i],
+            }
+
+            // บัญชีฝาก
+            if (this.dataAllBankSetting[i].type == 'deposit') {
+              this.dataBankAutoDepositSetting.push(_tempData)
+            }
+
+            // บัญชีถอน
+            if (this.dataAllBankSetting[i].type == 'withdraw') {
+              this.dataBankAutoWithdrawSetting.push(_tempData)
+            }
+          }
+        }
+        // Mockup
+        // this.mdEditBank = true
+        // this.clickAddBankAuto('deposit')
+        // this.clickAddBankAuto('withdraw')
+      })
+    },
     convertBankType(_type) {
       let type = _type.toString().toLowerCase()
       if (type == 'deposit') {
@@ -2055,7 +2823,78 @@ export default {
         this.$emit('input', file[0])
       }
     },
+    onchgStatusAddBank(_status) {
+      if (_status == 'active') {
+        this.dataAddBank.status = 'inactive'
+      } else if (_status == 'inactive') {
+        this.dataAddBank.status = 'active'
+      }
+    },
+    checkedStatusBank(_status) {
+      if (_status == 'active') {
+        return true
+      } else {
+        return false
+      }
+    },
+    onchgStatusEditBank(_status) {
+      if (_status == 'active') {
+        this.dataEditBank.status = 'inactive'
+      } else if (_status == 'inactive') {
+        this.dataEditBank.status = 'active'
+      }
+    },
+    clickShowEdit(_id) {
+      let foundBank = false
+      for (let i = 0; i < this.dataAllBankSetting.length; i++) {
+        if (this.dataAllBankSetting[i]._id == _id) {
+          let bank = this.dataAllBankSetting[i]
+          let memberbank = 'all'
+          let bankIMG = 'all'
+          if (this.dataAllBankSetting[i].memb_bank) {
+            memberbank = bank.memb_bank.memb_bank_id
+            bankIMG = bank.memb_bank.memb_bank_code
+          }
+          this.dataEditBank._id = bank._id
+          this.dataEditBank.agent_id = this.currentWebAgent
+          this.dataEditBank.bank_id = bank.bank_id
+          this.dataEditBank.bank_img = this.getBankIMG(bank.bank_code)
+          this.dataEditBank.bank_account_number = bank.bank_account
+          this.dataEditBank.bank_account_name = bank.account_name
+          this.dataEditBank.memb_bank = memberbank
+          this.dataEditBank.memb_bank_img = this.getBankIMG(bankIMG)
+          this.dataEditBank.description = bank.description
+          this.dataEditBank.privilege = bank.privilege
+          this.dataEditBank.status = bank.bank_status
+          this.dataEditBank.type = bank.type
+          this.dataEditBank.bank_auto_config = bank.bank_auto_config
+          this.dataEditBank.bank_auto_status = bank.bank_auto_status
+          this.dataEditBank.sms_auto_config = bank.sms_auto_config
+          this.dataEditBank.sms_auto_status = bank.sms_auto_status
+          foundBank = true
+          break
+        }
+      }
+      if (foundBank) {
+        this.mdEditBank = true
+      } else {
+        this.createToast(
+          'danger',
+          'การดำเนินการ',
+          'ไม่สามารถดำเนินการปรับปรุงบัญชีนี้ได้',
+        )
+      }
+    },
+    clickDeleteBankOrBankAuto(_dataType, _objBank) {
+      if (_dataType == 'bank') {
+        this.dataDeleteBank = _objBank
+      }
+      if (_dataType == 'bankAuto') {
+        this.dataDeleteBankAoto = _objBank
+      }
 
+      this.mdDeleteBank = true
+    },
     // Bank Auto - Deposit
     clickAddBankAuto(_type) {
       if (_type == 'deposit') {
@@ -2063,17 +2902,45 @@ export default {
         this.confAutoBankSetup.req_type = 'deposit'
         this.confAutoBankSetup.bank_code = ''
         this.confAutoBankSetup.bank_img = ''
+        // reset error
+        this.confAutoBankSetup.errVisible = false
+        this.confAutoBankSetup.errMessage = ''
+        // reset scb
         this.conf_deposit_scb._id = ''
         this.conf_deposit_scb.bank_auto_status = 'active'
         this.conf_deposit_scb.bank_auto_config.username = ''
         this.conf_deposit_scb.bank_auto_config.password = ''
         this.conf_deposit_scb.bank_auto_config.note = ''
-        this.conf_deposit_scb.bank_auto_config.push_bullet = ''
-        this.conf_deposit_scbstatus = ''
+        this.conf_deposit_scb.bank_auto_config.qr_code = ''
+        this.conf_deposit_scb.status = ''
         this.conf_deposit_scb.type = 'deposit'
+
+        // shown popup
         this.mdBankAutoDeposit = true
       } else if (_type == 'withdraw') {
-        // ...
+        this.optBankAutoTransfer = []
+        this.confAutoBankSetup.req_type = 'withdraw'
+        this.confAutoBankSetup.bank_code = ''
+        this.confAutoBankSetup.bank_img = ''
+        // reset error
+        this.confAutoBankSetup.errVisible = false
+        this.confAutoBankSetup.errMessage = ''
+        // reset ttb
+        let push_bullet = ''
+        if (this.optPushBullet.length > 0) {
+          push_bullet = this.optPushBullet[0]._id
+        }
+        this.conf_withdraw_ttb._id = ''
+        this.conf_withdraw_ttb.bank_auto_status = 'active'
+        this.conf_withdraw_ttb.bank_auto_config.username = ''
+        this.conf_withdraw_ttb.bank_auto_config.password = ''
+        this.conf_withdraw_ttb.bank_auto_config.note = ''
+        this.conf_withdraw_ttb.bank_auto_config.push_bullet = push_bullet
+        this.conf_withdraw_ttb.status = ''
+        this.conf_withdraw_ttb.type = 'withdraw'
+
+        // shown popup
+        this.mdBankAutoWithdraw = true
       }
       // this.confAutoBankSetup.bank_code = this.optDepositActivated[0].bankcode
       // this.onchgBankingAutoConf(this.confAutoBankSetup.bank_code)
@@ -2084,45 +2951,14 @@ export default {
   },
   mounted() {
     this.getWebPrefixList().then(() => {
-      this.getAllBankSetting().then(() => {
-        this.dataBankAutoDepositSetting = []
-        this.dataBankAutoWithdrawSetting = []
-        for (let i = 0; i < this.dataAllBankSetting.length; i++) {
-          if (
-            this.dataAllBankSetting[i].bank_auto_config == 'active' ||
-            this.dataAllBankSetting[i].bank_auto_config == 'suspend'
-          ) {
-            let _tempData = {
-              flagShow: false,
-              flagEdit: false,
-              bank: this.dataAllBankSetting[i],
-            }
-
-            // บัญชีฝาก
-            if (this.dataAllBankSetting[i].type == 'deposit') {
-              this.dataBankAutoDepositSetting.push(_tempData)
-            }
-
-            // บัญชีถอน
-            if (this.dataAllBankSetting[i].type == 'withdraw') {
-              this.dataBankAutoWithdrawSetting.push(_tempData)
-            }
-          }
-        }
-        // Mockup
-        // this.mdEditBank = true
-        this.clickAddBankAuto('deposit')
-      })
+      this.prepareBankSetting()
+      this.getPushBullet()
     })
     this.getAllBank()
 
     // Setup
     this.dataAddBank.memb_bank_img = require('../../../assets/images/banking/th/smooth-corner/all.png')
     this.dataEditBank.memb_bank_img = require('../../../assets/images/banking/th/smooth-corner/all.png')
-
-    // Mockup
-    // this.mdEditBank = true
-    // this.clickAddBankAuto()
   },
   setup() {
     return {
