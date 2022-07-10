@@ -1,5 +1,5 @@
 // import axios from 'axios'
-import { authAxios, mainAxios } from '@/_conf'
+import { authAxios, mainAxios, ipInfo } from '@/_conf'
 
 export default {
   namespaced: true,
@@ -8,6 +8,7 @@ export default {
     user: null,
     role: null,
     user_status: null,
+    ip_info: null,
   },
   getters: {
     authenticated(state) {
@@ -22,6 +23,9 @@ export default {
     user_status(state) {
       return state.user_status
     },
+    ip_info(state) {
+      return state.ip_info
+    },
   },
   mutations: {
     SET_TOKEN(state, token) {
@@ -35,6 +39,9 @@ export default {
     },
     SET_STATUS(state, status) {
       state.user_status = status
+    },
+    SET_IP_INFO(state, ipInfo) {
+      state.ip_info = ipInfo
     },
   },
   actions: {
@@ -131,6 +138,15 @@ export default {
           commit('SET_TOKEN', null)
           console.log(err)
         }
+
+        // Get IP info
+        try {
+          await ipInfo.get().then((response) => {
+            commit('SET_IP_INFO', response.data)
+          })
+        } catch (err) {
+          console.log(err)
+        }
       }
       if (!state.token) {
         return
@@ -140,15 +156,7 @@ export default {
       commit('SET_USER', payload.user)
       commit('SET_ROLE', payload.role)
       commit('SET_STATUS', payload.status)
-      // if (payload.uer) {
-      //   commit('SET_USER', payload.user)
-      // }
-      // if (payload.role) {
-      //   commit('SET_ROLE', payload.role)
-      // }
-      // if (payload.state) {
-      //   commit('SET_STATUS', payload.status)
-      // }
+      commit('SET_IP_INFO', payload.ipinfo)
     },
   },
 }

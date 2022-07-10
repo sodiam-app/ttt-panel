@@ -9,7 +9,7 @@
               รายชื่อลูกค้า
             </strong>
           </CCol>
-          <CCol sm="2">
+          <CCol sm="2" v-show="optWebAgent.length > 1">
             <CFormSelect @change="onchgPrefix($event.target.value)">
               <option
                 v-for="option in optWebAgent"
@@ -20,11 +20,12 @@
               </option>
             </CFormSelect>
           </CCol>
-          <CCol sm="2" class="text-end">
+          <CCol sm="3" class="text-end">
             <CInputGroup class="flex-nowrap">
               <CFormInput
                 placeholder="ค้นหา: ยูส, เบอร์โทร, ชื่อ"
                 aria-describedby="addon-lSearchMember"
+                @input="searchMember(currentWebAgent, $event.target.value)"
               />
               <CButton
                 type="button"
@@ -158,6 +159,12 @@
                 </CTableDataCell>
               </CTableRow>
             </CTableBody>
+            <CTableCaption
+              class="text-center text-reset"
+              v-show="listOfMember.length == 0"
+            >
+              ไม่พบข้อมูลลูกค้าในระบบ
+            </CTableCaption>
           </CTable>
         </div>
         <div class="text-center">
@@ -166,6 +173,7 @@
             :pages="totalPage"
             size="sm"
             align="center"
+            v-show="!listOfMember.length == 0"
           />
         </div>
       </CCardBody>
@@ -335,6 +343,43 @@ export default {
     onchgPrefix(_id) {
       this.currentWebAgent = _id
       this.getMemberList(_id)
+    },
+
+    // Search
+    async searchMember(_agentId, _val) {
+      if (_val.length >= 3 || _val.length == 0) {
+        await this.$http
+          .post('search/searchmember', {
+            agent_id: _agentId,
+            text: _val,
+          })
+          .then((response) => {
+            if (response.data.status == 200) {
+              this.listOfMember = response.data.result.Member
+              this.totalPage = Math.ceil(response.data.result.total / 10)
+              console.log(this.totalPage)
+              console.log(this.listOfMember)
+            } else if (
+              response.data.status == 502 ||
+              response.data.status == 503
+            ) {
+              this.tokenExpired().then(() => {
+                this.navigateTo('/pages/login')
+              })
+            } else {
+              this.listOfMember = []
+              console.log(
+                'call api - search/searchmember : status = ' +
+                  response.data.status +
+                  ', message = ' +
+                  response.data.message,
+              )
+            }
+          })
+          .catch((error) => {
+            console.log('call api - search/searchmember : error' + error)
+          })
+      }
     },
   },
   mounted() {

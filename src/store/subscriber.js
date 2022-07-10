@@ -36,5 +36,12 @@ store.subscribe((mutations) => {
         localStorage.removeItem('status')
       }
       break
+    case 'auth/SET_IP_INFO':
+      if (mutations.payload) {
+        localStorage.setItem('ipinfo', JSON.stringify(mutations.payload))
+      } else {
+        localStorage.removeItem('ipinfo')
+      }
+      break
   }
 })

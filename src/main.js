@@ -25,6 +25,8 @@ const timeagoOptions = {
   },
 }
 
+// import useVuelidate from '@vuelidate/core'
+
 // store.dispatch('auth/attempt', {
 //   user: JSON.parse(localStorage.getItem('user')),
 //   role: localStorage.getItem('role'),
@@ -38,6 +40,7 @@ store.dispatch('auth/atttoken', localStorage.getItem('token')).then(() => {
   app.use(CoreuiVuePro)
   app.use(VueAxios, mainAxios)
   app.use(timeago, timeagoOptions)
+  // app.use(useVuelidate)
   app.provide('icons', icons)
   app.component('CIcon', CIcon)
   app.component('DocsCallout', DocsCallout)

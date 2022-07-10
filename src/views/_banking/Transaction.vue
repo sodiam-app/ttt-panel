@@ -930,7 +930,6 @@
                       size="sm"
                       v-model="dataDeposit.account_deposit"
                     >
-                      <option value="" selected>บัญชีโบนัส</option>
                       <option
                         v-for="option in optBankDeposit"
                         :key="option._id"
@@ -980,7 +979,13 @@
                 <label for="depositMemberID" class="form-label mb-1">
                   * ยูสเซอร์ลูกค้า
                 </label>
-                <CInputGroup>
+                <CMultiSelect
+                  :options="optMemberListMultiSelect"
+                  :multiple="false"
+                  :optionsMaxHeight="5"
+                  search-no-results-label="ไม่พบข้อมูล"
+                />
+                <!-- <CInputGroup>
                   <CInputGroupText id="basic-addon1">
                     <CIcon :icon="ic.cilGroup" />
                   </CInputGroupText>
@@ -999,7 +1004,7 @@
                       {{ option.profile.surename }})
                     </option>
                   </CFormSelect>
-                </CInputGroup>
+                </CInputGroup> -->
                 <div class="form-text mt-0 mb-2">
                   สามารถค้นหาด้วย: ยูส, เบอร์โทร, ชื่อ
                 </div>
@@ -1884,8 +1889,8 @@ export default {
       },
 
       // controls
-      isBonusDeposit: true,
-      isBonusWithdraw: true,
+      isBonusDeposit: false,
+      isBonusWithdraw: false,
       errApproveVisible: false,
       errApproveMessage: '',
       errManageTransacVisible: false,
@@ -1937,6 +1942,7 @@ export default {
       optMemberList: [],
       optBankDeposit: [],
       optBankWithdraw: [],
+      optMemberListMultiSelect: [],
 
       // icons
       ic: {
@@ -2011,6 +2017,8 @@ export default {
         .then((response) => {
           if (response.data.status == 200) {
             this.optMemberList = response.data.result.Member
+            this.optMemberListMultiSelect =
+              this.prepareOptMemberListMultiSelect(this.optMemberList)
             console.log(this.optMemberList)
           } else if (
             response.data.status == 502 ||
@@ -2041,6 +2049,9 @@ export default {
         .then((response) => {
           if (response.data.status == 200) {
             this.optBankDeposit = response.data.result
+            if (!this.dataDeposit.account_deposit) {
+              this.dataDeposit.account_deposit = this.optBankDeposit[0]._id
+            }
             console.log(this.optBankDeposit)
           } else if (
             response.data.status == 502 ||
@@ -2071,6 +2082,9 @@ export default {
         .then((response) => {
           if (response.data.status == 200) {
             this.optBankWithdraw = response.data.result
+            if (!this.dataWithdraw.account_withdraw) {
+              this.dataWithdraw.account_withdraw = this.optBankWithdraw[0]._id
+            }
             console.log(this.optBankWithdraw)
           } else if (
             response.data.status == 502 ||
@@ -2093,9 +2107,15 @@ export default {
         })
     },
     async submitDeposit() {
+      let bank_id = ''
+      if (!this.isBonusDeposit) {
+        bank_id = this.dataDeposit.account_deposit
+      } else {
+        this.dataDeposit.account_deposit = ''
+      }
       await this.$http
         .post('panel/deposit', {
-          account_deposit: this.dataDeposit.account_deposit,
+          account_deposit: bank_id,
           memb_id: this.dataDeposit.memb_id,
           transaction_date: moment().format(),
           amount: this.dataDeposit.amount,
@@ -2143,9 +2163,15 @@ export default {
         })
     },
     async submitWithdraw() {
+      let bank_id = ''
+      if (!this.isBonusWithdraw) {
+        bank_id = this.dataWithdraw.account_withdraw
+      } else {
+        this.dataWithdraw.account_withdraw = ''
+      }
       await this.$http
         .post('panel/withdraw', {
-          account_withdraw: this.dataWithdraw.account_withdraw,
+          account_withdraw: bank_id,
           memb_id: this.dataWithdraw.memb_id,
           transaction_date: moment().format(),
           amount: this.dataWithdraw.amount,
@@ -2385,8 +2411,9 @@ export default {
         if (!this.dataDeposit.web_agent_id) {
           this.dataDeposit.web_agent_id = this.optWebAgent[0]._id
         }
-        this.getWebDeposit(this.dataDeposit.web_agent_id)
-        this.getMemberList(this.dataDeposit.web_agent_id)
+        this.getWebDeposit(this.dataDeposit.web_agent_id).then(() => {
+          this.getMemberList(this.dataDeposit.web_agent_id)
+        })
       }
       this.mdDeposit = !this.mdDeposit
     },
@@ -2395,15 +2422,11 @@ export default {
         if (!this.dataWithdraw.web_agent_id) {
           this.dataWithdraw.web_agent_id = this.optWebAgent[0]._id
         }
-        this.getWebWithdraw(this.dataWithdraw.web_agent_id)
-        this.getMemberList(this.dataWithdraw.web_agent_id)
+        this.getWebWithdraw(this.dataWithdraw.web_agent_id).then(() => {
+          this.getMemberList(this.dataWithdraw.web_agent_id)
+        })
       }
       this.mdWithdraw = !this.mdWithdraw
-    },
-    getDate(event, checkIn, checkOut) {
-      console.log(event)
-      console.log(checkIn)
-      console.log(checkOut)
     },
     loadHistory() {
       if (this.updateHistoryAuto) {
@@ -2598,6 +2621,25 @@ export default {
         return 'warning'
       }
     },
+
+    //prepare
+    prepareOptMemberListMultiSelect(_obj) {
+      let _result = []
+      for (let i = 0; i < _obj.length; i++) {
+        let id = _obj[i]._id
+        let _txt =
+          _obj[i].username +
+          ' | ' +
+          _obj[i].profile.name +
+          ' ' +
+          _obj[i].profile.surename +
+          ' (' +
+          _obj[i].profile.tel +
+          ')'
+        _result.push({ value: id, text: _txt })
+      }
+      return _result
+    },
   },
   created() {
     if (this.tabPaneActiveKey == 1) {
@@ -2617,8 +2659,6 @@ export default {
       this.loadHistory()
     }
     this.getWebPrefixList()
-    // test modal popup
-    // this.mdWithdraw = true
   },
   setup() {
     return {

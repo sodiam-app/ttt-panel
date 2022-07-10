@@ -6,34 +6,36 @@
           <CCardGroup>
             <CCard class="p-4">
               <CCardBody>
-                <CForm @submit.prevent="submit">
+                <CForm @submit.prevent="submit" novalidate>
                   <h1>Login</h1>
                   <p class="text-medium-emphasis">ระบบฝากถอนอัตโนมัติ</p>
                   <CAlert color="danger" class="py-1" :visible="isErrorVisible">
                     <CIcon :icon="cilWarning" />
                     {{ isErrorMessages }}
                   </CAlert>
-                  <CInputGroup class="mb-3">
+                  <CInputGroup class="mb-3 has-validation">
                     <CInputGroupText>
                       <CIcon icon="cil-user" />
                     </CInputGroupText>
                     <CFormInput
                       placeholder="Username"
-                      autocomplete="current-username"
                       v-model="form.username"
+                      feedbackInvalid="กรุณากรอกข้อมูลยูสเซอร์"
+                      :invalid="v$.form.username.$error"
+                      @input="v$.form.username.$touch()"
+                      @blur="v$.form.username.$touch()"
+                      :class="{
+                        'is-invalid': v$.form.username.$error,
+                        'is-valid': !v$.form.username.$error && validatedLogin,
+                      }"
                     />
                   </CInputGroup>
-                  <CInputGroup class="mb-4">
-                    <CInputGroupText>
+                  <CInputGroup class="mb-4 has-validation">
+                    <!-- <CInputGroupText>
                       <CIcon icon="cil-lock-locked" />
-                    </CInputGroupText>
-                    <CFormInput
-                      :type="pwdType"
-                      placeholder="Password"
-                      autocomplete="current-password"
-                      v-model="form.password"
-                    />
+                    </CInputGroupText> -->
                     <CButton
+                      tabindex="-1"
                       type="button"
                       color="secondary"
                       variant="outline"
@@ -42,6 +44,29 @@
                     >
                       <CIcon :icon="cilLowVision" />
                     </CButton>
+                    <CFormInput
+                      :type="pwdType"
+                      placeholder="Password"
+                      v-model="form.password"
+                      feedbackInvalid="กรุณากรอกข้อมูลรหัสผ่าน"
+                      :invalid="v$.form.password.$error"
+                      @input="v$.form.password.$touch()"
+                      @blur="v$.form.password.$touch()"
+                      :class="{
+                        'is-invalid': v$.form.password.$error,
+                        'is-valid': !v$.form.username.$error && validatedLogin,
+                      }"
+                    />
+                    <!-- <CButton
+                      type="button"
+                      color="secondary"
+                      variant="outline"
+                      class="border-start-0"
+                      @mousedown="showPwd"
+                      @mouseup="showPwd"
+                    >
+                      <CIcon :icon="cilLowVision" />
+                    </CButton> -->
                   </CInputGroup>
                   <CRow>
                     <CCol :xs="6">
@@ -51,6 +76,7 @@
                         color="primary"
                         class="px-4 rounded-pill"
                         :loading="loadingLoginBtn"
+                        @click="validatedLogin = true"
                       >
                         <CIcon
                           v-if="!loadingLoginBtn"
@@ -97,9 +123,11 @@
 <script>
 import { CIcon } from '@coreui/icons-vue'
 import { cilRoom, cilSmile, cilLowVision, cilWarning } from '@coreui/icons'
-import imgLogin from '@/assets/images/login-logo.jpg'
-
 import { mapActions } from 'vuex'
+import useVuelidate from '@vuelidate/core'
+import { required, minLength } from '@vuelidate/validators'
+
+import imgLogin from '@/assets/images/login-logo.jpg'
 
 export default {
   name: 'Login',
@@ -113,37 +141,46 @@ export default {
         username: '',
         password: '',
       },
+
       pwdType: 'password',
       loadingLoginBtn: false,
       isErrorVisible: false,
       isErrorMessages: '',
+
+      // validations
+      validatedLogin: false,
+      // username: '',
     }
   },
   methods: {
     ...mapActions({
       singIn: 'auth/signIn',
     }),
+
     submit() {
-      this.loadingLoginBtn = true
-      this.singIn(this.form).then(
-        (response) => {
-          if (response.data.status == 200) {
-            this.$router.replace({
-              name: 'Dashboard',
-            })
-          } else {
+      this.v$.$validate()
+      if (!this.v$.$error) {
+        this.loadingLoginBtn = true
+        this.singIn(this.form).then(
+          (response) => {
+            if (response.data.status == 200) {
+              this.$router.replace({
+                name: 'Dashboard',
+              })
+            } else {
+              this.isErrorVisible = true
+              this.isErrorMessages = response.data.message
+              this.loadingLoginBtn = false
+            }
+          },
+          (error) => {
+            console.error(error)
             this.isErrorVisible = true
-            this.isErrorMessages = response.data.message
+            this.isErrorMessages = error
             this.loadingLoginBtn = false
-          }
-        },
-        (error) => {
-          console.error(error)
-          this.isErrorVisible = true
-          this.isErrorMessages = error
-          this.loadingLoginBtn = false
-        },
-      )
+          },
+        )
+      }
     },
     showPwd() {
       if (this.pwdType == 'password') {
@@ -153,8 +190,12 @@ export default {
       }
     },
   },
+  created() {
+    localStorage.clear()
+  },
   setup() {
     return {
+      v$: useVuelidate(),
       // icon
       cilRoom,
       cilSmile,
@@ -162,8 +203,13 @@ export default {
       cilWarning,
     }
   },
-  created() {
-    localStorage.clear()
+  validations() {
+    return {
+      form: {
+        username: { required, minLength: minLength(6) },
+        password: { required, minLength: minLength(4) },
+      },
+    }
   },
 }
 </script>

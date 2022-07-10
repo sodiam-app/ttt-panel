@@ -210,7 +210,7 @@
           </p>
           <DocsExample href="forms/validation.html#server-side">
             <CForm class="row g-3 needs-validation">
-              <CCol ::md="4">
+              <CCol :md="4">
                 <CFormLabel for="validationServer01">Email</CFormLabel>
                 <CFormInput
                   id="validationServer01"
@@ -221,7 +221,7 @@
                 />
                 <CFormFeedback valid>Looks good!</CFormFeedback>
               </CCol>
-              <CCol ::md="4">
+              <CCol :md="4">
                 <CFormLabel for="validationServer02">Email</CFormLabel>
                 <CFormInput
                   id="validationServer02"
@@ -232,7 +232,7 @@
                 />
                 <CFormFeedback valid>Looks good!</CFormFeedback>
               </CCol>
-              <CCol ::md="4">
+              <CCol :md="4">
                 <CFormLabel for="validationServerUsername">Username</CFormLabel>
                 <CInputGroup class="has-validation">
                   <CInputGroupText id="inputGroupPrepend03">@</CInputGroupText>

@@ -29,226 +29,6 @@
               <CCard class="border-secondary mb-1">
                 <CCardHeader> ข้อมูลพื้นฐาน </CCardHeader>
                 <CCardBody>
-                  <!-- <CCardText class="small">
-                    <CRow>
-                      <CCol md="6">
-                        <div class="d-inline-flex align-items-center mb-2">
-                          <span class="me-2 small fw-semibold">
-                            * เปิดใช้งาน
-                          </span>
-                          <CFormSwitch id="formSwitchCheckChecked" checked />
-                        </div>
-                      </CCol>
-                    </CRow>
-                    <CRow class="mb-2">
-                      <CCol md="6">
-                        <div>
-                          <label for="cPrefix" class="form-label mb-0">
-                            Prefix *
-                          </label>
-                          <CFormSelect
-                            id="cPrefix"
-                            size="sm"
-                            v-model="dataMember.agent_id"
-                            required
-                          >
-                            <option value="">กรุณาเลือก</option>
-                            <option
-                              v-for="option in optWebAgent"
-                              :key="option._id"
-                              :value="option._id"
-                            >
-                              {{ option.name }}
-                            </option>
-                          </CFormSelect>
-                        </div>
-                      </CCol>
-                      <CCol md="6">
-                        <div>
-                          <label for="cPhone" class="form-label mb-0">
-                            เบอร์โทร *
-                            <small>
-                              <small class="text-muted">
-                                (สำหรับเข้าสู่ระบบ)
-                              </small>
-                            </small>
-                          </label>
-                          <CInputGroup>
-                            <CInputGroupText id="basic-cPhone">
-                              <CIcon :icon="ic.cilPhone" />
-                            </CInputGroupText>
-                            <CFormInput
-                              id="cPhone"
-                              placeholder="06123456xx"
-                              aria-label="เบอร์โทรลูกค้า"
-                              aria-describedby="basic-cPhone"
-                              v-model="dataMember.tel"
-                            />
-                          </CInputGroup>
-                        </div>
-                      </CCol>
-                    </CRow>
-                    <CRow class="mb-2">
-                      <CCol md="6">
-                        <div>
-                          <label for="cFName" class="form-label mb-0">
-                            ชื่อ *
-                          </label>
-                          <CFormInput
-                            type="text"
-                            id="cFName"
-                            v-model="dataMember.name"
-                          />
-                        </div>
-                      </CCol>
-                      <CCol md="6">
-                        <div>
-                          <label for="cLName" class="form-label mb-0">
-                            นามสกุล
-                          </label>
-                          <CFormInput
-                            type="text"
-                            id="cLName"
-                            v-model="dataMember.surename"
-                          />
-                        </div>
-                      </CCol>
-                    </CRow>
-                    <CRow class="mb-2">
-                      <CCol md="6">
-                        <div>
-                          <label for="cBirthday" class="form-label mb-0">
-                            วันเกิดลูกค้า
-                          </label>
-                          <CInputGroup>
-                            <CInputGroupText id="basic-cBirthday">
-                              <CIcon :icon="ic.cilBirthdayCake" />
-                            </CInputGroupText>
-                            <CFormInput
-                              type="date"
-                              id="cBirthday"
-                              aria-label="วันเกิดลูกค้า"
-                              aria-describedby="basic-cBirthday"
-                              :value="new Date()"
-                            />
-                          </CInputGroup>
-                        </div>
-                      </CCol>
-                      <CCol md="6">
-                        <div>
-                          <label for="cSpecial" class="form-label mb-0">
-                            สิทธิพิเศษ
-                          </label>
-                          <CFormSelect
-                            id="cSpecial"
-                            size="sm"
-                            v-model="dataMember.privilege_id"
-                          >
-                            <option value="">สามารถเลือกได้</option>
-                            <option
-                              v-for="option in optPrivilege"
-                              :key="option._id"
-                              :value="option.privilege_id"
-                            >
-                              {{ option.privilege_name }}
-                            </option>
-                          </CFormSelect>
-                        </div>
-                      </CCol>
-                    </CRow>
-                    <CRow class="mb-2">
-                      <CCol md="6">
-                        <div>
-                          <label for="cApplyMethod" class="form-label mb-0">
-                            ช่องทางการสมัคร
-                          </label>
-                          <CFormSelect
-                            id="cApplyMethod"
-                            size="sm"
-                            v-model="dataMember.channel"
-                          >
-                            <option value="">สามารถเลือกได้</option>
-                            <option
-                              v-for="option in optChannel"
-                              :key="option._id"
-                              :value="option.channel_id"
-                            >
-                              {{ option.channel }}
-                            </option>
-                          </CFormSelect>
-                        </div>
-                      </CCol>
-                      <CCol md="6">
-                        <div>
-                          <label for="cPartner" class="form-label mb-0">
-                            พาร์ทเนอร์
-                          </label>
-                          <CFormSelect id="cPartner" size="sm" disabled>
-                            <option value="">ยังไม่พร้อมใช้งาน</option>
-                          </CFormSelect>
-                        </div>
-                      </CCol>
-                    </CRow>
-                    <CRow class="mb-2">
-                      <CCol md="6">
-                        <div>
-                          <label for="cNote" class="form-label mb-0">
-                            หมายเหตุ
-                          </label>
-                          <CFormInput type="text" id="cNote" placeholder="" />
-                        </div>
-                      </CCol>
-                      <CCol md="6">
-                        <div>
-                          <label for="cRegisIP" class="form-label mb-0">
-                            ยูสเซอร์แนะนำ
-                          </label>
-                          <CFormInput type="text" id="cRegisIP" />
-                        </div>
-                      </CCol>
-                    </CRow>
-                    <hr />
-                    <CRow class="mb-2">
-                      <CCol md="6">
-                        <div>
-                          <label for="cPin" class="form-label mb-0">
-                            PIN *
-                            <small>
-                              <small class="text-muted">
-                                (สำหรับเข้าสู่ระบบ)
-                              </small>
-                            </small>
-                          </label>
-                          <CInputGroup>
-                            <CFormInput
-                              type="password"
-                              id="cPin"
-                              placeholder="PIN"
-                              aria-label="PIN"
-                              aria-describedby="basic-cPin"
-                              value="1111"
-                            />
-                            <CInputGroupText id="basic-cPin">
-                              <CIcon :icon="ic.cilLockLocked" />
-                            </CInputGroupText>
-                          </CInputGroup>
-                        </div>
-                      </CCol>
-                      <CCol md="6">
-                        <div>
-                          <label
-                            for="cPromotion"
-                            class="form-label mb-0"
-                          ></label>
-                          <CFormSwitch
-                            size="lg"
-                            label="ปิด/เปิดโปรฯ"
-                            id="cPromotion"
-                          />
-                        </div>
-                      </CCol>
-                    </CRow>
-                  </CCardText> -->
                   <CCardText class="small">
                     <CRow>
                       <CCol>
@@ -264,7 +44,7 @@
                         </div>
                       </CCol>
                     </CRow>
-                    <CRow class="mb-2">
+                    <CRow class="mb-2" v-show="optWebAgent.length > 1">
                       <CCol md="6">
                         <div>
                           <label for="cPrefix" class="form-label mb-0">
@@ -316,6 +96,15 @@
                             type="text"
                             id="cFName"
                             v-model="dataMember.name"
+                            feedbackInvalid="กรุณากรอกข้อมูลชื่อลูกค้า"
+                            :invalid="v$.dataMember.name.$error"
+                            @input="v$.dataMember.name.$touch()"
+                            @blur="v$.dataMember.name.$touch()"
+                            :class="{
+                              'is-invalid': v$.dataMember.name.$error,
+                              'is-valid':
+                                !v$.dataMember.name.$error && validatedLogin,
+                            }"
                           />
                         </div>
                       </CCol>
@@ -328,6 +117,16 @@
                             type="text"
                             id="cLName"
                             v-model="dataMember.surename"
+                            feedbackInvalid="กรุณากรอกข้อมูลนามสกุลลูกค้า"
+                            :invalid="v$.dataMember.surename.$error"
+                            @input="v$.dataMember.surename.$touch()"
+                            @blur="v$.dataMember.surename.$touch()"
+                            :class="{
+                              'is-invalid': v$.dataMember.surename.$error,
+                              'is-valid':
+                                !v$.dataMember.surename.$error &&
+                                validatedLogin,
+                            }"
                           />
                         </div>
                       </CCol>
@@ -369,6 +168,16 @@
                               size="sm"
                               v-model="dataMember.status_id"
                               @change="onchgStatus($event.target.value)"
+                              feedbackInvalid="กรุณาเลือกสถานะลูกค้า"
+                              :invalid="v$.dataMember.status_id.$error"
+                              @input="v$.dataMember.status_id.$touch()"
+                              @blur="v$.dataMember.status_id.$touch()"
+                              :class="{
+                                'is-invalid': v$.dataMember.status_id.$error,
+                                'is-valid':
+                                  !v$.dataMember.status_id.$error &&
+                                  validatedLogin,
+                              }"
                             >
                               <option
                                 v-for="option in optStatus"
@@ -388,7 +197,19 @@
                           <label for="cApplyMethod" class="form-label mb-0">
                             ช่องทางการสมัคร
                           </label>
-                          <CFormSelect size="sm" v-model="dataMember.channel">
+                          <CFormSelect
+                            size="sm"
+                            v-model="dataMember.channel"
+                            feedbackInvalid="กรุณาเลือกช่องทางการสมัครให้ถูกต้อง"
+                            :invalid="v$.dataMember.channel.$error"
+                            @input="v$.dataMember.channel.$touch()"
+                            @blur="v$.dataMember.channel.$touch()"
+                            :class="{
+                              'is-invalid': v$.dataMember.channel.$error,
+                              'is-valid':
+                                !v$.dataMember.channel.$error && validatedLogin,
+                            }"
+                          >
                             <option value="">สามารถเลือกได้</option>
                             <option
                               v-for="option in optChannel"
@@ -417,8 +238,18 @@
                               size="sm"
                               v-model="dataMember.privilege_id"
                               @change="onchgPrivilege($event.target.value)"
+                              feedbackInvalid="กรุณาเลือกสิทธิพิเศษ"
+                              :invalid="v$.dataMember.privilege_id.$error"
+                              @input="v$.dataMember.privilege_id.$touch()"
+                              @blur="v$.dataMember.privilege_id.$touch()"
+                              :class="{
+                                'is-invalid': v$.dataMember.privilege_id.$error,
+                                'is-valid':
+                                  !v$.dataMember.privilege_id.$error &&
+                                  validatedLogin,
+                              }"
                             >
-                              <option value="">สามารถเลือกได้</option>
+                              <!-- <option value="">สามารถเลือกได้</option> -->
                               <option
                                 v-for="option in optPrivilege"
                                 :key="option._id"
@@ -441,6 +272,16 @@
                             type="text"
                             id="cRegisIP"
                             v-model="dataMember.user_reference"
+                            feedbackInvalid="กรุณากรอกยูสเซอร์แนะนำให้ถูกต้อง"
+                            :invalid="v$.dataMember.user_reference.$error"
+                            @input="v$.dataMember.user_reference.$touch()"
+                            @blur="v$.dataMember.user_reference.$touch()"
+                            :class="{
+                              'is-invalid': v$.dataMember.user_reference.$error,
+                              'is-valid':
+                                !v$.dataMember.user_reference.$error &&
+                                validatedLogin,
+                            }"
                           />
                         </div>
                       </CCol>
@@ -471,17 +312,23 @@
                               </small>
                             </small>
                           </label>
-                          <CInputGroup>
-                            <CInputGroupText id="basic-cPhone">
+                          <CInputGroup class="has-validation">
+                            <CInputGroupText>
                               <CIcon :icon="ic.cilPhone" />
                             </CInputGroupText>
                             <CFormInput
                               id="cPhone"
-                              placeholder="06123456xx"
-                              aria-label="เบอร์โทรลูกค้า"
-                              aria-describedby="basic-cPhone"
-                              required
+                              placeholder="0612345xxx"
                               v-model="dataMember.tel"
+                              feedbackInvalid="กรุณากรอกข้อมูลเบอร์โทรลูกค้าให้ถูกต้อง"
+                              :invalid="v$.dataMember.tel.$error"
+                              @input="v$.dataMember.tel.$touch()"
+                              @blur="v$.dataMember.tel.$touch()"
+                              :class="{
+                                'is-invalid': v$.dataMember.tel.$error,
+                                'is-valid':
+                                  !v$.dataMember.tel.$error && validatedLogin,
+                              }"
                             />
                           </CInputGroup>
                         </div>
@@ -497,6 +344,16 @@
                             placeholder="IP Address"
                             v-model="dataMember.register_ip"
                             readonly
+                            feedbackInvalid="ไม่สามารถระบุ IP Address ได้"
+                            :invalid="v$.dataMember.register_ip.$error"
+                            @input="v$.dataMember.register_ip.$touch()"
+                            @blur="v$.dataMember.register_ip.$touch()"
+                            :class="{
+                              'is-invalid': v$.dataMember.register_ip.$error,
+                              'is-valid':
+                                !v$.dataMember.register_ip.$error &&
+                                validatedLogin,
+                            }"
                           />
                         </div>
                       </CCol>
@@ -510,8 +367,17 @@
                           <CFormTextarea
                             id="cNote"
                             rows="2"
-                            text="Must be 8-20 words long."
+                            text="สามารถกรอกข้อมูลที่มีความจำเป็นต่อการตรวจสอบลูกค้าได้"
                             v-model="dataMember.remark"
+                            feedbackInvalid=""
+                            :invalid="v$.dataMember.remark.$error"
+                            @input="v$.dataMember.remark.$touch()"
+                            @blur="v$.dataMember.remark.$touch()"
+                            :class="{
+                              'is-invalid': v$.dataMember.remark.$error,
+                              'is-valid':
+                                !v$.dataMember.remark.$error && validatedLogin,
+                            }"
                           ></CFormTextarea>
                         </div>
                       </CCol>
@@ -523,14 +389,9 @@
                           <label for="cPin" class="form-label mb-0">
                             PIN *
                           </label>
-                          <CInputGroup>
-                            <CFormInput
-                              :type="dataMember.pinType"
-                              id="cPin"
-                              aria-label="PIN"
-                              v-model="dataMember.pin"
-                            />
+                          <CInputGroup class="has-validation">
                             <CButton
+                              tabindex="-1"
                               type="button"
                               color="secondary"
                               variant="outline"
@@ -538,6 +399,21 @@
                             >
                               <CIcon :icon="ic.cilLockLocked" />
                             </CButton>
+                            <CFormInput
+                              :type="dataMember.pinType"
+                              id="cPin"
+                              aria-label="PIN"
+                              v-model="dataMember.pin"
+                              feedbackInvalid="กรุณากรอกข้อมูล PIN จำนวน 4 หลัก"
+                              :invalid="v$.dataMember.pin.$error"
+                              @input="v$.dataMember.pin.$touch()"
+                              @blur="v$.dataMember.pin.$touch()"
+                              :class="{
+                                'is-invalid': v$.dataMember.pin.$error,
+                                'is-valid':
+                                  !v$.dataMember.pin.$error && validatedLogin,
+                              }"
+                            />
                           </CInputGroup>
                         </div>
                       </CCol>
@@ -570,7 +446,7 @@
                         <label for="cBanking" class="form-label mb-0">
                           ธนาคาร *
                         </label>
-                        <CInputGroup>
+                        <CInputGroup class="has-validation">
                           <CInputGroupText id="basic-cBanking" class="p-2">
                             <CImage
                               fluid
@@ -581,6 +457,15 @@
                           <CFormSelect
                             v-model="dataMember.bank_id"
                             @change="onchgBanking($event.target.value)"
+                            feedbackInvalid="กรุณาเลือกข้อมูลธนาคาร"
+                            :invalid="v$.dataMember.bank_id.$error"
+                            @input="v$.dataMember.bank_id.$touch()"
+                            @blur="v$.dataMember.bank_id.$touch()"
+                            :class="{
+                              'is-invalid': v$.dataMember.bank_id.$error,
+                              'is-valid':
+                                !v$.dataMember.bank_id.$error && validatedLogin,
+                            }"
                           >
                             <option value="">กรุณาเลือกข้อมูลธนาคาร</option>
                             <option
@@ -601,15 +486,24 @@
                         <label for="cBankAcct" class="form-label mb-0">
                           เลขที่บัญชี *
                         </label>
-                        <CInputGroup>
+                        <CInputGroup class="has-validation">
                           <CInputGroupText id="basic-cBankAcct">
                             <CIcon :icon="ic.cilCreditCard" />
                           </CInputGroupText>
                           <CFormInput
                             id="cBankAcct"
                             placeholder="011-1-11111-1"
-                            aria-label="บัญชีลูกค้า"
                             v-model="dataMember.bank_acct"
+                            feedbackInvalid="กรุณากรอกข้อมูลเลขที่บัญชีลูกค้า"
+                            :invalid="v$.dataMember.bank_acct.$error"
+                            @input="v$.dataMember.bank_acct.$touch()"
+                            @blur="v$.dataMember.bank_acct.$touch()"
+                            :class="{
+                              'is-invalid': v$.dataMember.bank_acct.$error,
+                              'is-valid':
+                                !v$.dataMember.bank_acct.$error &&
+                                validatedLogin,
+                            }"
                           />
                         </CInputGroup>
                       </div>
@@ -667,6 +561,16 @@
                             aria-label="เบอร์โทรลูกค้า"
                             aria-describedby="basic-cPhone"
                             v-model="dataMember.mobile_number"
+                            feedbackInvalid="กรุณากรอกข้อมูลเบอร์ให้ถูกต้อง"
+                            :invalid="v$.dataMember.mobile_number.$error"
+                            @input="v$.dataMember.mobile_number.$touch()"
+                            @blur="v$.dataMember.mobile_number.$touch()"
+                            :class="{
+                              'is-invalid': v$.dataMember.mobile_number.$error,
+                              'is-valid':
+                                !v$.dataMember.mobile_number.$error &&
+                                validatedLogin,
+                            }"
                           />
                         </CInputGroup>
                       </div>
@@ -680,14 +584,13 @@
                           </small>
                         </label>
                         <CInputGroup>
-                          <CInputGroupText id="basic-cLineID">
+                          <CInputGroupText>
                             <CIcon :icon="ic.cibLine" />
                           </CInputGroupText>
                           <CFormInput
                             id="cLineID"
                             placeholder="cus.id.xxx"
                             aria-label="cus.id.xxx"
-                            aria-describedby="basic-cLineID"
                             v-model="dataMember.line_id"
                           />
                           <!-- <CInputGroupText id="basic-LinkLineID">
@@ -713,6 +616,15 @@
                             aria-label="อีเมลลูกค้า"
                             aria-describedby="basic-cEmail"
                             v-model="dataMember.email"
+                            feedbackInvalid="กรุณากรอกข้อมูลอีเมลให้ถูกต้อง ตัวอย่าง: panel@tttmail.com"
+                            :invalid="v$.dataMember.email.$error"
+                            @input="v$.dataMember.email.$touch()"
+                            @blur="v$.dataMember.email.$touch()"
+                            :class="{
+                              'is-invalid': v$.dataMember.email.$error,
+                              'is-valid':
+                                !v$.dataMember.email.$error && validatedLogin,
+                            }"
                           />
                         </CInputGroup>
                       </div>
@@ -769,7 +681,17 @@
 <script>
 import { imgBankSmoothSet as imgBank } from '@/assets/images/banking/th/smooth-corner'
 import { iconsSet as ic } from '@/assets/icons'
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
+import useVuelidate from '@vuelidate/core'
+import {
+  required,
+  numeric,
+  ipAddress,
+  email,
+  minLength,
+  maxLength,
+} from '@vuelidate/validators'
+import { validateAlphabet } from '../../validations/validation'
 
 export default {
   name: 'CreateMember',
@@ -814,6 +736,9 @@ export default {
       optStatus: [],
       optShownBankAcct: [],
       optAllBank: [],
+
+      // validations
+      validatedLogin: false,
     }
   },
   methods: {
@@ -823,6 +748,11 @@ export default {
     navigateTo(route) {
       // navigateToNewTab('/member/list/99dev/' + member._id)
       this.$router.push(route)
+    },
+    navigateToNewTab(route) {
+      // this.$router.push(route)
+      let _route = this.$router.resolve({ path: route })
+      window.open(_route.href)
     },
     createToast(_color, _title, _content) {
       this.toasts.push({
@@ -1021,67 +951,71 @@ export default {
         })
     },
     async addMember() {
-      await this.$http
-        .post('panel/createuser', {
-          body: {
-            agent_id: this.dataMember.agent_id,
-            username: this.dataMember.username,
-            password: this.dataMember.password,
-            tel: this.dataMember.tel,
-            mobile_number: this.dataMember.mobile_number,
-            pin: this.dataMember.pin,
-            line_id: this.dataMember.line_id,
-            name: this.dataMember.name,
-            email: this.dataMember.email,
-            surename: this.dataMember.surename,
-            birthday: this.dataMember.birthday,
-            channel: this.dataMember.channel,
-            privilege: this.dataMember.privilege,
-            remark: this.dataMember.remark,
-            register_ip: this.dataMember.register_ip,
-            user_reference: this.dataMember.user_reference,
-            bank_id: this.dataMember.bank_id,
-            bank_acct: this.dataMember.bank_acct,
-            status: this.dataMember.status_id,
-          },
-        })
-        .then((response) => {
-          if (response.data.status == 200) {
-            this.navigateTo(
-              '/member/list/' +
-                response.data.result.web_name +
-                '/' +
-                response.data.result._id,
-            )
-          } else if (
-            response.data.status == 502 ||
-            response.data.status == 503
-          ) {
-            this.tokenExpired().then(() => {
-              this.navigateTo('/pages/login')
-            })
-          } else {
+      console.log(this.v$)
+      this.v$.$validate()
+      if (!this.v$.$error) {
+        await this.$http
+          .post('panel/createuser', {
+            body: {
+              agent_id: this.dataMember.agent_id,
+              username: this.dataMember.username,
+              password: this.dataMember.password,
+              tel: this.dataMember.tel,
+              mobile_number: this.dataMember.mobile_number,
+              pin: this.dataMember.pin,
+              line_id: this.dataMember.line_id,
+              name: this.dataMember.name,
+              email: this.dataMember.email,
+              surename: this.dataMember.surename,
+              birthday: this.dataMember.birthday,
+              channel: this.dataMember.channel,
+              privilege: this.dataMember.privilege,
+              remark: this.dataMember.remark,
+              register_ip: this.ipinfo,
+              user_reference: this.dataMember.user_reference,
+              bank_id: this.dataMember.bank_id,
+              bank_acct: this.dataMember.bank_acct,
+              status: this.dataMember.status_id,
+            },
+          })
+          .then((response) => {
+            if (response.data.status == 200) {
+              this.navigateToNewTab(
+                '/member/list/' +
+                  response.data.result.web_name +
+                  '/' +
+                  response.data.result._id,
+              )
+            } else if (
+              response.data.status == 502 ||
+              response.data.status == 503
+            ) {
+              this.tokenExpired().then(() => {
+                this.navigateTo('/pages/login')
+              })
+            } else {
+              this.createToast(
+                'danger',
+                'การดำเนินการ',
+                'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + response.data.message,
+              )
+              console.log(
+                'call api - panel/createuser : status = ' +
+                  response.data.status +
+                  ', message = ' +
+                  response.data.message,
+              )
+            }
+          })
+          .catch((error) => {
             this.createToast(
               'danger',
               'การดำเนินการ',
-              'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + response.data.message,
+              'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + error,
             )
-            console.log(
-              'call api - panel/createuser : status = ' +
-                response.data.status +
-                ', message = ' +
-                response.data.message,
-            )
-          }
-        })
-        .catch((error) => {
-          this.createToast(
-            'danger',
-            'การดำเนินการ',
-            'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + error,
-          )
-          console.log('call api - panel/createuser : error' + error)
-        })
+            console.log('call api - panel/createuser : error' + error)
+          })
+      }
     },
 
     // functions
@@ -1159,6 +1093,11 @@ export default {
         this.dataMember.pinType = 'password'
       }
     },
+
+    // validations
+    // validateAlphabet(_val) {
+    //   return /^[\u0E00-\u0E7Fa-zA-Z']+$/.test(_val) ? true : false
+    // },
   },
   mounted() {
     this.getWebPrefixList().then(() => {
@@ -1171,11 +1110,62 @@ export default {
     })
     this.getAllBank()
     this.dataMember.pin = Math.floor(1000 + Math.random() * 9000) + ''
+    this.dataMember.register_ip = this.ipinfo?.ip
+
+    // console.log(this.validateAlphabet('&&&&&'))
+  },
+  computed: {
+    ...mapGetters({
+      ipinfo: 'auth/ip_info',
+    }),
   },
   setup() {
     return {
+      v$: useVuelidate(),
       imgBank,
       ic,
+    }
+  },
+  validations() {
+    return {
+      dataMember: {
+        // username: {},
+        // password: {},
+        status_id: { required },
+        tel: {
+          required,
+          numeric,
+          minLength: minLength(10),
+          maxLength: maxLength(10),
+        },
+        pin: {
+          required,
+          numeric,
+          minLength: minLength(4),
+          maxLength: maxLength(4),
+        },
+        line_id: {},
+        name: { required, validateAlphabet },
+        surename: { required, validateAlphabet },
+        birthday: {},
+        privilege_id: {},
+        channel: {},
+        remark: {},
+        register_ip: { ipAddress },
+        user_reference: {},
+        mobile_number: {
+          numeric,
+          minLength: minLength(10),
+          maxLength: maxLength(10),
+        },
+        email: { email },
+        bank_id: { required },
+        bank_acct: {
+          required,
+          minLength: minLength(9),
+          maxLength: maxLength(13),
+        },
+      },
     }
   },
 }
