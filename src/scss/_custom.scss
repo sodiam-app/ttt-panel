@@ -1,1 +1,16 @@
 // Here you can add other styles
+.modal {
+  z-index: 100000 !important;
+}
+
+.select2-container--open {
+  z-index: 9999999 !important;
+}
+
+.select2-selection__rendered {
+  line-height: 32px !important;
+}
+
+.select2-selection {
+  height: 34px !important;
+}

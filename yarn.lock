@@ -6331,6 +6331,11 @@
     "@sideway/formula" "^3.0.0"
     "@sideway/pinpoint" "^2.0.0"
 
+"jquery@^3.3.1":
+  "integrity" "sha512-JVzAR/AjBvVt2BmYhxRCSYysDsPcssdmTFnzyLEts9qNwmjmu4JTAMYubEfwVOSwpQ1I1sKKFcxhZCI2buerfw=="
+  "resolved" "https://registry.npmjs.org/jquery/-/jquery-3.6.0.tgz"
+  "version" "3.6.0"
+
 "js-beautify@^1.13.13", "js-beautify@^1.6.12":
   "integrity" "sha512-yuck9KirNSCAwyNJbqW+BxJqJ0NLJ4PwBUzQQACl5O3qHMBXVkXb/rD0ilh/Lat/tn88zSZ+CAHOlk0DsY7GuQ=="
   "resolved" "https://registry.npmjs.org/js-beautify/-/js-beautify-1.14.0.tgz"
@@ -8203,6 +8208,11 @@
   "resolved" "https://registry.npmjs.org/select/-/select-1.1.2.tgz"
   "version" "1.1.2"
 
+"select2@^4.0.7-rc.0":
+  "integrity" "sha512-1JeB87s6oN/TDxQQYCvS5EFoQyvV6eYMZZ0AeA4tdFDYWN3BAGZ8npr17UBFddU0lgAt3H0yjX3X6/ekOj1yjw=="
+  "resolved" "https://registry.npmjs.org/select2/-/select2-4.0.13.tgz"
+  "version" "4.0.13"
+
 "selfsigned@^2.0.1":
   "integrity" "sha512-LmME957M1zOsUhG+67rAjKfiWFox3SBxE/yymatMZsAx+oMrJ0YQ8AToOnyCm7xbeg2ep37IHLxdu0o2MavQOQ=="
   "resolved" "https://registry.npmjs.org/selfsigned/-/selfsigned-2.0.1.tgz"
@@ -9159,6 +9169,14 @@
   "resolved" "https://registry.npmjs.org/uuid/-/uuid-8.3.2.tgz"
   "version" "8.3.2"
 
+"v-select2-component@^0.4.7":
+  "integrity" "sha512-z/juA8qlRj8u66ktJ0CupUgtNbe63YT+EzqNjq3HwJkTbAE87d2By+L0rSqfLGKtBBAQ4T56Sk7QOMSvRw9OsQ=="
+  "resolved" "https://registry.npmjs.org/v-select2-component/-/v-select2-component-0.4.7.tgz"
+  "version" "0.4.7"
+  dependencies:
+    "jquery" "^3.3.1"
+    "select2" "^4.0.7-rc.0"
+
 "v-tooltip@^2.0.2":
   "integrity" "sha512-xXngyxLQTOx/yUEy50thb8te7Qo4XU6h4LZB6cvEfVd9mnysUxLEoYwGWDdqR+l69liKsy3IPkdYff3J1gAJ5w=="
   "resolved" "https://registry.npmjs.org/v-tooltip/-/v-tooltip-2.1.3.tgz"
@@ -9256,6 +9274,11 @@
   dependencies:
     "@vue/devtools-api" "^6.0.0-beta.18"
 
+"vue-select2@^0.2.6":
+  "integrity" "sha512-Kgyx0MOsCHZNUYsOG0npnIxro87PWqQLy7X9DvalCLLUuSA6OLXbGLAoUQjq+koj6gaF3pXQv6xJzLQTsFb0VQ=="
+  "resolved" "https://registry.npmjs.org/vue-select2/-/vue-select2-0.2.6.tgz"
+  "version" "0.2.6"
+
 "vue-style-loader@^4.1.0", "vue-style-loader@^4.1.3":
   "integrity" "sha512-sFuh0xfbtpRlKfm39ss/ikqs9AbKCoXZBpHeVZ8Tx650o0k0q/YCM7FRvigtxpACezfq6af+a7JeqVTWvncqDg=="
   "resolved" "https://registry.npmjs.org/vue-style-loader/-/vue-style-loader-4.1.3.tgz"
@@ -9305,6 +9328,14 @@
   "version" "1.0.0"
   dependencies:
     "clipboard" "^2.0.6"
+
+"vue3-select2-component@^0.1.7":
+  "integrity" "sha512-8UPZmFl02I47XwW+j8ICmHyAND8wfbavlvMrqh10wwdSVER1aF2kI9XCmfIrNlVQvxSbvc0mJjWQAHHSCW9dkw=="
+  "resolved" "https://registry.npmjs.org/vue3-select2-component/-/vue3-select2-component-0.1.7.tgz"
+  "version" "0.1.7"
+  dependencies:
+    "jquery" "^3.3.1"
+    "select2" "^4.0.7-rc.0"
 
 "vue3-timeago@^1.0.6":
   "integrity" "sha512-6CfGDfxenU+xZTGDp0ym3Q7swnWkWr4X1rnF4YhyfNGTOEre/WW+FuPrwOVVS8n1sBRLLnmIGN51mjblucvGzw=="

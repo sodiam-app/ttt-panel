@@ -898,7 +898,7 @@
   <!-- ฝากเงิน -->
   <!-- ------ -->
   <CModal
-    backdrop="static"
+    tabindex="-1"
     :visible="mdDeposit"
     @close="
       () => {
@@ -950,7 +950,7 @@
                 </span>
               </div>
               <hr class="mt-2 mb-2" />
-              <div class="mb-1">
+              <div class="mb-1" v-show="optWebAgent.length > 1">
                 <label for="depositWebAgent" class="form-label mb-1">
                   * เว็บลูกค้า
                 </label>
@@ -979,12 +979,34 @@
                 <label for="depositMemberID" class="form-label mb-1">
                   * ยูสเซอร์ลูกค้า
                 </label>
-                <CMultiSelect
+                <Select2
+                  tabindex="0"
+                  placeholder="กรุณาเลือกข้อมูลลูกค้า"
+                  v-model="dataDeposit.memb_id"
                   :options="optMemberListMultiSelect"
-                  :multiple="false"
-                  :optionsMaxHeight="5"
-                  search-no-results-label="ไม่พบข้อมูล"
+                  :settings="{
+                    width: '100%',
+                  }"
+                  @change="myChangeEvent($event)"
                 />
+
+                <!-- <Select2
+                  tabindex="0"
+                  :value="dataDeposit.memb_id"
+                  :options="optMemberListMultiSelect"
+                  :settings="{
+                    width: '100%',
+                    minimumResultsForSearch: -1,
+                    enoughRoomAbove: true,
+                    enoughRoomBelow: false,
+                  }"
+                /> -->
+                <!-- <CMultiSelect
+                  :options="optMemberListMultiSelect"
+                  search-no-results-label="ไม่พบข้อมูลลูกค้า"
+                  :select-all="false"
+                  :options-max-height="2"
+                /> -->
                 <!-- <CInputGroup>
                   <CInputGroupText id="basic-addon1">
                     <CIcon :icon="ic.cilGroup" />
@@ -1017,7 +1039,6 @@
                   <CCol sm="7">
                     <CDatePicker
                       id="depositDateTime"
-                      size="sm"
                       locale="th-TH"
                       confirm-button="ตกลง"
                       cancel-button="ยกเลิก"
@@ -1032,7 +1053,6 @@
                   </CCol>
                   <CCol sm>
                     <CTimePicker
-                      size="sm"
                       locale="th-TH"
                       placeholder="เวลาที่ทำรายการ"
                       :time="new Date()"
@@ -1054,7 +1074,7 @@
                     id="depositAmount"
                     v-model="dataDeposit.amount"
                   />
-                  <CInputGroupText> ฿ </CInputGroupText>
+                  <!-- <CInputGroupText> ฿ </CInputGroupText> -->
                 </CInputGroup>
               </div>
               <hr class="mb-2" />
@@ -1114,7 +1134,7 @@
   <!-- ถอนเงิน -->
   <!-- ------ -->
   <CModal
-    backdrop="static"
+    tabindex="-1"
     :visible="mdWithdraw"
     @close="
       () => {
@@ -1168,7 +1188,7 @@
                 </div>
               </div>
               <hr class="mt-2 mb-2" />
-              <div class="mb-1">
+              <div class="mb-1" v-show="optWebAgent.length > 1">
                 <label for="withdrawWebAgent" class="form-label mb-1">
                   * เว็บลูกค้า
                 </label>
@@ -1197,7 +1217,17 @@
                 <label for="withdrawMemberID" class="form-label mb-1">
                   * ยูสเซอร์ลูกค้า
                 </label>
-                <CInputGroup>
+                <Select2
+                  tabindex="0"
+                  placeholder="กรุณาเลือกข้อมูลลูกค้า"
+                  v-model="dataWithdraw.memb_id"
+                  :options="optMemberListMultiSelect"
+                  :settings="{
+                    width: '100%',
+                  }"
+                  @change="myChangeEvent($event)"
+                />
+                <!-- <CInputGroup>
                   <CInputGroupText id="basic-addon1">
                     <CIcon :icon="ic.cilGroup" />
                   </CInputGroupText>
@@ -1216,7 +1246,7 @@
                       {{ option.profile.surename }})
                     </option>
                   </CFormSelect>
-                </CInputGroup>
+                </CInputGroup> -->
                 <div class="form-text mt-0 mb-2">
                   สามารถค้นหาด้วย: ยูส, เบอร์โทร, ชื่อ
                 </div>
@@ -1234,7 +1264,7 @@
                     id="withdrawAmount"
                     v-model="dataWithdraw.amount"
                   />
-                  <CInputGroupText> ฿ </CInputGroupText>
+                  <!-- <CInputGroupText> ฿ </CInputGroupText> -->
                 </CInputGroup>
               </div>
               <hr class="mb-2" />
@@ -1856,6 +1886,7 @@ import {
 
 import { mapActions, mapGetters } from 'vuex'
 import { CDatePicker } from '@coreui/vue-pro'
+import Select2 from 'vue3-select2-component'
 import moment from 'moment'
 
 export default {
@@ -1863,6 +1894,7 @@ export default {
   comments: {
     CIcon,
     CDatePicker,
+    Select2,
   },
   data() {
     return {
@@ -1943,6 +1975,7 @@ export default {
       optBankDeposit: [],
       optBankWithdraw: [],
       optMemberListMultiSelect: [],
+      myOptions: ['op1', 'op2', 'op3'],
 
       // icons
       ic: {
@@ -2131,7 +2164,7 @@ export default {
             this.dataDeposit.amount = '0'
             this.dataDeposit.description = ''
             this.dataDeposit.account_withdraw = ''
-            this.isBonusDeposit = true
+            this.isBonusDeposit = false
 
             this.dataDeposit.errorVisible = false
             this.dataDeposit.errorMessage = ''
@@ -2187,7 +2220,7 @@ export default {
             this.dataWithdraw.amount = '0'
             this.dataWithdraw.description = ''
             this.dataWithdraw.account_withdraw = ''
-            this.isBonusWithdraw = true
+            this.isBonusWithdraw = false
 
             this.dataWithdraw.errorVisible = false
             this.dataWithdraw.errorMessage = ''
@@ -2621,6 +2654,12 @@ export default {
         return 'warning'
       }
     },
+    myChangeEvent(val) {
+      console.log(val)
+    },
+    mySelectEvent({ id, text }) {
+      console.log({ id, text })
+    },
 
     //prepare
     prepareOptMemberListMultiSelect(_obj) {
@@ -2636,7 +2675,7 @@ export default {
           ' (' +
           _obj[i].profile.tel +
           ')'
-        _result.push({ value: id, text: _txt })
+        _result.push({ id: id, text: _txt })
       }
       return _result
     },

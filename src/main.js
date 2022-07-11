@@ -24,6 +24,7 @@ const timeagoOptions = {
     locale: 'th',
   },
 }
+import Select2 from 'vue3-select2-component'
 
 // import useVuelidate from '@vuelidate/core'
 
@@ -43,6 +44,7 @@ store.dispatch('auth/atttoken', localStorage.getItem('token')).then(() => {
   // app.use(useVuelidate)
   app.provide('icons', icons)
   app.component('CIcon', CIcon)
+  app.component('Select2', Select2)
   app.component('DocsCallout', DocsCallout)
   app.component('DocsExample', DocsExample)
   // app.component('TimeAgo', TimeAgo)
