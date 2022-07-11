@@ -963,6 +963,15 @@
                     size="sm"
                     v-model="dataDeposit.web_agent_id"
                     @change="getMemberList($event.target.value)"
+                    feedbackInvalid="กรุณาเลือกข้อมูลเว็บ"
+                    :invalid="v$.dataDeposit.web_agent_id.$error"
+                    @input="v$.dataDeposit.web_agent_id.$touch()"
+                    @blur="v$.dataDeposit.web_agent_id.$touch()"
+                    :class="{
+                      'is-invalid': v$.dataDeposit.web_agent_id.$error,
+                      'is-valid':
+                        !v$.dataDeposit.web_agent_id.$error && validatedDeposit,
+                    }"
                   >
                     <option value="">กรุณาเลือกเว็บ</option>
                     <option
@@ -988,6 +997,15 @@
                     width: '100%',
                   }"
                   @change="myChangeEvent($event)"
+                  feedbackInvalid="กรุณาเลือกลูกค้าที่จะทำรายการ"
+                  :invalid="v$.dataDeposit.memb_id.$error"
+                  @input="v$.dataDeposit.memb_id.$touch()"
+                  @blur="v$.dataDeposit.memb_id.$touch()"
+                  :class="{
+                    'is-invalid': v$.dataDeposit.memb_id.$error,
+                    'is-valid':
+                      !v$.dataDeposit.memb_id.$error && validatedDeposit,
+                  }"
                 />
 
                 <!-- <Select2
@@ -1070,9 +1088,19 @@
                     <CIcon :icon="ic.cilCash" />
                   </CInputGroupText>
                   <CFormInput
+                    min="0"
                     type="number"
                     id="depositAmount"
                     v-model="dataDeposit.amount"
+                    feedbackInvalid="กรุณากรอกข้อมูลจำนวนเงินให้ถูกต้อง"
+                    :invalid="v$.dataDeposit.amount.$error"
+                    @input="v$.dataDeposit.amount.$touch()"
+                    @blur="v$.dataDeposit.amount.$touch()"
+                    :class="{
+                      'is-invalid': v$.dataDeposit.amount.$error,
+                      'is-valid':
+                        !v$.dataDeposit.amount.$error && validatedDeposit,
+                    }"
                   />
                   <!-- <CInputGroupText> ฿ </CInputGroupText> -->
                 </CInputGroup>
@@ -1167,7 +1195,7 @@
                       size="sm"
                       v-model="dataWithdraw.account_withdraw"
                     >
-                      <option value="" selected>บัญชีโบนัส</option>
+                      <!-- <option value="" selected>บัญชีโบนัส</option> -->
                       <option
                         v-for="option in optBankWithdraw"
                         :key="option._id"
@@ -1201,6 +1229,16 @@
                     size="sm"
                     v-model="dataWithdraw.web_agent_id"
                     @change="getMemberList($event.target.value)"
+                    feedbackInvalid="กรุณาเลือกข้อมูลเว็บ"
+                    :invalid="v$.dataWithdraw.web_agent_id.$error"
+                    @input="v$.dataWithdraw.web_agent_id.$touch()"
+                    @blur="v$.dataWithdraw.web_agent_id.$touch()"
+                    :class="{
+                      'is-invalid': v$.dataWithdraw.web_agent_id.$error,
+                      'is-valid':
+                        !v$.dataWithdraw.web_agent_id.$error &&
+                        validatedWithdraw,
+                    }"
                   >
                     <option value="">กรุณาเลือกเว็บ</option>
                     <option
@@ -1226,6 +1264,15 @@
                     width: '100%',
                   }"
                   @change="myChangeEvent($event)"
+                  feedbackInvalid="กรุณาเลือกลูกค้าที่จะทำรายการ"
+                  :invalid="v$.dataWithdraw.memb_id.$error"
+                  @input="v$.dataWithdraw.memb_id.$touch()"
+                  @blur="v$.dataWithdraw.memb_id.$touch()"
+                  :class="{
+                    'is-invalid': v$.dataWithdraw.memb_id.$error,
+                    'is-valid':
+                      !v$.dataWithdraw.memb_id.$error && validatedWithdraw,
+                  }"
                 />
                 <!-- <CInputGroup>
                   <CInputGroupText id="basic-addon1">
@@ -1261,8 +1308,18 @@
                   </CInputGroupText>
                   <CFormInput
                     type="number"
+                    min="0"
                     id="withdrawAmount"
                     v-model="dataWithdraw.amount"
+                    feedbackInvalid="กรุณากรอกข้อมูลจำนวนเงินให้ถูกต้อง"
+                    :invalid="v$.dataWithdraw.amount.$error"
+                    @input="v$.dataWithdraw.amount.$touch()"
+                    @blur="v$.dataWithdraw.amount.$touch()"
+                    :class="{
+                      'is-invalid': v$.dataWithdraw.amount.$error,
+                      'is-valid':
+                        !v$.dataWithdraw.amount.$error && validatedWithdraw,
+                    }"
                   />
                   <!-- <CInputGroupText> ฿ </CInputGroupText> -->
                 </CInputGroup>
@@ -1888,6 +1945,9 @@ import { mapActions, mapGetters } from 'vuex'
 import { CDatePicker } from '@coreui/vue-pro'
 import Select2 from 'vue3-select2-component'
 import moment from 'moment'
+import useVuelidate from '@vuelidate/core'
+import { required, numeric } from '@vuelidate/validators'
+import { validateAmount } from '../../validations/validation'
 
 export default {
   name: 'Transection',
@@ -1976,6 +2036,10 @@ export default {
       optBankWithdraw: [],
       optMemberListMultiSelect: [],
       myOptions: ['op1', 'op2', 'op3'],
+
+      // validations
+      validatedDeposit: false,
+      validatedWithdraw: false,
 
       // icons
       ic: {
@@ -2140,116 +2204,130 @@ export default {
         })
     },
     async submitDeposit() {
-      let bank_id = ''
-      if (!this.isBonusDeposit) {
-        bank_id = this.dataDeposit.account_deposit
-      } else {
-        this.dataDeposit.account_deposit = ''
-      }
-      await this.$http
-        .post('panel/deposit', {
-          account_deposit: bank_id,
-          memb_id: this.dataDeposit.memb_id,
-          transaction_date: moment().format(),
-          amount: this.dataDeposit.amount,
-          description: this.dataDeposit.description,
-        })
-        .then((response) => {
-          if (response.data.status == 200) {
-            console.log(response.data.message + ' : ' + response.data.result)
-            this.mdDeposit = false
+      this.validatedDeposit = true
+      this.v$.dataDeposit.$validate()
+      if (!this.v$.dataDeposit.$error) {
+        let bank_id = ''
+        if (!this.isBonusDeposit) {
+          bank_id = this.dataDeposit.account_deposit
+        } else {
+          this.dataDeposit.account_deposit = ''
+        }
+        await this.$http
+          .post('panel/deposit', {
+            account_deposit: bank_id,
+            memb_id: this.dataDeposit.memb_id,
+            transaction_date: moment().format(),
+            amount: this.dataDeposit.amount,
+            description: this.dataDeposit.description,
+          })
+          .then((response) => {
+            if (response.data.status == 200) {
+              console.log(response.data.message + ' : ' + response.data.result)
+              this.mdDeposit = false
 
-            // clear data
-            this.dataDeposit.memb_id = ''
-            this.dataDeposit.amount = '0'
-            this.dataDeposit.description = ''
-            this.dataDeposit.account_withdraw = ''
-            this.isBonusDeposit = false
+              // clear data
+              this.dataDeposit.memb_id = ''
+              this.dataDeposit.amount = '0'
+              this.dataDeposit.description = ''
+              this.dataDeposit.account_withdraw = ''
+              this.isBonusDeposit = false
 
-            this.dataDeposit.errorVisible = false
-            this.dataDeposit.errorMessage = ''
-          } else if (
-            response.data.status == 502 ||
-            response.data.status == 503
-          ) {
-            this.tokenExpired().then(() => {
-              this.navigateTo('/pages/login')
-            })
-          } else {
+              this.dataDeposit.errorVisible = false
+              this.dataDeposit.errorMessage = ''
+
+              this.validatedDeposit = false
+              this.v$.$reset()
+            } else if (
+              response.data.status == 502 ||
+              response.data.status == 503
+            ) {
+              this.tokenExpired().then(() => {
+                this.navigateTo('/pages/login')
+              })
+            } else {
+              this.dataDeposit.errorVisible = true
+              this.dataDeposit.errorMessage = response.data.message
+              console.log(
+                'call api - panel/deposit : status = ' +
+                  response.data.status +
+                  ', message = ' +
+                  response.data.message,
+              )
+            }
+          })
+          .catch((error) => {
             this.dataDeposit.errorVisible = true
-            this.dataDeposit.errorMessage = response.data.message
-            console.log(
-              'call api - panel/deposit : status = ' +
-                response.data.status +
-                ', message = ' +
-                response.data.message,
-            )
-          }
-        })
-        .catch((error) => {
-          this.dataDeposit.errorVisible = true
-          this.dataDeposit.errorMessage = error
-          console.log('call api - panel/deposit : error' + error)
-        })
-        .finally(() => {
-          this.onClicktabPaneActive(this.tabPaneActiveKey)
-        })
+            this.dataDeposit.errorMessage = error
+            console.log('call api - panel/deposit : error' + error)
+          })
+          .finally(() => {
+            this.onClicktabPaneActive(this.tabPaneActiveKey)
+          })
+      }
     },
     async submitWithdraw() {
-      let bank_id = ''
-      if (!this.isBonusWithdraw) {
-        bank_id = this.dataWithdraw.account_withdraw
-      } else {
-        this.dataWithdraw.account_withdraw = ''
-      }
-      await this.$http
-        .post('panel/withdraw', {
-          account_withdraw: bank_id,
-          memb_id: this.dataWithdraw.memb_id,
-          transaction_date: moment().format(),
-          amount: this.dataWithdraw.amount,
-          description: this.dataWithdraw.description,
-        })
-        .then((response) => {
-          if (response.data.status == 200) {
-            console.log(response.data.message + ' : ' + response.data.result)
-            this.mdWithdraw = false
+      this.validatedWithdraw = true
+      this.v$.dataWithdraw.$validate()
+      if (!this.v$.dataWithdraw.$error) {
+        let bank_id = ''
+        if (!this.isBonusWithdraw) {
+          bank_id = this.dataWithdraw.account_withdraw
+        } else {
+          this.dataWithdraw.account_withdraw = ''
+        }
+        await this.$http
+          .post('panel/withdraw', {
+            account_withdraw: bank_id,
+            memb_id: this.dataWithdraw.memb_id,
+            transaction_date: moment().format(),
+            amount: this.dataWithdraw.amount,
+            description: this.dataWithdraw.description,
+          })
+          .then((response) => {
+            if (response.data.status == 200) {
+              console.log(response.data.message + ' : ' + response.data.result)
+              this.mdWithdraw = false
 
-            // clear data
-            this.dataWithdraw.memb_id = ''
-            this.dataWithdraw.amount = '0'
-            this.dataWithdraw.description = ''
-            this.dataWithdraw.account_withdraw = ''
-            this.isBonusWithdraw = false
+              // clear data
+              this.dataWithdraw.memb_id = ''
+              this.dataWithdraw.amount = '0'
+              this.dataWithdraw.description = ''
+              this.dataWithdraw.account_withdraw = ''
+              this.isBonusWithdraw = false
 
-            this.dataWithdraw.errorVisible = false
-            this.dataWithdraw.errorMessage = ''
-          } else if (
-            response.data.status == 502 ||
-            response.data.status == 503
-          ) {
-            this.tokenExpired().then(() => {
-              this.navigateTo('/pages/login')
-            })
-          } else {
+              this.dataWithdraw.errorVisible = false
+              this.dataWithdraw.errorMessage = ''
+
+              this.validatedWithdraw = false
+              this.v$.$reset()
+            } else if (
+              response.data.status == 502 ||
+              response.data.status == 503
+            ) {
+              this.tokenExpired().then(() => {
+                this.navigateTo('/pages/login')
+              })
+            } else {
+              this.dataWithdraw.errorVisible = true
+              this.dataWithdraw.errorMessage = response.data.message
+              console.log(
+                'call api - panel/withdraw : status = ' +
+                  response.data.status +
+                  ', message = ' +
+                  response.data.message,
+              )
+            }
+          })
+          .catch((error) => {
             this.dataWithdraw.errorVisible = true
-            this.dataWithdraw.errorMessage = response.data.message
-            console.log(
-              'call api - panel/withdraw : status = ' +
-                response.data.status +
-                ', message = ' +
-                response.data.message,
-            )
-          }
-        })
-        .catch((error) => {
-          this.dataWithdraw.errorVisible = true
-          this.dataWithdraw.errorMessage = error
-          console.log('call api - panel/withdraw : error' + error)
-        })
-        .finally(() => {
-          this.onClicktabPaneActive(this.tabPaneActiveKey)
-        })
+            this.dataWithdraw.errorMessage = error
+            console.log('call api - panel/withdraw : error' + error)
+          })
+          .finally(() => {
+            this.onClicktabPaneActive(this.tabPaneActiveKey)
+          })
+      }
     },
     async getHistory() {
       await this.$http
@@ -2701,7 +2779,30 @@ export default {
   },
   setup() {
     return {
+      v$: useVuelidate(),
       imgBank,
+    }
+  },
+  validations() {
+    return {
+      dataDeposit: {
+        web_agent_id: { required },
+        account_deposit: {},
+        memb_id: { required },
+        transaction_date: {},
+        transaction_time: {},
+        amount: { required, numeric, validateAmount },
+        description: {},
+      },
+      dataWithdraw: {
+        web_agent_id: { required },
+        account_withdraw: {},
+        memb_id: { required },
+        transaction_date: {},
+        transaction_time: {},
+        amount: { required, numeric, validateAmount },
+        description: {},
+      },
     }
   },
 }

@@ -206,7 +206,7 @@ export default {
   validations() {
     return {
       form: {
-        username: { required, minLength: minLength(6) },
+        username: { required, minLength: minLength(4) },
         password: { required, minLength: minLength(4) },
       },
     }

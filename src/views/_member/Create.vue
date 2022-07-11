@@ -14,7 +14,7 @@
               color="success"
               class="ms-1 text-light"
               size="sm"
-              @click="addMember"
+              @click="addMember()"
             >
               <CIcon :icon="ic.cilSave" />
               สร้าง
@@ -103,7 +103,7 @@
                             :class="{
                               'is-invalid': v$.dataMember.name.$error,
                               'is-valid':
-                                !v$.dataMember.name.$error && validatedLogin,
+                                !v$.dataMember.name.$error && validatedCreate,
                             }"
                           />
                         </div>
@@ -125,7 +125,7 @@
                               'is-invalid': v$.dataMember.surename.$error,
                               'is-valid':
                                 !v$.dataMember.surename.$error &&
-                                validatedLogin,
+                                validatedCreate,
                             }"
                           />
                         </div>
@@ -176,7 +176,7 @@
                                 'is-invalid': v$.dataMember.status_id.$error,
                                 'is-valid':
                                   !v$.dataMember.status_id.$error &&
-                                  validatedLogin,
+                                  validatedCreate,
                               }"
                             >
                               <option
@@ -207,7 +207,8 @@
                             :class="{
                               'is-invalid': v$.dataMember.channel.$error,
                               'is-valid':
-                                !v$.dataMember.channel.$error && validatedLogin,
+                                !v$.dataMember.channel.$error &&
+                                validatedCreate,
                             }"
                           >
                             <option value="">สามารถเลือกได้</option>
@@ -246,7 +247,7 @@
                                 'is-invalid': v$.dataMember.privilege_id.$error,
                                 'is-valid':
                                   !v$.dataMember.privilege_id.$error &&
-                                  validatedLogin,
+                                  validatedCreate,
                               }"
                             >
                               <!-- <option value="">สามารถเลือกได้</option> -->
@@ -280,7 +281,7 @@
                               'is-invalid': v$.dataMember.user_reference.$error,
                               'is-valid':
                                 !v$.dataMember.user_reference.$error &&
-                                validatedLogin,
+                                validatedCreate,
                             }"
                           />
                         </div>
@@ -327,7 +328,7 @@
                               :class="{
                                 'is-invalid': v$.dataMember.tel.$error,
                                 'is-valid':
-                                  !v$.dataMember.tel.$error && validatedLogin,
+                                  !v$.dataMember.tel.$error && validatedCreate,
                               }"
                             />
                           </CInputGroup>
@@ -352,7 +353,7 @@
                               'is-invalid': v$.dataMember.register_ip.$error,
                               'is-valid':
                                 !v$.dataMember.register_ip.$error &&
-                                validatedLogin,
+                                validatedCreate,
                             }"
                           />
                         </div>
@@ -376,7 +377,7 @@
                             :class="{
                               'is-invalid': v$.dataMember.remark.$error,
                               'is-valid':
-                                !v$.dataMember.remark.$error && validatedLogin,
+                                !v$.dataMember.remark.$error && validatedCreate,
                             }"
                           ></CFormTextarea>
                         </div>
@@ -411,7 +412,7 @@
                               :class="{
                                 'is-invalid': v$.dataMember.pin.$error,
                                 'is-valid':
-                                  !v$.dataMember.pin.$error && validatedLogin,
+                                  !v$.dataMember.pin.$error && validatedCreate,
                               }"
                             />
                           </CInputGroup>
@@ -464,7 +465,8 @@
                             :class="{
                               'is-invalid': v$.dataMember.bank_id.$error,
                               'is-valid':
-                                !v$.dataMember.bank_id.$error && validatedLogin,
+                                !v$.dataMember.bank_id.$error &&
+                                validatedCreate,
                             }"
                           >
                             <option value="">กรุณาเลือกข้อมูลธนาคาร</option>
@@ -502,7 +504,7 @@
                               'is-invalid': v$.dataMember.bank_acct.$error,
                               'is-valid':
                                 !v$.dataMember.bank_acct.$error &&
-                                validatedLogin,
+                                validatedCreate,
                             }"
                           />
                         </CInputGroup>
@@ -569,7 +571,7 @@
                               'is-invalid': v$.dataMember.mobile_number.$error,
                               'is-valid':
                                 !v$.dataMember.mobile_number.$error &&
-                                validatedLogin,
+                                validatedCreate,
                             }"
                           />
                         </CInputGroup>
@@ -623,7 +625,7 @@
                             :class="{
                               'is-invalid': v$.dataMember.email.$error,
                               'is-valid':
-                                !v$.dataMember.email.$error && validatedLogin,
+                                !v$.dataMember.email.$error && validatedCreate,
                             }"
                           />
                         </CInputGroup>
@@ -738,7 +740,7 @@ export default {
       optAllBank: [],
 
       // validations
-      validatedLogin: false,
+      validatedCreate: false,
     }
   },
   methods: {
@@ -951,7 +953,7 @@ export default {
         })
     },
     async addMember() {
-      console.log(this.v$)
+      this.validatedCreate = true
       this.v$.$validate()
       if (!this.v$.$error) {
         await this.$http
@@ -1162,6 +1164,7 @@ export default {
         bank_id: { required },
         bank_acct: {
           required,
+          numeric,
           minLength: minLength(9),
           maxLength: maxLength(13),
         },
