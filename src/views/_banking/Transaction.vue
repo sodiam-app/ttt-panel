@@ -760,7 +760,18 @@
                       {{ historylasted.web_prefix }}
                     </CTableDataCell>
                     <CTableDataCell>
-                      {{ historylasted.description }}
+                      <div
+                        v-for="note in historylasted.description"
+                        :key="note._id"
+                      >
+                        <CBadge
+                          :color="convertUserNoteColor(note.username)"
+                          shape="rounded-pill"
+                        >
+                          {{ note.username }}
+                        </CBadge>
+                        : {{ note.note }}
+                      </div>
                     </CTableDataCell>
                   </CTableRow>
                 </CTableBody>
@@ -1701,7 +1712,7 @@
                 placeholder="Leave a comment here"
                 id="floatingTextarea1"
                 style="height: 90px"
-                v-model="dataDeposit.description"
+                v-model="dataManageTransactionNote"
               ></textarea>
               <label for="floatingTextarea2">หมายเหตุ</label>
             </div>
@@ -1719,7 +1730,7 @@
                         dataManageTransaction._id,
                         'approve',
                         dataManageTransaction.type,
-                        dataManageTransaction.description,
+                        dataManageTransactionNote,
                       )
                     "
                   >
@@ -1735,7 +1746,7 @@
                         dataManageTransaction._id,
                         'cancel',
                         dataManageTransaction.type,
-                        dataManageTransaction.description,
+                        dataManageTransactionNote,
                       )
                     "
                   >
@@ -1754,7 +1765,7 @@
                         dataManageTransaction._id,
                         'save',
                         dataManageTransaction.type,
-                        dataManageTransaction.description,
+                        dataManageTransactionNote,
                       )
                     "
                   >
@@ -1981,6 +1992,7 @@ export default {
       dataHistoryLasted: [],
       dataConfirmApprove: {},
       dataManageTransaction: {},
+      dataManageTransactionNote: '',
 
       // list of select elements
       optWebAgent: [],
@@ -2409,6 +2421,7 @@ export default {
         })
     },
     async showManageTransaction(_id, _type) {
+      this.dataManageTransactionNote = ''
       await this.$http
         .post('panel/historybyId', {
           doc_id: _id,
