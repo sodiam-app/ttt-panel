@@ -103,6 +103,7 @@ import {
   cilTerminal,
   cilSmilePlus,
   cilPowerStandby,
+  cilBalanceScale,
 } from '@coreui/icons'
 
 export const iconsSet = Object.assign(
@@ -208,6 +209,7 @@ export const iconsSet = Object.assign(
     cilTerminal,
     cilSmilePlus,
     cilPowerStandby,
+    cilBalanceScale,
   },
   {
     cifUs,

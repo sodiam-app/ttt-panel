@@ -15,6 +15,12 @@ export default [
     to: '/banking/transaction',
     icon: 'cil-institution',
   },
+  {
+    component: 'CNavItem',
+    name: 'คืนยอดเสีย',
+    to: '/banking/return-credit',
+    icon: 'cil-balance-scale',
+  },
   // {
   //   component: 'CNavItem',
   //   name: 'โอนมือ',

@@ -400,43 +400,6 @@
                       </CRow>
                     </CTableDataCell>
                     <CTableDataCell>{{ history.web_prefix }}</CTableDataCell>
-                    <!-- <CTableDataCell class="text-center">
-                      <CButton
-                        v-if="!history.Checked"
-                        color="warning"
-                        variant="outline"
-                        size="sm"
-                        shape="rounded-pill"
-                        @click.prevent="
-                          submitTransactionStatus(
-                            history._id,
-                            'check',
-                            history.type,
-                          )
-                        "
-                      >
-                        <CIcon :icon="ic.cilCircle" size="sm" />
-                        <div class="lh-1 mb-1">
-                          <small>เช็ค</small>
-                        </div>
-                      </CButton>
-                      <div v-else class="align-items-center">
-                        <CAvatar
-                          :src="
-                            getImgAvatar(
-                              history.Checked.checker_role,
-                              history.Checked.checker_avatar,
-                            )
-                          "
-                          size="sm"
-                          status="success"
-                          class="mb-1"
-                        />
-                        <CBadge color="dark" shape="rounded-pill">
-                          {{ history.Checked.checker_username }}
-                        </CBadge>
-                      </div>
-                    </CTableDataCell> -->
                     <CTableDataCell>
                       <div v-if="!checkLockedTransac(history.lock)">
                         <div class="d-inline-flex align-items-center">
@@ -1547,6 +1510,7 @@
                     dataConfirmApprove._id,
                     'approve',
                     dataConfirmApprove.type,
+                    dataConfirmApprove.description,
                   )
                 "
               >
@@ -1746,21 +1710,6 @@
               <div class="d-flex justify-content-between">
                 <!-- start -->
                 <div>
-                  <!-- <CButton
-                size="sm"
-                color="warning"
-                class="ms-1 text-light"
-                @click="
-                  submitTransactionStatus(
-                    dataManageTransaction._id,
-                    'check',
-                    dataManageTransaction.type,
-                  )
-                "
-              >
-                <CIcon :icon="ic.cilPencil" />
-                เช็ค
-              </CButton> -->
                   <CButton
                     size="sm"
                     color="success"
@@ -1770,6 +1719,7 @@
                         dataManageTransaction._id,
                         'approve',
                         dataManageTransaction.type,
+                        dataManageTransaction.description,
                       )
                     "
                   >
@@ -1785,6 +1735,7 @@
                         dataManageTransaction._id,
                         'cancel',
                         dataManageTransaction.type,
+                        dataManageTransaction.description,
                       )
                     "
                   >
@@ -1803,6 +1754,7 @@
                         dataManageTransaction._id,
                         'save',
                         dataManageTransaction.type,
+                        dataManageTransaction.description,
                       )
                     "
                   >
@@ -1818,6 +1770,7 @@
                         dataManageTransaction._id,
                         'close',
                         dataManageTransaction.type,
+                        '',
                       )
                     "
                   >
@@ -2385,24 +2338,14 @@ export default {
           console.log('call api - panel/historylasted : error' + error)
         })
     },
-    async submitApprove(_id, _checked, _type) {
+    async submitApprove(_id, _checked, _type, _description) {
       // ไม่ได้ใช้งานแล้วเนื่องจากมีการตัดเรื่องการ check ออก
       if (_checked == null) {
-        // this.dataHistory.forEach((value) => {
-        //   if (value._id == _id) {
-        //     this.dataConfirmApprove = value
-        //     // this.submitTransactionStatus(value._id, 'approve', value.type)
-        //     this.mdConfirmApprove = true
-        //     return null
-        //   }
-        // })
         let _isfound = false
         for (var val in this.dataHistory) {
           if (this.dataHistory[val]._id == _id) {
             console.log(this.dataHistory[val]._id)
             this.dataConfirmApprove = this.dataHistory[val]
-            // this.submitTransactionStatus(value._id, 'approve', value.type)
-            this.mdConfirmApprove = true
             this.errApproveVisible = false
             this.errApproveMessage = ''
             _isfound = true
@@ -2415,16 +2358,17 @@ export default {
           this.errApproveMessage = 'ไม่พบรายการนี้ในระบบ'
         }
       } else {
-        this.submitTransactionStatus(_id, 'approve', _type)
+        this.submitTransactionStatus(_id, 'approve', _type, _description)
       }
     },
-    async submitTransactionStatus(_id, _status, _type) {
+    async submitTransactionStatus(_id, _status, _type, _description) {
       // Check, Approve, Cancel, Close
       await this.$http
         .post('panel/updatetransaction', {
           doc_id: _id,
           status: _status,
           type: _type,
+          description: _description,
         })
         .then((response) => {
           if (response.data.status == 200) {

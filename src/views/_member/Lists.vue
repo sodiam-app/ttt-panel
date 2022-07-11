@@ -1,7 +1,7 @@
 <template>
   <div>
     <CCard>
-      <CCardHeader component="h5">
+      <CCardHeader component="h5" class="py-0">
         <CRow class="my-2">
           <CCol class="mt-1">
             <strong class="align-middle">

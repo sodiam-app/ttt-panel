@@ -44,6 +44,12 @@ const routes = [
             component: () => import('@/views/_banking/Transfer.vue'),
             meta: { requiresAuth: true },
           },
+          {
+            path: '/banking/return-credit',
+            name: 'Return Credit',
+            component: () => import('@/views/_banking/ReturnCredit.vue'),
+            meta: { requiresAuth: true },
+          },
         ],
       },
       {
