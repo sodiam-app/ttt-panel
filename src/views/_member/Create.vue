@@ -554,14 +554,13 @@
                         <label for="cPhone" class="form-label mb-0">
                           เบอร์ติดต่อ
                         </label>
-                        <CInputGroup>
+                        <CInputGroup class="has-validation">
                           <CInputGroupText id="basic-cPhone">
                             <CIcon :icon="ic.cilPhone" />
                           </CInputGroupText>
                           <CFormInput
                             id="cPhone"
                             aria-label="เบอร์โทรลูกค้า"
-                            aria-describedby="basic-cPhone"
                             v-model="dataMember.mobile_number"
                             feedbackInvalid="กรุณากรอกข้อมูลเบอร์ให้ถูกต้อง"
                             :invalid="v$.dataMember.mobile_number.$error"
@@ -585,7 +584,7 @@
                             <small class="text-muted"> (Line ID) </small>
                           </small>
                         </label>
-                        <CInputGroup>
+                        <CInputGroup class="has-validation">
                           <CInputGroupText>
                             <CIcon :icon="ic.cibLine" />
                           </CInputGroupText>
@@ -594,6 +593,16 @@
                             placeholder="cus.id.xxx"
                             aria-label="cus.id.xxx"
                             v-model="dataMember.line_id"
+                            feedbackInvalid="กรุณากรอกข้อมูลให้ถูกต้อง"
+                            :invalid="v$.dataMember.line_id.$error"
+                            @input="v$.dataMember.line_id.$touch()"
+                            @blur="v$.dataMember.line_id.$touch()"
+                            :class="{
+                              'is-invalid': v$.dataMember.line_id.$error,
+                              'is-valid':
+                                !v$.dataMember.line_id.$error &&
+                                validatedCreate,
+                            }"
                           />
                           <!-- <CInputGroupText id="basic-LinkLineID">
                               <CIcon :icon="ic.cilLink" />
@@ -693,7 +702,7 @@ import {
   minLength,
   maxLength,
 } from '@vuelidate/validators'
-import { validateAlphabet } from '../../validations/validation'
+import { validateAlphabet, validateLineID } from '../../validations/validation'
 
 export default {
   name: 'CreateMember',
@@ -1146,7 +1155,7 @@ export default {
           minLength: minLength(4),
           maxLength: maxLength(4),
         },
-        line_id: {},
+        line_id: { validateLineID },
         name: { required, validateAlphabet },
         surename: { required, validateAlphabet },
         birthday: {},
