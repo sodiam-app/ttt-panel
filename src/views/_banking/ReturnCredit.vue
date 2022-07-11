@@ -22,7 +22,7 @@
           <div class="table-responsive">
             <CTable hover>
               <CTableHead align="middle">
-                <CTableRow align="top">
+                <CTableRow align="middle">
                   <CTableHeaderCell
                     scope="col"
                     rowspan="2"
@@ -126,6 +126,32 @@
       </CCardBody>
     </CCard>
   </div>
+  <CModal
+    backdrop="static"
+    :visible="mdDemo"
+    @close="
+      () => {
+        mdDemo = false
+      }
+    "
+  >
+    <CModalHeader>
+      <CModalTitle>แจ้งเตือนตัวใหญ่</CModalTitle>
+    </CModalHeader>
+    <CModalBody>อยู่ระหว่างการพัฒนา (ยังไม่สามารถใช้งานได้)</CModalBody>
+    <CModalFooter>
+      <CButton
+        color="secondary"
+        @click="
+          () => {
+            mdDemo = false
+          }
+        "
+      >
+        Close
+      </CButton>
+    </CModalFooter>
+  </CModal>
 </template>
 <script>
 import { CIcon } from '@coreui/icons-vue'
@@ -138,12 +164,16 @@ export default {
   },
   data() {
     return {
+      mdDemo: false,
       // icons
       ic: {
         cilLoopCircular,
         cilPlaylistAdd,
       },
     }
+  },
+  mounted() {
+    this.mdDemo = true
   },
 }
 </script>
