@@ -486,6 +486,7 @@
     @close="
       () => {
         mdDuplicateFile = false
+        this.$refs.myFile.value = null
       }
     "
   >
@@ -515,6 +516,7 @@
             () => {
               csvfileResult = null
               mdDuplicateFile = false
+              this.$refs.myFile.value = null
             }
           "
         >
