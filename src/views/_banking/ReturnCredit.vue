@@ -774,9 +774,9 @@ export default {
           this.csvfileResult[i].checked == true
         ) {
           let _type = ''
-          if (this.csvfileResult[i] == '1') {
+          if (this.csvfileResult[i].type == '1') {
             _type = 'cash'
-          } else if (this.csvfileResult[i] == '2') {
+          } else if (this.csvfileResult[i].type == '2') {
             _type = 'bonus'
           }
 
@@ -1049,7 +1049,9 @@ export default {
           this.mdViewImport = true
           console.log(result)
         }
+        // this.$emit('input', file[0])
       } else {
+        this.mdDuplicateFile = true
         this.dupFile = false
       }
     },
