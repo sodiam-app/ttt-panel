@@ -908,151 +908,163 @@ export default {
     },
 
     pickFile(_confirmed) {
-      this.mdDuplicateFile = false
-      this.csvfileResult = null
-      this.csvfileAmountTotal = 0
-      this.csvfileName = ''
-      this.dupFile = _confirmed
-      this.csvFailAllTrans = false
+      if (this.$refs.myFile.value) {
+        this.mdDuplicateFile = false
+        this.csvfileResult = null
+        this.csvfileAmountTotal = 0
+        this.csvfileName = ''
+        this.dupFile = _confirmed
+        this.csvFailAllTrans = false
 
-      let isRead = true
-      if (this.dupFile == true) {
-        isRead = true
-      } else {
-        let _filename = this.$refs.myFile.files[0].name
-        for (let i = 0; i < this.listDataWinLoss.length; i++) {
-          if (_filename == this.listDataWinLoss[i].file_name) {
-            isRead = false
-            break
+        let isRead = true
+        if (this.dupFile == true) {
+          isRead = true
+        } else {
+          let _filename = this.$refs.myFile.files[0].name
+          for (let i = 0; i < this.listDataWinLoss.length; i++) {
+            if (_filename == this.listDataWinLoss[i].file_name) {
+              isRead = false
+              break
+            }
           }
         }
-      }
 
-      if (isRead == true) {
-        this.dupFile = false
-        // Read file
-        let lines = ''
-        let currentline = ''
-        let csv = ''
-        let header = ''
-        let result = []
-        let reader = new FileReader()
-        this.csvfileName = this.$refs.myFile.files[0].name
-        reader.readAsText(this.$refs.myFile.files[0])
-        reader.onload = (e) => {
-          csv = e.target.result
-          lines = csv.split('\r' + '\n')
-          // header = lines[0].split(',')
-          header = [
-            'row',
-            'username',
-            'amount',
-            'type',
-            'description',
-            'no',
-            'checked',
-            'validation',
-          ]
-          let _failAllTrans = 0
-          let _alltransaction = 0
-          for (var i = 1; i < lines.length; i++) {
-            if (!lines[i]) continue
-            let obj = {}
-            currentline = lines[i]
-            var re = /"/g
-            currentline = re[Symbol.replace](currentline, '')
-            currentline = currentline.split(',')
-            currentline.push(i)
-            _alltransaction += 1
+        if (isRead == true) {
+          this.dupFile = false
+          // Read file
+          let lines = ''
+          let currentline = ''
+          let csv = ''
+          let header = ''
+          let result = []
+          this.csvfileName = this.$refs.myFile.files[0].name
 
-            let _valid = true
-            let _checked = true
-            for (var j = 0; j < header.length; j++) {
-              if (
-                j == 0 ||
-                j == 1 ||
-                j == 2 ||
-                j == 3 ||
-                j == 4 ||
-                j == 5 ||
-                j == 6 ||
-                j == 7
-              ) {
-                let head = header[j].trim()
-                let value = ''
+          let input = this.$refs.myFile
 
-                // validations
-                if (j == 1) {
-                  // Customer name
-                  if (currentline[j] == '') {
-                    _checked = false
-                    _valid = false
+          // clear file selected
+          let file = input.files
+
+          if (file && file[0]) {
+            // reader.readAsText(this.$refs.myFile.files[0])
+            let reader = new FileReader()
+            reader.onload = (e) => {
+              csv = e.target.result
+              lines = csv.split('\r' + '\n')
+              // header = lines[0].split(',')
+              header = [
+                'row',
+                'username',
+                'amount',
+                'type',
+                'description',
+                'no',
+                'checked',
+                'validation',
+              ]
+              let _failAllTrans = 0
+              let _alltransaction = 0
+              for (var i = 1; i < lines.length; i++) {
+                if (!lines[i]) continue
+                let obj = {}
+                currentline = lines[i]
+                var re = /"/g
+                currentline = re[Symbol.replace](currentline, '')
+                currentline = currentline.split(',')
+                currentline.push(i)
+                _alltransaction += 1
+
+                let _valid = true
+                let _checked = true
+                for (var j = 0; j < header.length; j++) {
+                  if (
+                    j == 0 ||
+                    j == 1 ||
+                    j == 2 ||
+                    j == 3 ||
+                    j == 4 ||
+                    j == 5 ||
+                    j == 6 ||
+                    j == 7
+                  ) {
+                    let head = header[j].trim()
+                    let value = ''
+
+                    // validations
+                    if (j == 1) {
+                      // Customer name
+                      if (currentline[j] == '') {
+                        _checked = false
+                        _valid = false
+                      }
+                    }
+                    if (j == 2) {
+                      // Amount > 0
+                      let _number = Number(currentline[j])
+                      if (_number <= 0) {
+                        _checked = false
+                        _valid = false
+                      }
+                    }
+                    if (j == 3) {
+                      // Type (Cash / Bonus)
+                      if (currentline[j] != '2') {
+                        _checked = false
+                        _valid = false
+                      }
+                    }
+                    if (j == 4) {
+                      // Description
+                      if (currentline[j] == '') {
+                        _checked = false
+                        _valid = false
+                      }
+                    }
+                    // -----
+
+                    // final loop
+                    if (j == 6) {
+                      currentline.push(_checked)
+                    }
+                    if (j == 7) {
+                      currentline.push(_valid)
+                    }
+
+                    if (typeof currentline[j] == 'string') {
+                      value = currentline[j].trim()
+                    } else {
+                      value = currentline[j]
+                    }
+                    if (j == 2) {
+                      this.csvfileAmountTotal += Number(currentline[j])
+                    }
+                    obj[head] = value
                   }
                 }
-                if (j == 2) {
-                  // Amount > 0
-                  let _number = Number(currentline[j])
-                  if (_number <= 0) {
-                    _checked = false
-                    _valid = false
-                  }
+                if (_valid == false) {
+                  _failAllTrans += 1
                 }
-                if (j == 3) {
-                  // Type (Cash / Bonus)
-                  if (currentline[j] != '2') {
-                    _checked = false
-                    _valid = false
-                  }
-                }
-                if (j == 4) {
-                  // Description
-                  if (currentline[j] == '') {
-                    _checked = false
-                    _valid = false
-                  }
-                }
-                // -----
-
-                // final loop
-                if (j == 6) {
-                  currentline.push(_checked)
-                }
-                if (j == 7) {
-                  currentline.push(_valid)
-                }
-
-                if (typeof currentline[j] == 'string') {
-                  value = currentline[j].trim()
-                } else {
-                  value = currentline[j]
-                }
-                if (j == 2) {
-                  this.csvfileAmountTotal += Number(currentline[j])
-                }
-                obj[head] = value
+                result.push(obj)
               }
-            }
-            if (_valid == false) {
-              _failAllTrans += 1
-            }
-            result.push(obj)
-          }
-          // result = JSON.stringify(result)
-          this.csvfileResult = result
+              // result = JSON.stringify(result)
+              this.csvfileResult = result
 
-          // check fail all transaction
-          if (_failAllTrans == _alltransaction) {
-            this.csvFailAllTrans = true
-          }
+              // check fail all transaction
+              if (_failAllTrans == _alltransaction) {
+                this.csvFailAllTrans = true
+              }
 
-          // show import modal
-          this.mdViewImport = true
-          console.log(result)
+              // show import modal
+              this.mdViewImport = true
+              console.log(result)
+            }
+            reader.readAsText(file[0])
+            this.$emit('input', file[0])
+            this.$refs.myFile.value = null
+          }
+        } else {
+          this.mdDuplicateFile = true
+          this.dupFile = false
         }
-        // this.$emit('input', file[0])
-      } else {
-        this.mdDuplicateFile = true
-        this.dupFile = false
       }
     },
   },
