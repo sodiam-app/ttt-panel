@@ -9,108 +9,180 @@
               คืนยอดเสีย
             </strong>
           </div>
-          <div>
-            <CButton color="info">
+          <div class="d-inline-flex">
+            <CFormSelect
+              class="me-1"
+              style="width: 150px"
+              v-if="optWebAgent.length > 1"
+              @change="onchgPrefix($event.target.value)"
+            >
+              <option
+                v-for="option in optWebAgent"
+                :key="option._id"
+                :value="option._id"
+              >
+                {{ option.name }}
+              </option>
+            </CFormSelect>
+            <CButton color="primary" size="sm" @click="$refs.myFile.click()">
               <CIcon :icon="ic.cilPlaylistAdd" />
-              สร้างรายการ
+              สร้าง
             </CButton>
+            <input
+              style="display: none"
+              type="file"
+              accept=".csv"
+              class="form-control form-control-sm"
+              ref="myFile"
+              @change="pickFile(false)"
+            />
           </div>
         </div>
       </CCardHeader>
       <CCardBody class="p-0">
-        <CCardText>
+        <CCardText class="small lh-sm">
           <div class="table-responsive">
-            <CTable hover>
+            <CTable hover small bordered>
               <CTableHead align="middle">
-                <CTableRow align="middle">
-                  <CTableHeaderCell
-                    scope="col"
-                    rowspan="2"
-                    class="border-1 border-top-0 border-start-0"
-                  >
-                    ลำดับ
+                <CTableRow align="middle" class="border-top-0">
+                  <CTableHeaderCell scope="col" rowspan="2">
+                    #
                   </CTableHeaderCell>
-                  <CTableHeaderCell
-                    scope="col"
-                    rowspan="2"
-                    class="border-1 border-top-0"
-                  >
+                  <CTableHeaderCell scope="col" rowspan="2">
                     ชื่อไฟล์
                   </CTableHeaderCell>
-                  <CTableHeaderCell
-                    scope="col"
-                    colspan="4"
-                    class="border-1 border-top-0"
-                  >
+                  <CTableHeaderCell scope="col" colspan="4">
                     สถานะ
                   </CTableHeaderCell>
-                  <CTableHeaderCell
-                    scope="col"
-                    rowspan="2"
-                    class="border-1 border-top-0 border-end-0"
-                  >
-                    วันที่ทำรายการ
+                  <CTableHeaderCell scope="col" colspan="3">
+                    ยอดเงิน
+                  </CTableHeaderCell>
+                  <CTableHeaderCell scope="col" rowspan="2">
+                    โดย
+                  </CTableHeaderCell>
+                  <CTableHeaderCell scope="col" rowspan="2">
+                    วันที่
+                  </CTableHeaderCell>
+                  <CTableHeaderCell scope="col" rowspan="2">
+                    จัดการ
                   </CTableHeaderCell>
                 </CTableRow>
                 <CTableRow>
-                  <!-- <CTableHeaderCell scope="col">ลำดับ</CTableHeaderCell> -->
-                  <!-- <CTableHeaderCell scope="col">ชื่อไฟล์</CTableHeaderCell> -->
-                  <CTableHeaderCell scope="col" class="border-1">
-                    สำเร็จ
+                  <CTableHeaderCell scope="col"> สำเร็จ </CTableHeaderCell>
+                  <CTableHeaderCell scope="col"> ไม่สำเร็จ </CTableHeaderCell>
+                  <CTableHeaderCell scope="col"> รอ </CTableHeaderCell>
+                  <CTableHeaderCell scope="col"> ทั้งหมด </CTableHeaderCell>
+                  <CTableHeaderCell scope="col"> Cash </CTableHeaderCell>
+                  <CTableHeaderCell scope="col"> Bonus </CTableHeaderCell>
+                  <CTableHeaderCell scope="col" class="text-end">
+                    รวม
                   </CTableHeaderCell>
-                  <CTableHeaderCell scope="col" class="border-1">
-                    ไม่สำเร็จ
-                  </CTableHeaderCell>
-                  <CTableHeaderCell scope="col" class="border-1">
-                    กำลังดำเนินการ
-                  </CTableHeaderCell>
-                  <CTableHeaderCell scope="col" class="border-1">
-                    ทั้งหมด
-                  </CTableHeaderCell>
-                  <!-- <CTableHeaderCell scope="col">วันที่ทำรายการ</CTableHeaderCell> -->
                 </CTableRow>
               </CTableHead>
               <CTableBody>
-                <CTableRow>
-                  <CTableHeaderCell scope="row" class="text-center">
-                    1.
-                  </CTableHeaderCell>
-                  <CTableDataCell> loss-2022-07-11.xlsx </CTableDataCell>
-                  <CTableDataCell class="text-center"> 100 </CTableDataCell>
-                  <CTableDataCell class="text-center"> 0 </CTableDataCell>
-                  <CTableDataCell class="text-center"> 0 </CTableDataCell>
-                  <CTableDataCell class="text-center"> 100 </CTableDataCell>
-                  <CTableDataCell class="text-center">
-                    11/07/2022 20:59:20
+                <CTableRow
+                  align="middle"
+                  v-for="(winloss, index) in listDataWinLoss"
+                  :key="winloss.id"
+                >
+                  <CTableDataCell scope="row" class="text-center">
+                    {{ index + 1 }}.
                   </CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell scope="row" class="text-center">
-                    2.
-                  </CTableHeaderCell>
-                  <CTableDataCell>คืนยอดเสียลูกค้า11022022.xlsx</CTableDataCell>
-                  <CTableDataCell class="text-center">60</CTableDataCell>
-                  <CTableDataCell class="text-center">5</CTableDataCell>
-                  <CTableDataCell class="text-center">3</CTableDataCell>
-                  <CTableDataCell class="text-center">68</CTableDataCell>
-                  <CTableDataCell class="text-center">
-                    11/07/2022 06:49:11
+                  <CTableDataCell class="fw-semibold">
+                    {{ winloss.file_name }}
+                    <CSpinner
+                      v-show="winloss.pending"
+                      color="dark"
+                      size="sm"
+                      style="width: 0.8rem; height: 0.8rem"
+                    />
                   </CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell scope="row" class="text-center">
-                    3.
-                  </CTableHeaderCell>
-                  <CTableDataCell>11-07-2022รายการคืนยอด.xlsx</CTableDataCell>
-                  <CTableDataCell class="text-center">99</CTableDataCell>
-                  <CTableDataCell class="text-center">0</CTableDataCell>
-                  <CTableDataCell class="text-center">1</CTableDataCell>
-                  <CTableDataCell class="text-center">100</CTableDataCell>
+                  <CTableDataCell
+                    class="text-center"
+                    :color="winloss.success ? 'success' : 'light'"
+                  >
+                    {{ winloss.success }}
+                  </CTableDataCell>
+                  <CTableDataCell
+                    class="text-center"
+                    :color="winloss.fail ? 'danger' : 'light'"
+                    :class="winloss.fail ? 'text-danger' : ''"
+                  >
+                    {{ winloss.fail }}
+                  </CTableDataCell>
+                  <CTableDataCell
+                    class="text-center"
+                    :color="winloss.pending ? 'warning' : 'light'"
+                  >
+                    {{ winloss.pending }}
+                  </CTableDataCell>
+                  <CTableDataCell
+                    class="text-center fw-bolder"
+                    color="secondary"
+                  >
+                    {{ winloss.all }}
+                  </CTableDataCell>
                   <CTableDataCell class="text-center">
-                    09/06/2022 15:07:43
+                    {{ convertAmount2Degit(winloss.amountCash) }}
+                  </CTableDataCell>
+                  <CTableDataCell class="text-center">
+                    {{ convertAmount2Degit(winloss.amountBonus) }}
+                  </CTableDataCell>
+                  <CTableDataCell class="text-end fw-bolder" color="primary">
+                    {{
+                      convertAmount2Degit(
+                        Number(winloss.amountCash) +
+                          Number(winloss.amountBonus),
+                      )
+                    }}
+                  </CTableDataCell>
+                  <CTableDataCell class="text-center">
+                    <CBadge color="dark" shape="rounded-pill">
+                      {{ winloss.cr_by }}
+                    </CBadge>
+                  </CTableDataCell>
+                  <CTableDataCell class="text-center">
+                    {{ convertDate(winloss.cr_date) }}
+                    {{ convertTime(winloss.cr_date) }}
+                  </CTableDataCell>
+                  <CTableDataCell class="text-center">
+                    <CButton
+                      color="info"
+                      variant="outline"
+                      size="sm"
+                      shape="rounded-pill"
+                      style="padding: 0.1em 0.5em"
+                      @click="viewWinLossByID(winloss._id)"
+                    >
+                      <CIcon :icon="ic.cilSearch" size="sm" />
+                    </CButton>
                   </CTableDataCell>
                 </CTableRow>
               </CTableBody>
+              <CTableHead>
+                <CTableRow class="fs-6">
+                  <CTableDataCell colspan="6" class="text-end fw-bolder">
+                    รวม
+                  </CTableDataCell>
+                  <CTableDataCell class="text-center fw-bolder">
+                    {{ convertAmount2Degit(totalBonusWinLoss) }}
+                  </CTableDataCell>
+                  <CTableDataCell class="text-center fw-bolder">
+                    {{ convertAmount2Degit(totalCashWinLoss) }}
+                  </CTableDataCell>
+                  <CTableDataCell
+                    class="text-end fw-bolder fs-5 text-decoration-underline"
+                  >
+                    {{ convertAmount2Degit(totalWinLoss) }}
+                  </CTableDataCell>
+                  <CTableDataCell colspan="3"></CTableDataCell>
+                </CTableRow>
+                <CTableRow class="fs-6" v-show="listDataWinLoss == 0">
+                  <CTableDataCell colspan="12" class="text-center fw-bolder">
+                    ไม่พบข้อมูลในระบบ
+                  </CTableDataCell>
+                </CTableRow>
+              </CTableHead>
             </CTable>
           </div>
         </CCardText>
@@ -126,6 +198,334 @@
       </CCardBody>
     </CCard>
   </div>
+
+  <!-- --- -->
+  <!-- Shown Win Loss by file -->
+  <!-- --- -->
+  <CModal
+    size="xl"
+    backdrop="static"
+    :visible="mdView"
+    @close="
+      () => {
+        mdView = false
+      }
+    "
+  >
+    <CModalHeader class="pt-3 pb-2">
+      <CModalTitle class="h5">
+        <CIcon :icon="ic.cilBook" size="lg" />
+        รายการคืนยอดเสีย
+      </CModalTitle>
+    </CModalHeader>
+    <CModalBody class="small">
+      <div class="text-end mb-1">
+        <CBadge color="primary" class="ms-1">
+          ทั้งหมด : {{ dataWinLossByIDSummary.all }}
+        </CBadge>
+        <CBadge
+          color="warning"
+          class="ms-1"
+          v-show="dataWinLossByIDSummary.pending > 0"
+        >
+          รอดำเนินการ : {{ dataWinLossByIDSummary.pending }}
+        </CBadge>
+        <CBadge color="success" class="ms-1">
+          สำเร็จ : {{ dataWinLossByIDSummary.success }}
+        </CBadge>
+        <CBadge color="danger" class="ms-1">
+          ไม่สำเร็จ : {{ dataWinLossByIDSummary.fail }}
+        </CBadge>
+        <CBadge color="dark" shape="rounded-pill" class="ms-1">
+          Cash : {{ dataWinLossByIDSummary.amountCash }}
+        </CBadge>
+        <CBadge color="info" shape="rounded-pill" class="ms-1">
+          Bonus : {{ dataWinLossByIDSummary.amountBonus }}
+        </CBadge>
+      </div>
+      <div class="table-responsive">
+        <CTable small hover bordered>
+          <CTableHead color="secondary">
+            <CTableRow>
+              <CTableHeaderCell scope="col" colspan="6" class="text-center">
+                <CIcon :icon="ic.cilDescription" />
+                {{ dataWinLossByIDSummary.file_name }}
+                <span class="small text-muted fw-lighter">
+                  <small>
+                    ({{ convertDate(dataWinLossByIDSummary.cr_date) }}
+                    {{ convertTime(dataWinLossByIDSummary.cr_date) }})
+                  </small>
+                </span>
+              </CTableHeaderCell>
+            </CTableRow>
+            <CTableRow>
+              <CTableHeaderCell scope="col" class="text-center">
+                #
+              </CTableHeaderCell>
+              <CTableHeaderCell scope="col">ยูสลูกค้า</CTableHeaderCell>
+              <CTableHeaderCell scope="col" class="text-center">
+                ประเภท
+              </CTableHeaderCell>
+              <CTableHeaderCell scope="col" class="text-end">
+                จำนวนเงิน
+              </CTableHeaderCell>
+              <CTableHeaderCell scope="col" class="text-center">
+                สถานะ
+              </CTableHeaderCell>
+              <CTableHeaderCell scope="col">หมายเหตุ</CTableHeaderCell>
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
+            <CTableRow
+              v-for="(transac, index) in dataWinLossByIDTransaction"
+              :key="transac.id"
+            >
+              <CTableHeaderCell scope="row" class="text-center">
+                {{ index + 1 }}.
+              </CTableHeaderCell>
+              <CTableDataCell>{{ transac.username }}</CTableDataCell>
+              <CTableDataCell class="text-center">
+                <CBadge
+                  shape="rounded-pill"
+                  class="ms-1"
+                  :color="convertTypeColor(transac.type)"
+                >
+                  {{ transac.type }}
+                </CBadge>
+              </CTableDataCell>
+              <CTableDataCell class="text-end">
+                {{ convertAmount2Degit(transac.amount) }}
+              </CTableDataCell>
+              <CTableDataCell class="text-center">
+                <CBadge :color="convertTransacStatusColor(transac.status)">
+                  {{ transac.status }}
+                </CBadge>
+              </CTableDataCell>
+              <CTableDataCell>
+                <div v-if="typeof transac.description === 'object'">
+                  <div v-for="note in transac.description" :key="note._id">
+                    <CBadge
+                      :color="convertUserNoteColor(note.username)"
+                      shape="rounded-pill"
+                    >
+                      {{ note.username }}
+                    </CBadge>
+                    : {{ note.note }}
+                  </div>
+                </div>
+                <div v-else>
+                  {{ transac.description }}
+                </div>
+              </CTableDataCell>
+            </CTableRow>
+          </CTableBody>
+          <CTableHead class="secondary">
+            <CTableRow class="fs-6" color="secondary">
+              <CTableDataCell colspan="3" class="text-end fw-bolder">
+                รวม
+              </CTableDataCell>
+              <CTableDataCell
+                class="text-end fw-bolder text-decoration-underline"
+              >
+                {{ convertAmount2Degit(totalWinLossByID) }}
+              </CTableDataCell>
+              <CTableDataCell colspan="2"></CTableDataCell>
+            </CTableRow>
+            <CTableRow class="fs-6" v-show="dataWinLossByIDTransaction == 0">
+              <CTableDataCell colspan="6" class="text-center fw-bolder">
+                ไม่พบข้อมูลในระบบ
+              </CTableDataCell>
+            </CTableRow>
+          </CTableHead>
+        </CTable>
+      </div>
+    </CModalBody>
+  </CModal>
+
+  <!-- ----- -->
+  <!-- Shown import CSV file file -->
+  <!-- ------ -->
+  <CModal
+    size="xl"
+    backdrop="static"
+    :visible="mdViewImport"
+    @close="
+      () => {
+        mdViewImport = false
+      }
+    "
+  >
+    <CModalHeader class="pt-3 pb-2">
+      <CModalTitle class="h5">
+        <CIcon :icon="ic.cilNoteAdd" size="lg" />
+        รายการนำเข้า
+      </CModalTitle>
+    </CModalHeader>
+    <CModalBody>
+      <div class="table-responsive">
+        <CTable small hover bordered>
+          <CTableHead color="secondary">
+            <CTableRow>
+              <CTableHeaderCell scope="col" colspan="6" class="text-center">
+                <CIcon :icon="ic.cilNewspaper" size="lg" />
+                {{ csvfileName }}
+              </CTableHeaderCell>
+            </CTableRow>
+            <CTableRow>
+              <CTableHeaderCell scope="col" class="text-center">
+                #
+              </CTableHeaderCell>
+              <CTableHeaderCell scope="col" class="text-center">
+                ลำดับ
+              </CTableHeaderCell>
+              <CTableHeaderCell scope="col">ยูสลูกค้า</CTableHeaderCell>
+              <CTableHeaderCell scope="col" class="text-center">
+                ประเภท
+              </CTableHeaderCell>
+              <CTableHeaderCell scope="col" class="text-end">
+                จำนวนเงิน
+              </CTableHeaderCell>
+              <CTableHeaderCell scope="col">หมายเหตุ</CTableHeaderCell>
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
+            <CTableRow
+              v-for="csv in csvfileResult"
+              :key="csv._id"
+              :color="!csv.validation ? 'danger' : 'light'"
+              class="text-danger"
+            >
+              <CTableHeaderCell scope="row" class="text-center">
+                <CFormCheck
+                  id="flexCheckDefault"
+                  v-model="csv.checked"
+                  :disabled="!csv.validation"
+                />
+              </CTableHeaderCell>
+              <CTableHeaderCell scope="row" class="text-center">
+                {{ csv.no }}.
+              </CTableHeaderCell>
+              <CTableDataCell>{{ csv.username }}</CTableDataCell>
+              <CTableDataCell class="text-center">
+                <CBadge
+                  :color="convertTypeAmountColor(csv.type)"
+                  shape="rounded-pill"
+                >
+                  {{ convertTypeAmount(csv.type) }}
+                </CBadge>
+              </CTableDataCell>
+              <CTableDataCell class="text-end">
+                {{ convertAmount2Degit(csv.amount) }}
+              </CTableDataCell>
+              <CTableDataCell>
+                <span class="fw-lighter"> {{ csv.description }} </span>
+              </CTableDataCell>
+            </CTableRow>
+          </CTableBody>
+          <CTableHead class="secondary">
+            <CTableRow
+              class="fs-6"
+              color="secondary"
+              v-show="csvfileResult.length > 0"
+            >
+              <CTableDataCell colspan="4" class="text-end fw-bolder">
+                รวม
+              </CTableDataCell>
+              <CTableDataCell
+                class="text-end fw-semibold text-decoration-underline"
+              >
+                {{ convertAmount2Degit(csvfileAmountTotal) }}
+              </CTableDataCell>
+            </CTableRow>
+            <CTableRow class="fs-6" v-show="csvfileResult.length == 0">
+              <CTableDataCell colspan="6" class="text-center fw-bolder">
+                ไม่พบข้อมูลในไฟล์
+              </CTableDataCell>
+            </CTableRow>
+          </CTableHead>
+        </CTable>
+      </div>
+    </CModalBody>
+    <CModalFooter>
+      <CButton
+        color="success"
+        size="sm"
+        v-show="csvfileResult.length > 0 && csvFailAllTrans == false"
+        @click="submitImportWinLoss()"
+      >
+        <CIcon :icon="ic.cilCheckCircle" />
+        ตกลง
+      </CButton>
+      <CButton
+        color="secondary"
+        size="sm"
+        @click="
+          () => {
+            csvfileAmountTotal = 0
+            csvfileName = ''
+            csvfileResult = null
+            csvFailAllTrans = false
+            mdViewImport = false
+          }
+        "
+      >
+        <CIcon :icon="ic.cilXCircle" />
+        ยกเลิก
+      </CButton>
+    </CModalFooter>
+  </CModal>
+
+  <!-- ----- -->
+  <!-- Confirm Duplicate file -->
+  <!-- ------ -->
+  <CModal
+    alignment="center"
+    size="sm"
+    backdrop="static"
+    :visible="mdDuplicateFile"
+    @close="
+      () => {
+        mdDuplicateFile = false
+      }
+    "
+  >
+    <CModalHeader class="pb-2">
+      <CModalTitle>
+        <CIcon size="lg" :icon="ic.cilWarning" />
+        กรุณายืนยัน
+      </CModalTitle>
+    </CModalHeader>
+    <CModalBody>
+      <div>
+        <span
+          >ท่ากำลังดำเนินการอัพโหลดไฟล์ข้อมูลที่มี
+          <span class="text-decoration-underline">"ชื่อไฟล์"</span> ซ้ำ
+          กับที่มีในระบบ, กรุณากดปุ่ม "ยืนยัน" เพื่อดำเนินการต่อ</span
+        >
+      </div>
+      <hr />
+      <div class="d-grid gap-2 d-flex justify-content-center">
+        <CButton color="warning" class="me-2" @click="pickFile(true)">
+          <CIcon :icon="ic.cilCheckCircle" />
+          ยืนยัน
+        </CButton>
+        <CButton
+          color="secondary"
+          @click="
+            () => {
+              csvfileResult = null
+              mdDuplicateFile = false
+            }
+          "
+        >
+          <CIcon :icon="ic.cilXCircle" />
+          ยกเลิก
+        </CButton>
+      </div>
+    </CModalBody>
+  </CModal>
+
+  <!-- Demo -->
   <CModal
     backdrop="static"
     :visible="mdDemo"
@@ -152,10 +552,48 @@
       </CButton>
     </CModalFooter>
   </CModal>
+
+  <!-- Toaster popup -->
+  <CToaster placement="top-end">
+    <CToast
+      v-for="toast in toasts"
+      :key="toast._id"
+      :delay="10000"
+      :class="'bg-' + toast.color + ' border-' + toast.color"
+    >
+      <CToastHeader closeButton>
+        <span class="me-auto fw-bolder fs-5 lh-sm text-dark">
+          <CIcon
+            size="lg"
+            :icon="toast.color == 'success' ? ic.cilThumbUp : ic.cilThumbDown"
+            class="me-1 text-black"
+          />
+          {{ toast.title }}
+        </span>
+        <!-- <small>7 min ago</small> -->
+      </CToastHeader>
+      <CToastBody>
+        {{ toast.content }}
+      </CToastBody>
+    </CToast>
+  </CToaster>
 </template>
 <script>
 import { CIcon } from '@coreui/icons-vue'
-import { cilLoopCircular, cilPlaylistAdd } from '@coreui/icons'
+import {
+  cilLoopCircular,
+  cilPlaylistAdd,
+  cilDescription,
+  cilSearch,
+  cilBook,
+  cilCheckCircle,
+  cilXCircle,
+  cilWarning,
+  cilNoteAdd,
+  cilNewspaper,
+} from '@coreui/icons'
+import { mapActions } from 'vuex'
+import moment from 'moment'
 
 export default {
   name: 'Transection',
@@ -164,16 +602,468 @@ export default {
   },
   data() {
     return {
+      toasts: [],
+
       mdDemo: false,
+      mdView: false,
+      mdDuplicateFile: false,
+      mdViewImport: false,
+      // Data
+      currentWebAgent: '',
+      dataWinLossByIDSummary: {},
+      dataWinLossByIDTransaction: [],
+      totalWinLossByID: 0,
+      listDataWinLoss: [],
+      totalBonusWinLoss: 0,
+      totalCashWinLoss: 0,
+      totalWinLoss: 0,
+      optWebAgent: [],
+      // import file
+      csvfileResult: null,
+      csvfileAmountTotal: 0,
+      csvfileName: 'mockup-demo-001.csv',
+      csvFailAllTrans: false,
+      dupFile: false,
       // icons
       ic: {
         cilLoopCircular,
         cilPlaylistAdd,
+        cilDescription,
+        cilSearch,
+        cilBook,
+        cilCheckCircle,
+        cilXCircle,
+        cilWarning,
+        cilNoteAdd,
+        cilNewspaper,
       },
     }
   },
+  methods: {
+    ...mapActions({
+      tokenExpired: 'auth/tokenExpired',
+    }),
+    createToast(_color, _title, _content) {
+      this.toasts.push({
+        title: _title,
+        content: _content,
+        color: _color,
+      })
+    },
+
+    async getWebPrefixList() {
+      await this.$http
+        .post('panel/getprefix', {})
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.optWebAgent = response.data.result_perfix
+            console.log(this.optWebAgent)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - panel/getprefix : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('call api - panel/getprefix : error' + error)
+        })
+    },
+    async getWinLossList() {
+      this.listDataWinLoss = []
+      this.totalBonusWinLoss = 0
+      this.totalCashWinLoss = 0
+      this.totalWinLoss = 0
+
+      await this.$http
+        .post('panel/getreturnwinloss', {})
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.listDataWinLoss = response.data.result
+            for (let i = 0; i < this.listDataWinLoss.length; i++) {
+              this.totalBonusWinLoss += this.listDataWinLoss[i].amountBonus
+              this.totalCashWinLoss += this.listDataWinLoss[i].amountCash
+              this.totalWinLoss +=
+                this.listDataWinLoss[i].amountCash +
+                this.listDataWinLoss[i].amountBonus
+            }
+            console.log(this.listDataWinLoss)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - panel/getreturnwinloss : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('call api - panel/getreturnwinloss : error' + error)
+        })
+    },
+    async viewWinLossByID(_id) {
+      this.dataWinLossByIDSummary = {}
+      this.dataWinLossByIDTransaction = []
+      this.totalWinLossByID = 0
+
+      await this.$http
+        .post('panel/getreturnwinlossbyid', {
+          file_id: _id,
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.dataWinLossByIDSummary = response.data.summary
+            this.dataWinLossByIDTransaction = response.data.transaction
+            this.totalWinLossByID =
+              this.dataWinLossByIDSummary.amountBonus +
+              this.dataWinLossByIDSummary.amountCash
+            this.mdView = true
+            console.log(this.dataWinLossByIDSummary)
+            console.log(this.dataWinLossByIDTransaction)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            this.createToast(
+              'danger',
+              'การดำเนินการ',
+              'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + response.data.message,
+            )
+            console.log(
+              'call api - panel/getreturnwinlossbyid : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          this.createToast(
+            'danger',
+            'การดำเนินการ',
+            'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + error,
+          )
+          console.log('call api - panel/getreturnwinlossbyid : error' + error)
+        })
+    },
+    async submitImportWinLoss() {
+      let _transactions = []
+      for (let i = 0; i < this.csvfileResult.length; i++) {
+        if (
+          this.csvfileResult[i].validation == true &&
+          this.csvfileResult[i].checked == true
+        ) {
+          let _type = ''
+          if (this.csvfileResult[i] == '1') {
+            _type = 'cash'
+          } else if (this.csvfileResult[i] == '2') {
+            _type = 'bonus'
+          }
+
+          // prepare json
+          let _result = {
+            no: this.csvfileResult[i].no,
+            username: this.csvfileResult[i].username,
+            amount: this.csvfileResult[i].amount,
+            type: _type,
+            description: this.csvfileResult[i].description,
+          }
+          _transactions.push(_result)
+        }
+      }
+      await this.$http
+        .post('panel/returnwinloss', {
+          agent_id: this.currentWebAgent,
+          file_name: this.csvfileName,
+          transaction_file: _transactions,
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.createToast(
+              'success',
+              'การดำเนินการ',
+              'ทำรายการเข้าสู่ระบบเรียบร้อยแล้ว',
+            )
+            this.getWinLossList()
+            this.mdViewImport = false
+            // Resets
+            this.csvFailAllTrans = false
+            this.csvfileAmountTotal = 0
+            this.csvfileName = ''
+            this.csvfileResult = null
+            this.dupFile = false
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            this.createToast(
+              'danger',
+              'การดำเนินการ',
+              'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + response.data.message,
+            )
+            console.log(
+              'call api - panel/returnwinloss : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          this.createToast(
+            'danger',
+            'การดำเนินการ',
+            'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + error,
+          )
+          console.log('call api - panel/returnwinloss : error' + error)
+        })
+    },
+
+    // functions
+    onchgPrefix(_id) {
+      this.currentWebAgent = _id
+      this.getMemberList(_id)
+    },
+    convertTransacStatusColor(_val) {
+      if (_val == 'success') {
+        return 'success'
+      } else if (_val == 'failed') {
+        return 'danger'
+      } else if (_val == 'processing') {
+        return 'warning'
+      } else {
+        return 'light'
+      }
+    },
+    convertTypeColor(_val) {
+      if (_val == 'bonus' || _val == 'Bonus') {
+        return 'info'
+      } else if (_val == 'cash' || _val == 'Cash') {
+        return 'dark'
+      } else {
+        return 'warning'
+      }
+    },
+    convertUserNoteColor(value) {
+      if (!value) return 'danger'
+      const _val = value.toString().toLowerCase()
+      if (_val == 'system') {
+        return 'secondary'
+      } else {
+        return 'dark'
+      }
+    },
+    convertDate(_val) {
+      var myDate = new Date(_val)
+      return moment(myDate).format('DD/MM/YYYY')
+    },
+    convertTime(_val) {
+      var myDate = new Date(_val)
+      return moment(myDate).format('HH:mm')
+    },
+    convertAmount2Degit(_val) {
+      return Number(_val).toFixed(2)
+    },
+    convertTypeAmount(_val) {
+      if (_val == '1') {
+        return 'cash'
+      } else if (_val == '2') {
+        return 'bonus'
+      } else {
+        return '!!' + _val
+      }
+    },
+    convertTypeAmountColor(_val) {
+      if (_val == '1') {
+        return 'dark'
+      } else if (_val == '2') {
+        return 'info'
+      } else {
+        return 'warning'
+      }
+    },
+
+    pickFile(_confirmed) {
+      this.mdDuplicateFile = false
+      this.csvfileResult = null
+      this.csvfileAmountTotal = 0
+      this.csvfileName = ''
+      this.dupFile = _confirmed
+      this.csvFailAllTrans = false
+
+      let isRead = true
+      if (this.dupFile == true) {
+        isRead = true
+      } else {
+        let _filename = this.$refs.myFile.files[0].name
+        for (let i = 0; i < this.listDataWinLoss.length; i++) {
+          if (_filename == this.listDataWinLoss[i].file_name) {
+            isRead = false
+            break
+          }
+        }
+      }
+
+      if (isRead == true) {
+        this.dupFile = false
+        // Read file
+        let lines = ''
+        let currentline = ''
+        let csv = ''
+        let header = ''
+        let result = []
+        let reader = new FileReader()
+        this.csvfileName = this.$refs.myFile.files[0].name
+        reader.readAsText(this.$refs.myFile.files[0])
+        reader.onload = (e) => {
+          csv = e.target.result
+          lines = csv.split('\r' + '\n')
+          // header = lines[0].split(',')
+          header = [
+            'row',
+            'username',
+            'amount',
+            'type',
+            'description',
+            'no',
+            'checked',
+            'validation',
+          ]
+          let _failAllTrans = 0
+          let _alltransaction = 0
+          for (var i = 1; i < lines.length; i++) {
+            if (!lines[i]) continue
+            let obj = {}
+            currentline = lines[i]
+            var re = /"/g
+            currentline = re[Symbol.replace](currentline, '')
+            currentline = currentline.split(',')
+            currentline.push(i)
+            _alltransaction += 1
+
+            let _valid = true
+            let _checked = true
+            for (var j = 0; j < header.length; j++) {
+              if (
+                j == 0 ||
+                j == 1 ||
+                j == 2 ||
+                j == 3 ||
+                j == 4 ||
+                j == 5 ||
+                j == 6 ||
+                j == 7
+              ) {
+                let head = header[j].trim()
+                let value = ''
+
+                // validations
+                if (j == 1) {
+                  // Customer name
+                  if (currentline[j] == '') {
+                    _checked = false
+                    _valid = false
+                  }
+                }
+                if (j == 2) {
+                  // Amount > 0
+                  let _number = Number(currentline[j])
+                  if (_number <= 0) {
+                    _checked = false
+                    _valid = false
+                  }
+                }
+                if (j == 3) {
+                  // Type (Cash / Bonus)
+                  if (currentline[j] != '2') {
+                    _checked = false
+                    _valid = false
+                  }
+                }
+                if (j == 4) {
+                  // Description
+                  if (currentline[j] == '') {
+                    _checked = false
+                    _valid = false
+                  }
+                }
+                // -----
+
+                // final loop
+                if (j == 6) {
+                  currentline.push(_checked)
+                }
+                if (j == 7) {
+                  currentline.push(_valid)
+                }
+
+                if (typeof currentline[j] == 'string') {
+                  value = currentline[j].trim()
+                } else {
+                  value = currentline[j]
+                }
+                if (j == 2) {
+                  this.csvfileAmountTotal += Number(currentline[j])
+                }
+                obj[head] = value
+              }
+            }
+            if (_valid == false) {
+              _failAllTrans += 1
+            }
+            result.push(obj)
+          }
+          // result = JSON.stringify(result)
+          this.csvfileResult = result
+
+          // check fail all transaction
+          if (_failAllTrans == _alltransaction) {
+            this.csvFailAllTrans = true
+          }
+
+          // show import modal
+          this.mdViewImport = true
+          console.log(result)
+        }
+      } else {
+        this.dupFile = false
+      }
+    },
+  },
   mounted() {
-    this.mdDemo = true
+    this.getWebPrefixList().then(() => {
+      if (!this.currentWebAgent) {
+        this.currentWebAgent = this.optWebAgent[0]._id
+        this.getWinLossList()
+      }
+    })
+
+    // Demo
+    // this.mdViewImport = true
   },
 }
 </script>

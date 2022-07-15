@@ -1,7 +1,7 @@
 <template>
   <div class="mb-3">
-    <CAccordion :active-item-key="1" always-open>
-      <CAccordionItem :item-key="1">
+    <CAccordion :active-item-key="3" always-open>
+      <CAccordionItem :item-key="1" aria-expanded="true">
         <CAccordionHeader>
           <CIcon :icon="ic.cilBank" class="me-1" /> บัญชีธนาคาร
         </CAccordionHeader>
@@ -80,13 +80,20 @@
                           "
                         />
                       </CTableDataCell>
-                      <CTableDataCell class="text-success">
-                        <CBadge
-                          :color="convertBankTypeColor(bank.type)"
-                          shape="rounded-pill"
-                        >
-                          {{ convertBankType(bank.type) }}
-                        </CBadge>
+                      <CTableDataCell>
+                        <span class="text-success">
+                          <CBadge
+                            :color="convertBankTypeColor(bank.type)"
+                            shape="rounded-pill"
+                          >
+                            {{ convertBankType(bank.type) }}
+                          </CBadge>
+                        </span>
+                        <CIcon
+                          v-show="bank.qr_code"
+                          :icon="ic.cilQrCode"
+                          class="ms-1"
+                        />
                       </CTableDataCell>
                       <CTableDataCell>
                         <CRow
@@ -469,7 +476,7 @@
                       </CCol>
                     </CRow>
                     <CRow class="mb-2">
-                      <CCol md="6">
+                      <!-- <CCol md="6">
                         <div>
                           <label for="cFName" class="form-label mb-0">
                             QR Code
@@ -502,6 +509,7 @@
                             </CButton>
                             <input
                               style="display: none"
+                              accept=".png, .jpg, jpeg"
                               type="file"
                               class="form-control form-control-sm"
                               ref="fileInput"
@@ -509,7 +517,7 @@
                             />
                           </div>
                         </div>
-                      </CCol>
+                      </CCol> -->
                       <CCol md="6">
                         <div>
                           <label for="cLName" class="form-label mb-0">
@@ -799,6 +807,12 @@
           </CRow>
         </CAccordionBody>
       </CAccordionItem>
+      <CAccordionItem :item-key="3">
+        <CAccordionHeader>
+          <CIcon :icon="ic.cilSpeech" class="me-1" /> SMS Auto Transfer
+        </CAccordionHeader>
+        <CAccordionBody> ยังไม่พร้อมใช้งาน </CAccordionBody>
+      </CAccordionItem>
     </CAccordion>
   </div>
 
@@ -859,7 +873,10 @@
                       >
                         <CIcon :icon="ic.cibDiscover" />
                       </CInputGroupText>
-                      <CFormSelect v-model="dataAddBank.type">
+                      <CFormSelect
+                        v-model="dataAddBank.type"
+                        @change="dataAddBank.qr_code = ''"
+                      >
                         <option value="deposit">ฝาก</option>
                         <option value="withdraw">ถอน</option>
                       </CFormSelect>
@@ -962,8 +979,8 @@
                     </CCol>
                   </CRow>
                   <CRow>
-                    <CCol class="mb-2">
-                      <div>
+                    <CCol>
+                      <div class="mb-2">
                         <label for="aNote" class="form-label mb-0">
                           โน้ต
                         </label>
@@ -978,7 +995,7 @@
                   </CRow>
                 </CCol>
                 <CCol md="6" class="mb-2">
-                  <div>
+                  <div class="mb-2">
                     <label for="aNote" class="form-label mb-0">
                       คลาส
                       <span class="small text-muted">
@@ -993,6 +1010,55 @@
                       selection-type="tags"
                       selection-type-counter-text="คลาส ที่เลือกไว้"
                     />
+                  </div>
+                  <div v-show="dataAddBank.type == 'deposit'">
+                    <label for="cFName" class="form-label mb-1">
+                      QR Code
+                      <span class="small text-muted">
+                        (สำหรับแสดงที่หน้าจอลูกค้า)
+                      </span>
+                    </label>
+                    <div class="clearfix mb-2" v-if="dataAddBank.qr_code">
+                      <CImage
+                        align="center"
+                        class="border"
+                        height="150"
+                        rounded
+                        :src="dataAddBank.qr_code"
+                      />
+                    </div>
+                    <div class="text-center">
+                      <CButton
+                        color="dark"
+                        size="sm"
+                        shape="rounded-pill"
+                        variant="outline"
+                        @click="$refs.fileInput.click()"
+                      >
+                        <CIcon :icon="ic.cilCloudUpload" />
+                        อัพโหลด
+                      </CButton>
+                      <CButton
+                        color="danger"
+                        size="sm"
+                        shape="rounded-pill"
+                        variant="outline"
+                        class="ms-2"
+                        @click="dataAddBank.qr_code = ''"
+                        v-if="dataAddBank.qr_code"
+                      >
+                        <CIcon :icon="ic.cilTrash" />
+                        ลบ
+                      </CButton>
+                      <input
+                        style="display: none"
+                        type="file"
+                        accept=".png, .jpg, jpeg"
+                        class="form-control form-control-sm"
+                        ref="fileInput"
+                        @change="pickFile('add')"
+                      />
+                    </div>
                   </div>
                 </CCol>
               </CRow>
@@ -1105,6 +1171,7 @@
                           dataEditBank.bank_auto_config ||
                           dataEditBank.sms_auto_config
                         "
+                        @change="dataEditBank.qr_code = ''"
                       >
                         <option value="deposit">ฝาก</option>
                         <option value="withdraw">ถอน</option>
@@ -1241,6 +1308,55 @@
                       selection-type="tags"
                       selection-type-counter-text="คลาส ที่เลือกไว้"
                     />
+                  </div>
+                  <div>
+                    <label for="cFName" class="form-label mb-1">
+                      QR Code
+                      <span class="small text-muted">
+                        (สำหรับแสดงที่หน้าจอลูกค้า)
+                      </span>
+                    </label>
+                    <div class="clearfix mb-2" v-if="dataEditBank.qr_code">
+                      <CImage
+                        align="center"
+                        class="border"
+                        height="150"
+                        rounded
+                        :src="dataEditBank.qr_code"
+                      />
+                    </div>
+                    <div class="text-center">
+                      <CButton
+                        color="dark"
+                        size="sm"
+                        shape="rounded-pill"
+                        variant="outline"
+                        @click="$refs.fileInputEdit.click()"
+                      >
+                        <CIcon :icon="ic.cilCloudUpload" />
+                        อัพโหลด
+                      </CButton>
+                      <CButton
+                        color="danger"
+                        size="sm"
+                        shape="rounded-pill"
+                        variant="outline"
+                        class="ms-2"
+                        @click="dataEditBank.qr_code = ''"
+                        v-if="dataEditBank.qr_code"
+                      >
+                        <CIcon :icon="ic.cilTrash" />
+                        ลบ
+                      </CButton>
+                      <input
+                        style="display: none"
+                        type="file"
+                        accept=".png, .jpg, jpeg"
+                        class="form-control form-control-sm"
+                        ref="fileInputEdit"
+                        @change="pickFile('edit')"
+                      />
+                    </div>
                   </div>
                 </CCol>
               </CRow>
@@ -1424,7 +1540,7 @@
                   v-model="conf_deposit_scb.bank_auto_config.note"
                 ></CFormTextarea>
               </div>
-              <div class="mb-2">
+              <!-- <div class="mb-2">
                 <label for="cFName" class="form-label mb-0">
                   QR Code
                   <span class="small text-muted">
@@ -1453,13 +1569,14 @@
                   </CButton>
                   <input
                     style="display: none"
+                    accept=".png, .jpg, jpeg"
                     type="file"
                     class="form-control form-control-sm"
                     ref="fileInputSCBDP"
                     @change="pickFileAddAutoTransfer('DP', 'scb')"
                   />
                 </div>
-              </div>
+              </div> -->
             </div>
             <!-- ::Other:: - Bank Auto Tranfer (Deposit) -->
             <!-- ... -->
@@ -1806,6 +1923,8 @@ import {
   cilSave,
   cilCloudUpload,
   cilTerminal,
+  cilQrCode,
+  cilSpeech,
 } from '@coreui/icons'
 
 import avatar from '@/assets/images/avatars/owner/02.png'
@@ -1846,6 +1965,7 @@ export default {
         privilege: '',
         status: 'active',
         type: 'deposit',
+        qr_code: '',
       },
       dataEditBank: {
         _id: '',
@@ -1860,6 +1980,7 @@ export default {
         privilege: '',
         status: 'active',
         type: 'deposit',
+        qr_code: '',
         bank_auto_status: null,
         bank_auto_config: null,
         sms_auto_status: null,
@@ -1883,7 +2004,6 @@ export default {
           username: '',
           password: '',
           note: '',
-          qr_code: '',
         },
         status: '',
         type: 'deposit',
@@ -2021,6 +2141,8 @@ export default {
         cilSave,
         cilCloudUpload,
         cilTerminal,
+        cilQrCode,
+        cilSpeech,
       },
     }
   },
@@ -2215,6 +2337,7 @@ export default {
           privilege: this.dataAddBank.privilege,
           status: this.dataAddBank.status,
           type: this.dataAddBank.type,
+          qr_code: this.dataAddBank.qr_code,
         })
         .then((response) => {
           if (response.data.status == 200) {
@@ -2286,6 +2409,7 @@ export default {
           privilege: this.dataEditBank.privilege,
           status: this.dataEditBank.status,
           type: this.dataEditBank.type,
+          qr_code: this.dataEditBank.qr_code,
         })
         .then((response) => {
           if (response.data.status == 200) {
@@ -2793,15 +2917,25 @@ export default {
         }
       }
     },
-    pickFile() {
-      let input = this.$refs.fileInput
+    pickFile(_type) {
+      let input = null
+      if (_type == 'add') {
+        input = this.$refs.fileInput
+      }
+      if (_type == 'edit') {
+        input = this.$refs.fileInputEdit
+      }
       let file = input.files
       if (file && file[0]) {
         let reader = new FileReader()
         reader.onload = (e) => {
           this.previewImage = e.target.result
-          this.dataBankAutoDepositSetting[0].bank.bank_auto_config.qr_code =
-            reader.result
+          if (_type == 'add') {
+            this.dataAddBank.qr_code = reader.result
+          }
+          if (_type == 'edit') {
+            this.dataEditBank.qr_code = reader.result
+          }
         }
         reader.readAsDataURL(file[0])
         this.$emit('input', file[0])
@@ -2871,6 +3005,7 @@ export default {
           this.dataEditBank.bank_auto_status = bank.bank_auto_status
           this.dataEditBank.sms_auto_config = bank.sms_auto_config
           this.dataEditBank.sms_auto_status = bank.sms_auto_status
+          this.dataEditBank.qr_code = bank.qr_code
           foundBank = true
           break
         }

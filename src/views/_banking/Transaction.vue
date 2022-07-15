@@ -904,6 +904,9 @@
                       size="sm"
                       v-model="dataDeposit.account_deposit"
                     >
+                      <option v-if="optBankDeposit.length == 0" value="">
+                        บัญชีโบนัส
+                      </option>
                       <option
                         v-for="option in optBankDeposit"
                         :key="option._id"
@@ -928,7 +931,7 @@
                 <label for="depositWebAgent" class="form-label mb-1">
                   * เว็บลูกค้า
                 </label>
-                <CInputGroup>
+                <CInputGroup class="has-validation">
                   <CInputGroupText>
                     <CIcon :icon="ic.cilPin" />
                   </CInputGroupText>
@@ -981,44 +984,6 @@
                       !v$.dataDeposit.memb_id.$error && validatedDeposit,
                   }"
                 />
-
-                <!-- <Select2
-                  tabindex="0"
-                  :value="dataDeposit.memb_id"
-                  :options="optMemberListMultiSelect"
-                  :settings="{
-                    width: '100%',
-                    minimumResultsForSearch: -1,
-                    enoughRoomAbove: true,
-                    enoughRoomBelow: false,
-                  }"
-                /> -->
-                <!-- <CMultiSelect
-                  :options="optMemberListMultiSelect"
-                  search-no-results-label="ไม่พบข้อมูลลูกค้า"
-                  :select-all="false"
-                  :options-max-height="2"
-                /> -->
-                <!-- <CInputGroup>
-                  <CInputGroupText id="basic-addon1">
-                    <CIcon :icon="ic.cilGroup" />
-                  </CInputGroupText>
-                  <CFormSelect
-                    id="depositMemberID"
-                    size="sm"
-                    v-model="dataDeposit.memb_id"
-                  >
-                    <option value="">กรุณาเลือกยูสเซอร์</option>
-                    <option
-                      v-for="option in optMemberList"
-                      :key="option._id"
-                      :value="option._id"
-                    >
-                      {{ option.username }} ({{ option.profile.name }}
-                      {{ option.profile.surename }})
-                    </option>
-                  </CFormSelect>
-                </CInputGroup> -->
                 <div class="form-text mt-0 mb-2">
                   สามารถค้นหาด้วย: ยูส, เบอร์โทร, ชื่อ
                 </div>
@@ -1057,7 +1022,7 @@
                 <label for="depositAmount" class="form-label mb-1">
                   * ยอดเงิน
                 </label>
-                <CInputGroup>
+                <CInputGroup class="has-validation">
                   <CInputGroupText>
                     <CIcon :icon="ic.cilCash" />
                   </CInputGroupText>
@@ -1169,7 +1134,9 @@
                       size="sm"
                       v-model="dataWithdraw.account_withdraw"
                     >
-                      <!-- <option value="" selected>บัญชีโบนัส</option> -->
+                      <option v-if="optBankWithdraw.length == 0" value="">
+                        บัญชีโบนัส
+                      </option>
                       <option
                         v-for="option in optBankWithdraw"
                         :key="option._id"
@@ -1194,7 +1161,7 @@
                 <label for="withdrawWebAgent" class="form-label mb-1">
                   * เว็บลูกค้า
                 </label>
-                <CInputGroup>
+                <CInputGroup class="has-validation">
                   <CInputGroupText>
                     <CIcon :icon="ic.cilPin" />
                   </CInputGroupText>
@@ -1248,26 +1215,6 @@
                       !v$.dataWithdraw.memb_id.$error && validatedWithdraw,
                   }"
                 />
-                <!-- <CInputGroup>
-                  <CInputGroupText id="basic-addon1">
-                    <CIcon :icon="ic.cilGroup" />
-                  </CInputGroupText>
-                  <CFormSelect
-                    id="withdrawMemberID"
-                    size="sm"
-                    v-model="dataWithdraw.memb_id"
-                  >
-                    <option value="">กรุณาเลือกยูสเซอร์</option>
-                    <option
-                      v-for="option in optMemberList"
-                      :key="option._id"
-                      :value="option._id"
-                    >
-                      {{ option.username }} ({{ option.profile.name }}
-                      {{ option.profile.surename }})
-                    </option>
-                  </CFormSelect>
-                </CInputGroup> -->
                 <div class="form-text mt-0 mb-2">
                   สามารถค้นหาด้วย: ยูส, เบอร์โทร, ชื่อ
                 </div>
@@ -1276,7 +1223,7 @@
                 <label for="withdrawAmount" class="form-label mb-1">
                   * ยอดเงิน
                 </label>
-                <CInputGroup>
+                <CInputGroup class="has-validation">
                   <CInputGroupText>
                     <CIcon :icon="ic.cilCash" />
                   </CInputGroupText>
@@ -1691,7 +1638,7 @@
               <CCardHeader class="py-1">* หมายเหตุก่อนหน้า</CCardHeader>
               <CCardBody class="py-1">
                 <CCardText>
-                  <div
+                  <!-- <div
                     v-for="note in dataManageTransaction.description"
                     :key="note._id"
                   >
@@ -1702,6 +1649,25 @@
                       {{ note.username }}
                     </CBadge>
                     : {{ note.note }}
+                  </div> -->
+                  <div
+                    v-if="typeof dataManageTransaction.description === 'object'"
+                  >
+                    <div
+                      v-for="note in dataManageTransaction.description"
+                      :key="note._id"
+                    >
+                      <CBadge
+                        :color="convertUserNoteColor(note.username)"
+                        shape="rounded-pill"
+                      >
+                        {{ note.username }}
+                      </CBadge>
+                      : {{ note.note }}
+                    </div>
+                  </div>
+                  <div v-else>
+                    {{ dataManageTransaction.description }}
                   </div>
                 </CCardText>
               </CCardBody>
@@ -2380,7 +2346,7 @@ export default {
           doc_id: _id,
           status: _status,
           type: _type,
-          description: _description,
+          description: _description.trim(),
         })
         .then((response) => {
           if (response.data.status == 200) {
