@@ -231,7 +231,7 @@
                         <option
                           v-for="option in optRole"
                           :key="option._id"
-                          :value="option.role"
+                          :value="option._id"
                         >
                           {{ option.description }}
                         </option>
@@ -414,7 +414,7 @@
                         <option
                           v-for="option in optRole"
                           :key="option._id"
-                          :value="option.role"
+                          :value="option._id"
                         >
                           {{ option.description }}
                         </option>
@@ -723,7 +723,7 @@ export default {
         tel: '',
         avatar: '',
         name: '',
-        role: 'staff',
+        role: '',
         status: true,
         apiResult: '',
         alertAddEmpVisible: false,
@@ -817,6 +817,7 @@ export default {
         .then((response) => {
           if (response.data.status == 200) {
             this.optRole = response.data.result
+            this.addEmp.role = this.optRole[0]._id
           } else if (
             response.data.status == 502 ||
             response.data.status == 503
@@ -920,17 +921,24 @@ export default {
         })
     },
     // functions
-    getAvatar(role) {
+    getAvatar(_roleID) {
+      let _role = ''
+      for (let i = 0; i < this.optRole.length; i++) {
+        if (this.optRole[i]._id == _roleID) {
+          _role = this.optRole[i].role
+          break
+        }
+      }
       let randomNo = 0
-      if (role === 'admin') {
+      if (_role == 'admin') {
         randomNo = this.getRandomArbitrary(1, 5)
-      } else if (role === 'owner') {
+      } else if (_role == 'owner') {
         randomNo = this.getRandomArbitrary(1, 4)
-      } else if (role === 'manager') {
+      } else if (_role == 'manager') {
         randomNo = this.getRandomArbitrary(1, 8)
-      } else if (role === 'staff') {
+      } else if (_role == 'staff') {
         randomNo = this.getRandomArbitrary(1, 24)
-      } else if (role === 'partner') {
+      } else if (_role == 'partner') {
         randomNo = this.getRandomArbitrary(1, 2)
       }
       return this.leftPad(randomNo, 2) + '.png'
@@ -1025,13 +1033,13 @@ export default {
       }
     },
     addEmpShown() {
-      this.addEmp.agent_id = '629e381cb4839cabb5622da1'
+      this.addEmp.agent_id = this.currentWebAgent
       this.addEmp.username = ''
       this.addEmp.password = ''
       this.addEmp.tel = ''
       this.addEmp.avatar = ''
       this.addEmp.name = ''
-      this.addEmp.role = 'staff'
+      this.addEmp.role = this.optRole[0]._id
       this.addEmp.status = true
       this.addEmp.apiResult = ''
       this.addEmp.alertAddEmpVisible = false
@@ -1042,7 +1050,7 @@ export default {
       this.mdEdit = !this.mdEdit
       this.employees.listOfEmp.forEach((value) => {
         if (value._id == empID) {
-          this.editEmp.agent_id = '629e381cb4839cabb5622da1'
+          this.editEmp.agent_id = this.currentWebAgent
           this.editEmp._id = value._id
           this.editEmp.username = value.username
           this.editEmp.password = value.password
