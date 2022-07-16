@@ -449,7 +449,13 @@
                         </label>
                         <CInputGroup class="has-validation">
                           <CInputGroupText id="basic-cBanking" class="p-2">
+                            <CIcon
+                              class="mx-1"
+                              :icon="ic.cilBank"
+                              v-if="!dataMember.bank_img"
+                            />
                             <CImage
+                              v-else
                               fluid
                               :src="dataMember.bank_img"
                               width="22"

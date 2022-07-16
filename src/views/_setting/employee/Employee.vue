@@ -278,7 +278,8 @@
                           type="button"
                           color="secondary"
                           variant="outline"
-                          @click="showPwd"
+                          @mousedown="showPwd('add')"
+                          @mouseup="showPwd('add')"
                         >
                           <CIcon :icon="ic.cilLowVision" />
                         </CButton>
@@ -327,7 +328,7 @@
                   color="success"
                   size="sm"
                   class="ms-1 text-light"
-                  @click="addEmployee"
+                  @click="addEmployee()"
                 >
                   <CIcon :icon="ic.cilCheckCircle" size="sm" />
                   ตกลง
@@ -374,6 +375,16 @@
           <CCardText class="small">
             <form>
               <CContainer fluid>
+                <CAlert
+                  color="danger"
+                  variant="solid"
+                  class="py-2"
+                  :visible="editEmp.alertAddEmpVisible"
+                >
+                  <CIcon :icon="ic.cilWarning" />
+
+                  {{ editEmp.apiResult }}
+                </CAlert>
                 <CRow>
                   <CCol md="6">
                     <div class="d-inline-flex align-items-center">
@@ -451,13 +462,22 @@
                           <CIcon :icon="ic.cilLockLocked" />
                         </CInputGroupText>
                         <CFormInput
-                          type="password"
+                          :type="editEmp.pwdType"
                           id="cPassword"
                           v-model="editEmp.password"
                         />
-                        <CInputGroupText id="basic-cHidden">
+                        <!-- <CInputGroupText id="basic-cHidden">
                           <CIcon :icon="ic.cilLowVision" />
-                        </CInputGroupText>
+                        </CInputGroupText> -->
+                        <CButton
+                          type="button"
+                          color="secondary"
+                          variant="outline"
+                          @mousedown="showPwd('edit')"
+                          @mouseup="showPwd('edit')"
+                        >
+                          <CIcon :icon="ic.cilLowVision" />
+                        </CButton>
                       </CInputGroup>
                     </div>
                   </CCol>
@@ -496,7 +516,12 @@
               </CContainer>
               <hr />
               <div class="text-end">
-                <CButton color="success" size="sm" class="ms-1 text-light">
+                <CButton
+                  color="success"
+                  size="sm"
+                  class="ms-1 text-light"
+                  @click="editEmployee()"
+                >
                   <CIcon :icon="ic.cilCheckCircle" size="sm" />
                   ตกลง
                 </CButton>
@@ -670,6 +695,31 @@
       </CContainer>
     </CModalBody>
   </CModal>
+
+  <!-- Toaster popup -->
+  <CToaster placement="top-end">
+    <CToast
+      v-for="toast in toasts"
+      :key="toast._id"
+      :delay="10000"
+      :class="'bg-' + toast.color + ' border-' + toast.color"
+    >
+      <CToastHeader closeButton>
+        <span class="me-auto fw-bolder fs-5 lh-sm text-dark">
+          <CIcon
+            size="lg"
+            :icon="toast.color == 'success' ? ic.cilThumbUp : ic.cilThumbDown"
+            class="me-1 text-black"
+          />
+          {{ toast.title }}
+        </span>
+        <!-- <small>7 min ago</small> -->
+      </CToastHeader>
+      <CToastBody>
+        {{ toast.content }}
+      </CToastBody>
+    </CToast>
+  </CToaster>
 </template>
 
 <script>
@@ -699,7 +749,7 @@ import {
   cilMagnifyingGlass,
   cilWarning,
 } from '@coreui/icons'
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'SettingEmployee',
@@ -708,9 +758,11 @@ export default {
   },
   data() {
     return {
+      toasts: [],
+
       // Data
       currentWebAgent: '',
-      tmpRoleMyself: 'manager',
+      tmpRoleMyself: '',
       employees: {
         listOfEmp: [],
         totalPage: 1,
@@ -779,6 +831,13 @@ export default {
     ...mapActions({
       tokenExpired: 'auth/tokenExpired',
     }),
+    createToast(_color, _title, _content) {
+      this.toasts.push({
+        title: _title,
+        content: _content,
+        color: _color,
+      })
+    },
     navigateTo(route) {
       this.$router.push(route)
     },
@@ -872,9 +931,9 @@ export default {
       this.addEmp.avatar = await this.getAvatar(this.addEmp.role)
       let _status = ''
       if (this.addEmp.status) {
-        _status = 'Active'
+        _status = 'active'
       } else {
-        _status = 'Inactive'
+        _status = 'inactive'
       }
       await this.$http
         .post('panel/addemployee', {
@@ -889,6 +948,11 @@ export default {
         })
         .then((response) => {
           if (response.data.status == 200) {
+            this.createToast(
+              'success',
+              'การดำเนินการ',
+              'เพิ่มข้อมูลพนักงานเรียบร้อยแล้ว',
+            )
             this.mdCreate = false
             console.log(response)
           } else if (
@@ -899,6 +963,11 @@ export default {
               this.navigateTo('/pages/login')
             })
           } else {
+            this.createToast(
+              'danger',
+              'การดำเนินการ',
+              'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + response.data.message,
+            )
             this.mdCreate = true
             this.addEmp.alertAddEmpVisible = true
             this.addEmp.apiResult = response.data.message
@@ -911,6 +980,11 @@ export default {
           }
         })
         .catch((error) => {
+          this.createToast(
+            'danger',
+            'การดำเนินการ',
+            'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + error,
+          )
           this.mdCreate = true
           this.addEmp.alertAddEmpVisible = true
           this.addEmp.apiResult = error
@@ -920,6 +994,71 @@ export default {
           this.getAllEmployee()
         })
     },
+    async editEmployee() {
+      let _status = ''
+      if (this.addEmp.status) {
+        _status = 'active'
+      } else {
+        _status = 'inactive'
+      }
+      await this.$http
+        .post('panel/updateemp', {
+          _id: this.editEmp._id,
+          password: this.editEmp.password,
+          name: this.editEmp.name,
+          tel: this.editEmp.tel,
+          role: this.editEmp.role,
+          status: _status,
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.createToast(
+              'success',
+              'การดำเนินการ',
+              'ปรับปรุงข้อมูลพนักงานเรียบร้อยแล้ว',
+            )
+            this.mdEdit = false
+            console.log(response)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            this.createToast(
+              'danger',
+              'การดำเนินการ',
+              'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + response.data.message,
+            )
+            this.mdEdit = true
+            this.editEmp.alertAddEmpVisible = true
+            this.editEmp.apiResult = response.data.message
+            console.log(
+              'call api - panel/updateemp : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          this.createToast(
+            'danger',
+            'การดำเนินการ',
+            'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + error,
+          )
+          this.mdEdit = true
+          this.editEmp.alertAddEmpVisible = true
+          this.editEmp.apiResult = error
+          console.log('call api - panel/updateemp : error' + error)
+        })
+        .finally(() => {
+          this.getAllEmployee()
+        })
+    },
+
     // functions
     getAvatar(_roleID) {
       let _role = ''
@@ -943,11 +1082,19 @@ export default {
       }
       return this.leftPad(randomNo, 2) + '.png'
     },
-    showPwd() {
-      if (this.addEmp.pwdType == 'password') {
-        this.addEmp.pwdType = 'text'
-      } else {
-        this.addEmp.pwdType = 'password'
+    showPwd(_from) {
+      if (_from == 'add') {
+        if (this.addEmp.pwdType == 'password') {
+          this.addEmp.pwdType = 'text'
+        } else {
+          this.addEmp.pwdType = 'password'
+        }
+      } else if (_from == 'edit') {
+        if (this.editEmp.pwdType == 'password') {
+          this.editEmp.pwdType = 'text'
+        } else {
+          this.editEmp.pwdType = 'password'
+        }
       }
     },
     getRandomArbitrary(min, max) {
@@ -1029,7 +1176,7 @@ export default {
       try {
         return require('../../../assets/images/avatars/' + role + '/' + img)
       } catch (err) {
-        console.log(err)
+        return require('../../../assets/images/error-404-01.png')
       }
     },
     addEmpShown() {
@@ -1070,10 +1217,15 @@ export default {
     this.getRoleStaff().then(() => {
       this.getWebPrefixList().then(() => {
         this.getAllEmployee().then(() => {
-          console.log('Started')
+          this.tmpRoleMyself = this.user.role
         })
       })
     })
+  },
+  computed: {
+    ...mapGetters({
+      user: 'auth/user',
+    }),
   },
 }
 </script>

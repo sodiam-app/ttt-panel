@@ -39,8 +39,8 @@
                       type="button"
                       color="secondary"
                       variant="outline"
-                      @mousedown="showPwd"
-                      @mouseup="showPwd"
+                      @mousedown="showPwd()"
+                      @mouseup="showPwd()"
                     >
                       <CIcon :icon="cilLowVision" />
                     </CButton>

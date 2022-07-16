@@ -2668,14 +2668,14 @@ export default {
       for (let i = 0; i < _obj.length; i++) {
         let id = _obj[i]._id
         let _txt =
+          '🌐 ' +
           _obj[i].username +
-          ' | ' +
+          ' 🕵 ' +
           _obj[i].profile.name +
           ' ' +
           _obj[i].profile.surename +
-          ' (' +
-          _obj[i].profile.tel +
-          ')'
+          ' 📲 ' +
+          _obj[i].profile.tel
         _result.push({ id: id, text: _txt })
       }
       return _result
