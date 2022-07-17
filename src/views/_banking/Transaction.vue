@@ -373,7 +373,7 @@
                       <div class="d-inline-flex align-items-center">
                         <CIcon :icon="ic.cilBank" />
                         <CBadge color="dark" class="ms-1 d-none d-md-block">
-                          --
+                          {{ history.channel }}
                         </CBadge>
                       </div>
                     </CTableDataCell>
@@ -657,7 +657,7 @@
                       <div class="d-inline-flex align-items-center">
                         <CIcon :icon="ic.cilBank" />
                         <CBadge color="dark" class="ms-1 d-none d-md-block">
-                          -----
+                          {{ historylasted.channel }}
                         </CBadge>
                       </div>
                     </CTableDataCell>
