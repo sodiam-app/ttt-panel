@@ -795,7 +795,7 @@
                     </CTableDataCell>
                     <CTableDataCell>
                       <div
-                        v-show="historylasted.approve_by"
+                        v-if="historylasted.approve_by"
                         class="align-items-center"
                       >
                         <CAvatar
@@ -811,6 +811,21 @@
                         />
                         <CBadge color="dark" shape="rounded-pill">
                           {{ historylasted.approve_by.approve_username }}
+                        </CBadge>
+                      </div>
+                      <div v-else>
+                        <CAvatar
+                          :src="getImgAvatar('system', '01.png')"
+                          size="sm"
+                          status="info"
+                          class="mb-1"
+                        />
+                        <CBadge
+                          color="light"
+                          shape="rounded-pill"
+                          class="text-dark"
+                        >
+                          ระบบออโต้
                         </CBadge>
                       </div>
                     </CTableDataCell>
