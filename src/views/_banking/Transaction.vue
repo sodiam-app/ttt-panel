@@ -2621,6 +2621,10 @@ export default {
           console.log('loop i', this.optMemberList[i])
           // this.dataManageTransaction.memb_id =
           // this.optMemberList[i].banking_account.bank_id
+          this.dataManageTransaction.from_bank_id =
+            this.optMemberList[i].banking_account.bank_id
+          this.dataManageTransaction.from_account_id =
+            this.optMemberList[i].banking_account.account_bank_id
           this.dataManageTransaction.memb_bank =
             this.optMemberList[i].banking_account.account_number
           this.dataManageTransaction.memb_name =
