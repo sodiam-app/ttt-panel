@@ -67,7 +67,7 @@
                   class="ms-1 text-light"
                   size="sm"
                   v-if="tabPaneActiveKey === 1"
-                  disabled
+                  @click.prevent="updateMember()"
                 >
                   <CIcon :icon="ic.cilSave" />
                   บันทึก
@@ -1190,6 +1190,7 @@ export default {
 
       memberID: 0,
       memberProfile: {
+        _id: '',
         status: false,
         status_id: '',
         status_img: '',
@@ -1343,6 +1344,7 @@ export default {
             } else {
               this.memberProfile.status = false
             }
+            this.memberProfile._id = mem._id
             this.memberProfile.status_id = mem.status
             this.onchgStatus(this.memberProfile.status_id)
             this.memberProfile.username = mem.username
@@ -1411,6 +1413,13 @@ export default {
             this.memberProfile.create_date = this.dateTime(mem.create_date)
             this.memberProfile.update_date = mem.update_date
             this.memberProfile.update_by = mem.update_by
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
           } else {
             // open elements after get member success
             this.visiblePage = false
@@ -1445,6 +1454,13 @@ export default {
           if (response.data.status == 200) {
             this.optChannel = response.data.channel
             console.log(this.optChannel)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
           } else {
             console.log(
               'call api - panel/getchannel : status = ' +
@@ -1465,6 +1481,13 @@ export default {
           if (response.data.status == 200) {
             this.optPrivilege = response.data.privilege
             console.log(this.optPrivilege)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
           } else {
             console.log(
               'call api - panel/getprivilege : status = ' +
@@ -1485,6 +1508,13 @@ export default {
           if (response.data.status == 200) {
             this.optStatus = response.data.result_status
             console.log(this.optStatus)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
           } else {
             console.log(
               'call api - panel/getstatus : status = ' +
@@ -1505,6 +1535,13 @@ export default {
           if (response.data.status == 200) {
             this.optBanking = response.data.result.banking
             console.log(this.optBanking)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
           } else {
             console.log(
               'call api - panel/getbanking : status = ' +
@@ -1516,6 +1553,63 @@ export default {
         })
         .catch((error) => {
           console.log('call api - panel/getbanking : error' + error)
+        })
+    },
+    async updateMember() {
+      await this.$http
+        .post('panel/updatemember', {
+          memb_id: this.memberProfile._id,
+          agent_id: this.webAgentID,
+          username: this.memberProfile.surename,
+          name: this.memberProfile.name,
+          surname: this.memberProfile.surename,
+          birthday_date: this.memberProfile.birthday_date,
+          status: this.status_id,
+          channel: this.memberProfile.channel,
+          privilege: this.memberProfile.privilege,
+          user_reference: this.memberProfile.user_reference,
+          tel: this.memberProfile.tel,
+          ipinfo: this.memberProfile.register_ip,
+          remark: this.memberProfile.note,
+          pin: this.memberProfile.pin,
+          mobile_no: this.memberProfile.mobile_number,
+          line_id: this.memberProfile.line_id,
+          email: this.memberProfile.email,
+          // promotion_status:
+          bank_id: this.memberProfile.banking_account.bank_id,
+          bank_acctount: this.memberProfile.banking_account.bank_acct,
+        })
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.createToast(
+              'danger',
+              'การดำเนินการ',
+              'อัพเดทข้อมูลของลูกค้าเรียบร้อย',
+            )
+            console.log(response.data.message)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - panel/updatemember : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          this.createToast(
+            'danger',
+            'การดำเนินการ',
+            'ไม่สามารถดำเนินการได้, ข้อผิดพลาด : ' + error,
+          )
+          console.log('call api - panel/updatemember : error' + error)
         })
     },
 

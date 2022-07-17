@@ -50,11 +50,12 @@
                 <CTableHeaderCell scope="col">สถานะ</CTableHeaderCell>
                 <CTableHeaderCell scope="col">ยูส</CTableHeaderCell>
                 <CTableHeaderCell scope="col">ชื่อ-นามสกุล</CTableHeaderCell>
+                <CTableHeaderCell scope="col">บัญชีลูกค้า</CTableHeaderCell>
                 <CTableHeaderCell scope="col">เบอร์โทร</CTableHeaderCell>
-                <CTableHeaderCell scope="col">เว็บไซต์</CTableHeaderCell>
-                <CTableHeaderCell scope="col">
-                  วันที่เริ่มใช้งาน
+                <CTableHeaderCell scope="col" v-show="optWebAgent.length > 1">
+                  เว็บไซต์
                 </CTableHeaderCell>
+                <CTableHeaderCell scope="col">เริ่มใช้งาน</CTableHeaderCell>
                 <CTableHeaderCell scope="col" class="text-end">
                   ฝากครั้งแรก
                 </CTableHeaderCell>
@@ -91,12 +92,36 @@
                     {{ convertStatus(member.status) }}
                   </CBadge>
                 </CTableDataCell>
-                <CTableDataCell>{{ member.username }}</CTableDataCell>
+                <CTableDataCell>{{ member.username_provider }}</CTableDataCell>
                 <CTableDataCell>
                   {{ member.profile.name + ' ' + member.profile.surename }}
                 </CTableDataCell>
+                <CTableDataCell>
+                  <div>
+                    <CRow :xs="{ cols: 'auto', gutterX: 0, gutterY: 1 }">
+                      <CCol xs>
+                        <CImage
+                          fluid
+                          :src="getBankIMG(member.banking_account.bank_code)"
+                          width="20"
+                          class="ms-1 me-1"
+                        />
+                      </CCol>
+                      <CCol>
+                        <div class="fw-bolder">
+                          {{ member.banking_account.account_number }}
+                        </div>
+                      </CCol>
+                    </CRow>
+                    <div class="fst-italic small">
+                      {{ member.banking_account.account_name }}
+                    </div>
+                  </div>
+                </CTableDataCell>
                 <CTableDataCell>{{ member.profile.tel }}</CTableDataCell>
-                <CTableDataCell>{{ member.prefix }}</CTableDataCell>
+                <CTableDataCell v-show="optWebAgent.length > 1">
+                  {{ member.prefix }}
+                </CTableDataCell>
                 <CTableDataCell>
                   <CRow>
                     <!-- <p class="m-0">{{ member.create_date }}</p> -->
@@ -110,7 +135,11 @@
                 </CTableDataCell>
                 <CTableDataCell class="text-end">
                   <strong class="fst-italic">
-                    {{ member.financial.deposit_first_time_amount }}
+                    {{
+                      convertAmount2Degit(
+                        member.financial.deposit_first_time_amount,
+                      )
+                    }}
                   </strong>
                 </CTableDataCell>
                 <CTableDataCell class="text-end">
@@ -282,6 +311,18 @@ export default {
         })
     },
     // functions
+    getBankIMG(bankCode) {
+      try {
+        return require('../../assets/images/banking/th/smooth-corner/' +
+          bankCode +
+          '.png')
+      } catch (error) {
+        return require('../../assets/images/error-404-01.png')
+      }
+    },
+    convertAmount2Degit(value) {
+      return Number(value).toFixed(2)
+    },
     convertDate(value) {
       var myDate = new Date(value)
       return moment(myDate).format('DD/MM/YYYY')

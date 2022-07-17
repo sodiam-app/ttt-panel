@@ -1003,7 +1003,7 @@ export default {
       }
       await this.$http
         .post('panel/updateemp', {
-          _id: this.editEmp._id,
+          user_id: this.editEmp.username,
           password: this.editEmp.password,
           name: this.editEmp.name,
           tel: this.editEmp.tel,

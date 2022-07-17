@@ -353,7 +353,7 @@
                     <CTableHeaderCell scope="col">
                       ยูสเซอร์ลูกค้า
                     </CTableHeaderCell>
-                    <CTableHeaderCell scope="col">ชื่อลูกค้า</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">บัญชีลูกค้า</CTableHeaderCell>
                     <CTableHeaderCell scope="col">บัญชีเว็บ</CTableHeaderCell>
                     <CTableHeaderCell scope="col">สถานะ</CTableHeaderCell>
                     <CTableHeaderCell scope="col">หมายเหตุ</CTableHeaderCell>
@@ -449,13 +449,17 @@
                     <CTableDataCell class="text-center">
                       <CButtonGroup role="group" size="sm">
                         <CButton
-                          color="info"
+                          :color="history.memb_username ? 'info' : 'warning'"
                           variant="outline"
                           @click.prevent="
                             showManageTransaction(history._id, history.type)
                           "
                         >
-                          <CIcon :icon="ic.cilCog" size="sm" />
+                          <CIcon
+                            :icon="ic.cilCog"
+                            size="sm"
+                            :class="!history.memb_username ? 'loader' : ''"
+                          />
                           <div class="lh-1 mb-1">
                             <small>จัดการ</small>
                           </div>
@@ -463,84 +467,109 @@
                       </CButtonGroup>
                     </CTableDataCell>
                     <CTableDataCell>
-                      <CButton
-                        size="sm"
-                        color="link"
-                        class="p-0"
-                        @click="
-                          navigateToNewTap(
-                            '/member/list/' +
-                              history.web_aka +
-                              '/' +
-                              history.memb_id,
-                          )
-                        "
-                        >{{ history.memb_username }}
-                      </CButton>
-                      <br />
-                      <CBadge
-                        :color="convertMemberStatusColor(history.memb_status)"
-                        shape="rounded-pill"
-                      >
-                        {{ convertMemberStatus(history.memb_status) }}
-                      </CBadge>
-                    </CTableDataCell>
-                    <CTableDataCell>
-                      <CRow :xs="{ cols: 'auto', gutterX: 0, gutterY: 1 }">
-                        <CCol xs>
-                          <CImage
-                            fluid
-                            :src="getBankIMG(history.memb_banking_code)"
-                            width="20"
-                            class="ms-1 me-1"
-                          />
-                        </CCol>
-                        <CCol>
-                          <div class="fw-bolder">
-                            {{ history.memb_bank }}
-                          </div>
-                        </CCol>
-                      </CRow>
-                      <div class="fst-italic small">
-                        {{ history.memb_name }}
+                      <div v-if="history.memb_username">
+                        <CButton
+                          size="sm"
+                          color="link"
+                          class="p-0"
+                          @click="
+                            navigateToNewTap(
+                              '/member/list/' +
+                                history.web_aka +
+                                '/' +
+                                history.memb_id,
+                            )
+                          "
+                          >{{ history.memb_username }}
+                        </CButton>
+                        <br />
+                        <CBadge
+                          :color="convertMemberStatusColor(history.memb_status)"
+                          shape="rounded-pill"
+                        >
+                          {{ convertMemberStatus(history.memb_status) }}
+                        </CBadge>
+                      </div>
+                      <div v-else class="text-danger fw-bolder">
+                        <CIcon :icon="ic.cilSad" size="sm" />
+                        ระบุลูกค้าไม่ได้
+                        <div class="small fw-lighter text-secondary">
+                          <small>
+                            กรุณากดปุ่ม "จัดการ" เพื่อระบุยูสลูกค้า
+                          </small>
+                        </div>
                       </div>
                     </CTableDataCell>
                     <CTableDataCell>
-                      <div v-if="history.sub_type != 'bonus'">
+                      <div v-if="history.memb_bank">
                         <CRow :xs="{ cols: 'auto', gutterX: 0, gutterY: 1 }">
                           <CCol xs>
                             <CImage
                               fluid
-                              :src="getBankIMG(history.web_account_code)"
+                              :src="getBankIMG(history.memb_banking_code)"
                               width="20"
                               class="ms-1 me-1"
                             />
                           </CCol>
                           <CCol>
                             <div class="fw-bolder">
-                              {{ history.web_account_number }}
+                              {{ history.memb_bank }}
                             </div>
                           </CCol>
                         </CRow>
                         <div class="fst-italic small">
-                          {{ history.web_account_name }}
+                          {{ history.memb_name }}
                         </div>
                       </div>
-                      <div v-else class="d-inline-flex align-items-start">
-                        <CIcon class="text-info" :icon="ic.cibPalantir" />
-                        <CBadge color="info" class="ms-1 d-none d-md-block">
-                          บัญชีโบนัส
-                        </CBadge>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <div v-if="history.web_account_number">
+                        <div v-if="history.sub_type != 'bonus'">
+                          <CRow :xs="{ cols: 'auto', gutterX: 0, gutterY: 1 }">
+                            <CCol xs>
+                              <CImage
+                                fluid
+                                :src="getBankIMG(history.web_account_code)"
+                                width="20"
+                                class="ms-1 me-1"
+                              />
+                            </CCol>
+                            <CCol>
+                              <div class="fw-bolder">
+                                {{ history.web_account_number }}
+                              </div>
+                            </CCol>
+                          </CRow>
+                          <div class="fst-italic small">
+                            {{ history.web_account_name }}
+                          </div>
+                        </div>
+                        <div v-else class="d-inline-flex align-items-start">
+                          <CIcon class="text-info" :icon="ic.cibPalantir" />
+                          <CBadge color="info" class="ms-1 d-none d-md-block">
+                            บัญชีโบนัส
+                          </CBadge>
+                        </div>
+                      </div>
+                      <div v-else class="text-danger">
+                        <div>
+                          <CIcon :icon="ic.cilFire" size="sm" />
+                          ระบบผิดพลาด
+                        </div>
+                        <div class="small fw-lighter text-secondary">
+                          กรุณาติดต่อผู้ดูแล
+                        </div>
                       </div>
                     </CTableDataCell>
                     <CTableDataCell>
                       <div class="d-inline-flex align-items-start">
                         <CSpinner
-                          v-if="history.status == 'pending'"
-                          component="span"
                           color="warning"
                           size="sm"
                           class="me-1"
+                          :variant="
+                            history.status == 'pending' ? 'grow' : 'border'
+                          "
                         />
                         <CBadge :color="convertStatusColor(history.status)">
                           <!-- {{ convertHistoryStatus(history.status) }} -->
@@ -1568,42 +1597,61 @@
                 class="list-group-item d-flex justify-content-between align-items-center lh-1 py-1"
               >
                 ยูสเซอร์ลูกค้า:
-                <CButton
-                  size="sm"
-                  color="link"
-                  class="p-0"
-                  @click="
-                    navigateToNewTap(
-                      '/member/list/' +
-                        dataManageTransaction.web_aka +
-                        '/' +
-                        dataManageTransaction.memb_id,
-                    )
-                  "
-                >
-                  {{ dataManageTransaction.memb_username }}
-                </CButton>
+                <div v-if="dataManageTransaction.memb_username">
+                  <CButton
+                    size="sm"
+                    color="link"
+                    class="p-0"
+                    @click="
+                      navigateToNewTap(
+                        '/member/list/' +
+                          dataManageTransaction.web_aka +
+                          '/' +
+                          dataManageTransaction.memb_id,
+                      )
+                    "
+                  >
+                    {{ dataManageTransaction.memb_username }}
+                  </CButton>
+                </div>
+                <div v-else>
+                  <Select2
+                    class="text-start"
+                    tabindex="0"
+                    placeholder="กรุณาเลือกข้อมูลลูกค้า"
+                    v-model="dataManageTransaction.memb_id"
+                    :options="optMemberListMultiSelect"
+                    :settings="{
+                      width: '300px',
+                    }"
+                    @select="selectedMemberOnManage($event)"
+                  />
+                </div>
               </li>
               <li
                 class="list-group-item d-flex justify-content-between align-items-center"
               >
                 บัญชีลูกค้า:
-                <div class="text-end d-flex">
-                  <div class="d-inline d-block">
-                    <div class="fw-bolder lh-1">
-                      {{ dataManageTransaction.memb_bank }}
+                <div v-if="dataManageTransaction.memb_bank">
+                  <div class="text-end d-flex">
+                    <div class="d-inline d-block">
+                      <div class="fw-bolder lh-1">
+                        {{ dataManageTransaction.memb_bank }}
+                      </div>
+                      <div class="fst-italic small">
+                        {{ dataManageTransaction.memb_name }}
+                      </div>
                     </div>
-                    <div class="fst-italic small">
-                      {{ dataManageTransaction.memb_name }}
+                    <div class="d-inline">
+                      <CImage
+                        fluid
+                        :src="
+                          getBankIMG(dataManageTransaction.memb_banking_code)
+                        "
+                        width="30"
+                        class="ms-2"
+                      />
                     </div>
-                  </div>
-                  <div class="d-inline">
-                    <CImage
-                      fluid
-                      :src="getBankIMG(dataManageTransaction.memb_banking_code)"
-                      width="30"
-                      class="ms-2"
-                    />
                   </div>
                 </div>
               </li>
@@ -1611,22 +1659,35 @@
                 class="list-group-item d-flex justify-content-between align-items-center"
               >
                 บัญชีเว็บ:
-                <div class="text-end d-flex">
-                  <div class="d-inline d-block">
-                    <div class="fw-bolder lh-1">
-                      {{ dataManageTransaction.web_account_number }}
+                <div v-if="dataManageTransaction.web_account_number">
+                  <div class="text-end d-flex">
+                    <div class="d-inline d-block">
+                      <div class="fw-bolder lh-1">
+                        {{ dataManageTransaction.web_account_number }}
+                      </div>
+                      <div class="fst-italic small">
+                        {{ dataManageTransaction.web_account_name }}
+                      </div>
                     </div>
-                    <div class="fst-italic small">
-                      {{ dataManageTransaction.web_account_name }}
+                    <div class="d-inline">
+                      <CImage
+                        fluid
+                        :src="
+                          getBankIMG(dataManageTransaction.web_account_code)
+                        "
+                        width="30"
+                        class="ms-2"
+                      />
                     </div>
                   </div>
-                  <div class="d-inline">
-                    <CImage
-                      fluid
-                      :src="getBankIMG(dataManageTransaction.web_account_code)"
-                      width="30"
-                      class="ms-2"
-                    />
+                </div>
+                <div v-else class="text-danger text-end">
+                  <div>
+                    <CIcon :icon="ic.cilFire" size="sm" />
+                    ระบบผิดพลาด
+                  </div>
+                  <div class="small fw-lighter text-secondary">
+                    กรุณาติดต่อผู้ดูแล
                   </div>
                 </div>
               </li>
@@ -1691,12 +1752,17 @@
                     size="sm"
                     color="success"
                     class="text-light"
+                    v-show="dataManageTransaction.memb_id"
                     @click="
                       submitTransactionStatus(
                         dataManageTransaction._id,
                         'approve',
                         dataManageTransaction.type,
                         dataManageTransactionNote,
+                        dataManageTransaction.memb_id,
+                        dataManageTransaction.from_bank_id,
+                        dataManageTransaction.from_account_id,
+                        dataManageTransaction.silp_image,
                       )
                     "
                   >
@@ -1713,6 +1779,10 @@
                         'cancel',
                         dataManageTransaction.type,
                         dataManageTransactionNote,
+                        dataManageTransaction.memb_id,
+                        dataManageTransaction.from_bank_id,
+                        dataManageTransaction.from_account_id,
+                        dataManageTransaction.silp_image,
                       )
                     "
                   >
@@ -1732,6 +1802,10 @@
                         'save',
                         dataManageTransaction.type,
                         dataManageTransactionNote,
+                        dataManageTransaction.memb_id,
+                        dataManageTransaction.from_bank_id,
+                        dataManageTransaction.from_account_id,
+                        dataManageTransaction.silp_image,
                       )
                     "
                   >
@@ -1747,6 +1821,10 @@
                         dataManageTransaction._id,
                         'close',
                         dataManageTransaction.type,
+                        '',
+                        '',
+                        '',
+                        '',
                         '',
                       )
                     "
@@ -1869,6 +1947,8 @@ import {
   cilPencil,
   cilSave,
   cilCog,
+  cilSad,
+  cilFire,
 } from '@coreui/icons'
 
 import { mapActions, mapGetters } from 'vuex'
@@ -2001,6 +2081,8 @@ export default {
         cilPencil,
         cilSave,
         cilCog,
+        cilSad,
+        cilFire,
       },
     }
   },
@@ -2339,7 +2421,16 @@ export default {
         this.submitTransactionStatus(_id, 'approve', _type, _description)
       }
     },
-    async submitTransactionStatus(_id, _status, _type, _description) {
+    async submitTransactionStatus(
+      _id,
+      _status,
+      _type,
+      _description,
+      _memb_id,
+      _bank_id,
+      _bank_account_id,
+      _silp_image,
+    ) {
       // Check, Approve, Cancel, Close
       await this.$http
         .post('panel/updatetransaction', {
@@ -2347,6 +2438,10 @@ export default {
           status: _status,
           type: _type,
           description: _description.trim(),
+          memb_id: _memb_id,
+          bank_id: _bank_id,
+          bank_account_id: _bank_account_id,
+          silp_image: _silp_image,
         })
         .then((response) => {
           if (response.data.status == 200) {
@@ -2396,6 +2491,7 @@ export default {
         .then((response) => {
           if (response.data.status == 200) {
             this.dataManageTransaction = response.data.result
+            this.getMemberList(this.dataManageTransaction.agent_id)
             this.mdManageTransaction = true
             console.log(
               'call api - panel/historybyId : status = ' +
@@ -2518,6 +2614,22 @@ export default {
         return false
       }
     },
+    selectedMemberOnManage({ id }) {
+      console.log('id', id)
+      for (let i = 0; i < this.optMemberList.length; i++) {
+        if (id == this.optMemberList[i]._id) {
+          console.log('loop i', this.optMemberList[i])
+          // this.dataManageTransaction.memb_id =
+          // this.optMemberList[i].banking_account.bank_id
+          this.dataManageTransaction.memb_bank =
+            this.optMemberList[i].banking_account.account_number
+          this.dataManageTransaction.memb_name =
+            this.optMemberList[i].banking_account.account_name
+          this.dataManageTransaction.memb_banking_code =
+            this.optMemberList[i].banking_account.bank_code
+        }
+      }
+    },
     // convert functions
     getImgAvatar(role, avatar) {
       try {
@@ -2600,6 +2712,8 @@ export default {
         return 'success'
       } else if (_val == 'pending') {
         return 'warning'
+      } else if (_val == 'save') {
+        return 'warning'
       } else if (_val == 'cancel') {
         return 'danger'
       } else {
@@ -2652,7 +2766,7 @@ export default {
       if (_val == 'system') {
         return 'secondary'
       } else {
-        return 'warning'
+        return 'primary'
       }
     },
     myChangeEvent(val) {

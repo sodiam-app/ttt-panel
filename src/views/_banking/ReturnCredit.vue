@@ -24,6 +24,21 @@
                 {{ option.name }}
               </option>
             </CFormSelect>
+            <CButton
+              class="me-1"
+              color="light"
+              size="sm"
+              @click="
+                exportCSVFile(
+                  csvtemplate_headers,
+                  csvtemplate_itemsFormatted,
+                  csvtemplate_fileTitle,
+                )
+              "
+            >
+              <CIcon :icon="ic.cilArrowThickToBottom" size="sm" />
+              ตัวอย่าง
+            </CButton>
             <CButton color="primary" size="sm" @click="$refs.myFile.click()">
               <CIcon :icon="ic.cilPlaylistAdd" />
               สร้าง
@@ -237,10 +252,10 @@
           ไม่สำเร็จ : {{ dataWinLossByIDSummary.fail }}
         </CBadge>
         <CBadge color="dark" shape="rounded-pill" class="ms-1">
-          Cash : {{ dataWinLossByIDSummary.amountCash }}
+          Cash : {{ convertAmount2Degit(dataWinLossByIDSummary.amountCash) }}
         </CBadge>
         <CBadge color="info" shape="rounded-pill" class="ms-1">
-          Bonus : {{ dataWinLossByIDSummary.amountBonus }}
+          Bonus : {{ convertAmount2Degit(dataWinLossByIDSummary.amountBonus) }}
         </CBadge>
       </div>
       <div class="table-responsive">
@@ -283,27 +298,57 @@
               <CTableHeaderCell scope="row" class="text-center">
                 {{ index + 1 }}.
               </CTableHeaderCell>
-              <CTableDataCell>{{ transac.username }}</CTableDataCell>
+              <CTableDataCell>
+                <CButton
+                  size="sm"
+                  color="link"
+                  class="p-0"
+                  v-if="transac.transaction_file.member_id"
+                  @click="
+                    navigateToNewTap(
+                      '/member/list/' +
+                        transac.transaction_file.prefix +
+                        '/' +
+                        transac.transaction_file.member_id,
+                    )
+                  "
+                  >{{ transac.transaction_file.username }}
+                </CButton>
+                <span v-else>
+                  {{ transac.transaction_file.username }}
+                </span>
+              </CTableDataCell>
               <CTableDataCell class="text-center">
                 <CBadge
                   shape="rounded-pill"
                   class="ms-1"
-                  :color="convertTypeColor(transac.type)"
+                  :color="convertTypeColor(transac.transaction_file.type)"
                 >
-                  {{ transac.type }}
+                  {{ transac.transaction_file.type }}
                 </CBadge>
               </CTableDataCell>
               <CTableDataCell class="text-end">
-                {{ convertAmount2Degit(transac.amount) }}
+                {{ convertAmount2Degit(transac.transaction_file.amount) }}
               </CTableDataCell>
               <CTableDataCell class="text-center">
-                <CBadge :color="convertTransacStatusColor(transac.status)">
-                  {{ transac.status }}
+                <CBadge
+                  :color="
+                    convertTransacStatusColor(transac.transaction_file.status)
+                  "
+                >
+                  {{ transac.transaction_file.status }}
                 </CBadge>
               </CTableDataCell>
               <CTableDataCell>
-                <div v-if="typeof transac.description === 'object'">
-                  <div v-for="note in transac.description" :key="note._id">
+                <div
+                  v-if="
+                    typeof transac.transaction_file.description === 'object'
+                  "
+                >
+                  <div
+                    v-for="note in transac.transaction_file.description"
+                    :key="note._id"
+                  >
                     <CBadge
                       :color="convertUserNoteColor(note.username)"
                       shape="rounded-pill"
@@ -314,7 +359,7 @@
                   </div>
                 </div>
                 <div v-else>
-                  {{ transac.description }}
+                  {{ transac.transaction_file.description }}
                 </div>
               </CTableDataCell>
             </CTableRow>
@@ -362,12 +407,17 @@
       </CModalTitle>
     </CModalHeader>
     <CModalBody>
+      <div class="text-end mb-1">
+        <CBadge color="primary" class="ms-1">
+          ทั้งหมด {{ csvfileResult.length }} รายการ
+        </CBadge>
+      </div>
       <div class="table-responsive">
         <CTable small hover bordered>
           <CTableHead color="secondary">
-            <CTableRow>
+            <CTableRow class="small">
               <CTableHeaderCell scope="col" colspan="6" class="text-center">
-                <CIcon :icon="ic.cilNewspaper" size="lg" />
+                <CIcon :icon="ic.cilNewspaper" size="sm" />
                 {{ csvfileName }}
               </CTableHeaderCell>
             </CTableRow>
@@ -593,6 +643,7 @@ import {
   cilWarning,
   cilNoteAdd,
   cilNewspaper,
+  cilArrowThickToBottom,
 } from '@coreui/icons'
 import { mapActions } from 'vuex'
 import moment from 'moment'
@@ -626,6 +677,28 @@ export default {
       csvfileName: 'mockup-demo-001.csv',
       csvFailAllTrans: false,
       dupFile: false,
+      // export template
+      csvtemplate_headers: {
+        username: 'User ID'.replace(/,/g, ''), // remove commas to avoid errors
+        amount: 'Amount',
+        type: 'Cash(1) / Bonus (2)',
+        note: 'Note',
+      },
+      csvtemplate_itemsFormatted: [
+        {
+          username: '99dev101000019'.replace(/,/g, ''),
+          amount: '100',
+          type: '1',
+          note: '(ตัวอย่างที่ 1 ประเภท cash)',
+        },
+        {
+          username: '99dev101000002'.replace(/,/g, ''),
+          amount: '50',
+          type: '2',
+          note: '(ตัวอย่างที่ 2 ประเภท bonus)',
+        },
+      ],
+      csvtemplate_fileTitle: 'csv-template-import-return-credit-v1',
       // icons
       ic: {
         cilLoopCircular,
@@ -638,6 +711,7 @@ export default {
         cilWarning,
         cilNoteAdd,
         cilNewspaper,
+        cilArrowThickToBottom,
       },
     }
   },
@@ -651,6 +725,11 @@ export default {
         content: _content,
         color: _color,
       })
+    },
+    navigateToNewTap(route) {
+      // this.$router.push(route)
+      let _route = this.$router.resolve({ path: route })
+      window.open(_route.href)
     },
 
     async getWebPrefixList() {
@@ -954,7 +1033,6 @@ export default {
               lines = csv.split('\r' + '\n')
               // header = lines[0].split(',')
               header = [
-                'row',
                 'username',
                 'amount',
                 'type',
@@ -985,21 +1063,20 @@ export default {
                     j == 3 ||
                     j == 4 ||
                     j == 5 ||
-                    j == 6 ||
-                    j == 7
+                    j == 6
                   ) {
                     let head = header[j].trim()
                     let value = ''
 
                     // validations
-                    if (j == 1) {
+                    if (j == 0) {
                       // Customer name
                       if (currentline[j] == '') {
                         _checked = false
                         _valid = false
                       }
                     }
-                    if (j == 2) {
+                    if (j == 1) {
                       // Amount > 0
                       let _number = Number(currentline[j])
                       if (_number <= 0) {
@@ -1007,14 +1084,14 @@ export default {
                         _valid = false
                       }
                     }
-                    if (j == 3) {
+                    if (j == 2) {
                       // Type (Cash / Bonus)
                       if (currentline[j] != '2') {
                         _checked = false
                         _valid = false
                       }
                     }
-                    if (j == 4) {
+                    if (j == 3) {
                       // Description
                       if (currentline[j] == '') {
                         _checked = false
@@ -1024,10 +1101,10 @@ export default {
                     // -----
 
                     // final loop
-                    if (j == 6) {
+                    if (j == 5) {
                       currentline.push(_checked)
                     }
-                    if (j == 7) {
+                    if (j == 6) {
                       currentline.push(_valid)
                     }
 
@@ -1036,7 +1113,7 @@ export default {
                     } else {
                       value = currentline[j]
                     }
-                    if (j == 2) {
+                    if (j == 1) {
                       this.csvfileAmountTotal += Number(currentline[j])
                     }
                     obj[head] = value
@@ -1068,6 +1145,54 @@ export default {
           this.dupFile = false
         }
       }
+    },
+    exportCSVFile(headers, items, fileTitle) {
+      if (headers) {
+        items.unshift(headers)
+      }
+
+      // Convert Object to JSON
+      var jsonObject = JSON.stringify(items)
+
+      var csv = this.convertToCSV(jsonObject)
+
+      var exportedFilenmae = fileTitle + '.csv' || 'export.csv'
+
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+      if (navigator.msSaveBlob) {
+        // IE 10+
+        navigator.msSaveBlob(blob, exportedFilenmae)
+      } else {
+        var link = document.createElement('a')
+        if (link.download !== undefined) {
+          // feature detection
+          // Browsers that support HTML5 download attribute
+          var url = URL.createObjectURL(blob)
+          link.setAttribute('href', url)
+          link.setAttribute('download', exportedFilenmae)
+          link.style.visibility = 'hidden'
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        }
+      }
+    },
+    convertToCSV(objArray) {
+      var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray
+      var str = ''
+
+      for (var i = 0; i < array.length; i++) {
+        var line = ''
+        for (var index in array[i]) {
+          if (line != '') line += ','
+
+          line += array[i][index]
+        }
+
+        str += line + '\r\n'
+      }
+
+      return str
     },
   },
   mounted() {
