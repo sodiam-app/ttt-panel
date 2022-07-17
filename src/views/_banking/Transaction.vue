@@ -306,6 +306,16 @@
               รายการล่าสุด
             </CNavLink>
           </CNavItem>
+          <CNavItem>
+            <CNavLink
+              class="text-reset"
+              href="javascript:void(0);"
+              :active="tabPaneActiveKey === 3"
+              @click="onClicktabPaneActive(3)"
+            >
+              กำลังดำเนินการ
+            </CNavLink>
+          </CNavItem>
         </CNav>
       </CCardHeader>
       <CCardBody class="pt-1">
@@ -590,6 +600,12 @@
                     </CTableDataCell>
                   </CTableRow>
                 </CTableBody>
+                <CTableCaption
+                  class="text-center text-reset"
+                  v-show="dataHistory.length == 0"
+                >
+                  ไม่พบข้อมูลลูกค้าในระบบ
+                </CTableCaption>
               </CTable>
             </div>
           </CCardText>
@@ -688,32 +704,38 @@
                       </CRow>
                     </CTableDataCell>
                     <CTableDataCell>
-                      <CButton
-                        size="sm"
-                        color="link"
-                        class="p-0"
-                        @click="
-                          navigateToNewTap(
-                            '/member/list/' +
-                              historylasted.web_aka +
-                              '/' +
-                              historylasted.memb_id,
-                          )
-                        "
-                        >{{ historylasted.memb_username }}
-                      </CButton>
-                      <br />
-                      <CBadge
-                        :color="
-                          convertMemberStatusColor(historylasted.memb_status)
-                        "
-                        shape="rounded-pill"
-                      >
-                        {{ convertMemberStatus(historylasted.memb_status) }}
-                      </CBadge>
+                      <div v-if="historylasted.memb_username">
+                        <CButton
+                          size="sm"
+                          color="link"
+                          class="p-0"
+                          @click="
+                            navigateToNewTap(
+                              '/member/list/' +
+                                historylasted.web_aka +
+                                '/' +
+                                historylasted.memb_id,
+                            )
+                          "
+                          >{{ historylasted.memb_username }}
+                        </CButton>
+                        <br />
+                        <CBadge
+                          :color="
+                            convertMemberStatusColor(historylasted.memb_status)
+                          "
+                          shape="rounded-pill"
+                        >
+                          {{ convertMemberStatus(historylasted.memb_status) }}
+                        </CBadge>
+                      </div>
+                      <div v-else class="text-danger fw-bolder">
+                        <CIcon :icon="ic.cilSad" size="sm" />
+                        ระบุลูกค้าไม่ได้
+                      </div>
                     </CTableDataCell>
                     <CTableDataCell>
-                      <div>
+                      <div v-show="historylasted.memb_bank">
                         <CRow :xs="{ cols: 'auto', gutterX: 0, gutterY: 1 }">
                           <CCol xs>
                             <CImage
@@ -736,23 +758,27 @@
                     </CTableDataCell>
                     <CTableDataCell>
                       <div v-if="historylasted.sub_type != 'bonus'">
-                        <CRow :xs="{ cols: 'auto', gutterX: 0, gutterY: 1 }">
-                          <CCol xs>
-                            <CImage
-                              fluid
-                              :src="getBankIMG(historylasted.web_account_code)"
-                              width="20"
-                              class="ms-1 me-1"
-                            />
-                          </CCol>
-                          <CCol>
-                            <div class="fw-bolder">
-                              {{ historylasted.web_account_number }}
-                            </div>
-                          </CCol>
-                        </CRow>
-                        <div class="fst-italic small">
-                          {{ historylasted.web_account_name }}
+                        <div v-show="historylasted.web_account_number">
+                          <CRow :xs="{ cols: 'auto', gutterX: 0, gutterY: 1 }">
+                            <CCol xs>
+                              <CImage
+                                fluid
+                                :src="
+                                  getBankIMG(historylasted.web_account_code)
+                                "
+                                width="20"
+                                class="ms-1 me-1"
+                              />
+                            </CCol>
+                            <CCol>
+                              <div class="fw-bolder">
+                                {{ historylasted.web_account_number }}
+                              </div>
+                            </CCol>
+                          </CRow>
+                          <div class="fst-italic small">
+                            {{ historylasted.web_account_name }}
+                          </div>
                         </div>
                       </div>
                       <div v-else class="d-inline-flex align-items-start">
@@ -768,7 +794,10 @@
                       </CBadge>
                     </CTableDataCell>
                     <CTableDataCell>
-                      <div class="align-items-center">
+                      <div
+                        v-show="historylasted.approve_by"
+                        class="align-items-center"
+                      >
                         <CAvatar
                           :src="
                             getImgAvatar(
@@ -804,8 +833,32 @@
                     </CTableDataCell>
                   </CTableRow>
                 </CTableBody>
+                <CTableCaption
+                  class="text-center text-reset"
+                  v-show="dataHistoryLasted.length == 0"
+                >
+                  ไม่พบข้อมูลลูกค้าในระบบ
+                </CTableCaption>
               </CTable>
             </div>
+          </CCardText>
+          <div class="text-center">
+            <CSmartPagination
+              :activePage="activePage2"
+              :pages="totalPage2"
+              size="sm"
+              align="end"
+            />
+          </div>
+        </CTabPane>
+        <!-- กำลังดำเนินการ -->
+        <CTabPane
+          role="tabpanel"
+          aria-labelledby="profile-tab"
+          :visible="tabPaneActiveKey === 3"
+        >
+          <CCardText class="small mb-0">
+            ยังไม่สามารถใช้งานได้ (อยู่ระหว่างการพัฒนาระบบ)
           </CCardText>
           <div class="text-center">
             <CSmartPagination
@@ -1330,7 +1383,7 @@
   <!-- ----- -->
   <!-- Confirm Approve -->
   <!-- ------ -->
-  <CModal
+  <!-- <CModal
     backdrop="static"
     :visible="mdConfirmApprove"
     @close="
@@ -1509,7 +1562,7 @@
         </CCardBody>
       </CCard>
     </CModalBody>
-  </CModal>
+  </CModal> -->
 
   <!-- ----- -->
   <!-- Manage Transaction -->
@@ -1524,7 +1577,7 @@
     "
   >
     <CModalBody class="m-0 p-0">
-      <CCard class="border-warning m-0 p-0">
+      <CCard class="border-warning border-top-4 m-0 p-0">
         <CCardBody>
           <CCardText class="small text-center">
             <CModalTitle class="fw-bolder text-decoration-underline mb-1 mt-1">
@@ -2010,6 +2063,7 @@ export default {
         transaction_time: Date(),
         amount: '0',
         description: '',
+        silp_image: '',
         errorVisible: false,
         errorMessage: '',
       },
@@ -2233,6 +2287,7 @@ export default {
             transaction_date: moment().format(),
             amount: this.dataDeposit.amount,
             description: this.dataDeposit.description,
+            silp_image: this.dataDeposit.silp_image,
           })
           .then((response) => {
             if (response.data.status == 200) {

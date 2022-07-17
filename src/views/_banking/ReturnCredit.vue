@@ -927,7 +927,7 @@ export default {
     // functions
     onchgPrefix(_id) {
       this.currentWebAgent = _id
-      this.getMemberList(_id)
+      // this.getMemberList(_id)
     },
     convertTransacStatusColor(_val) {
       if (_val == 'success') {
