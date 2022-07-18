@@ -1012,7 +1012,7 @@
                     />
                   </div>
                   <div v-show="dataAddBank.type == 'deposit'">
-                    <label for="cFName" class="form-label mb-1">
+                    <label class="form-label mb-1">
                       QR Code
                       <span class="small text-muted">
                         (สำหรับแสดงที่หน้าจอลูกค้า)

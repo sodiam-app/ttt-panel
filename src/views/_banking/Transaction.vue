@@ -391,6 +391,16 @@
                       <CBadge :color="convertTypeColor(history.type)">
                         {{ convertType(history.type) }}
                       </CBadge>
+                      <span class="ms-1" v-show="history.silp_image">
+                        <CButton
+                          size="sm"
+                          color="link"
+                          class="p-0 trxt-reset"
+                          @click="clickshowImage(history.silp_image)"
+                        >
+                          <CIcon :icon="ic.cilImagePlus" />
+                        </CButton>
+                      </span>
                     </CTableDataCell>
                     <CTableDataCell>
                       <strong class="fst-italic">
@@ -681,6 +691,16 @@
                       <CBadge :color="convertTypeColor(historylasted.type)">
                         {{ convertType(historylasted.type) }}
                       </CBadge>
+                      <span class="ms-1" v-show="historylasted.silp_image">
+                        <CButton
+                          size="sm"
+                          color="link"
+                          class="p-0 trxt-reset"
+                          @click="clickshowImage(historylasted.silp_image)"
+                        >
+                          <CIcon :icon="ic.cilImagePlus" />
+                        </CButton>
+                      </span>
                     </CTableDataCell>
                     <CTableDataCell>
                       <strong class="fst-italic">
@@ -1081,9 +1101,9 @@
                       !v$.dataDeposit.memb_id.$error && validatedDeposit,
                   }"
                 />
-                <div class="form-text mt-0 mb-2">
+                <!-- <div class="form-text mt-0 mb-2">
                   สามารถค้นหาด้วย: ยูส, เบอร์โทร, ชื่อ
-                </div>
+                </div> -->
               </div>
               <div v-if="!isBonusDeposit" class="mb-1">
                 <label for="depositDateTime" class="form-label mb-1">
@@ -1115,7 +1135,7 @@
                   </CCol>
                 </CRow>
               </div>
-              <div class="mb-1">
+              <div class="mb-2">
                 <label for="depositAmount" class="form-label mb-1">
                   * ยอดเงิน
                 </label>
@@ -1141,7 +1161,7 @@
                   <!-- <CInputGroupText> ฿ </CInputGroupText> -->
                 </CInputGroup>
               </div>
-              <hr class="mb-2" />
+              <!-- <hr class="mb-2" /> -->
               <div class="mb-1">
                 <div class="form-floating">
                   <textarea
@@ -1153,6 +1173,61 @@
                   ></textarea>
                   <label for="floatingTextarea2">หมายเหตุ</label>
                 </div>
+              </div>
+              <hr class="mb-2 mt-1" />
+              <div>
+                <label class="form-label mb-1">
+                  สลิปโอนเงิน
+                  <span class="small text-muted"> (ถ้ามี) </span>
+                </label>
+                <CRow :xs="{ cols: 'auto' }" class="justify-content-start">
+                  <CCol v-if="dataDeposit.silp_image">
+                    <div class="clearfix ms-1">
+                      <CImage
+                        align="center"
+                        class="border"
+                        height="150"
+                        rounded
+                        :src="dataDeposit.silp_image"
+                      />
+                    </div>
+                  </CCol>
+                  <CCol>
+                    <div class="text-start">
+                      <div class="d-grid gap-2 d-block justify-content-start">
+                        <CButton
+                          color="dark"
+                          size="sm"
+                          shape="rounded-pill"
+                          variant="outline"
+                          @click="$refs.fileInputAddDeposit.click()"
+                        >
+                          <CIcon :icon="ic.cilCloudUpload" />
+                          อัพโหลด
+                        </CButton>
+                        <CButton
+                          color="danger"
+                          size="sm"
+                          shape="rounded-pill"
+                          variant="outline"
+                          @click="dataDeposit.silp_image = ''"
+                          v-if="dataDeposit.silp_image"
+                        >
+                          <CIcon :icon="ic.cilTrash" />
+                          ลบ
+                        </CButton>
+                      </div>
+                      <input
+                        style="display: none"
+                        type="file"
+                        accept=".png, .jpg, jpeg"
+                        class="form-control form-control-sm"
+                        ref="fileInputAddDeposit"
+                        @change="pickFile('deposit')"
+                      />
+                    </div>
+                  </CCol>
+                </CRow>
               </div>
               <hr />
               <CAlert
@@ -1811,6 +1886,65 @@
               ></textarea>
               <label for="floatingTextarea2">หมายเหตุ</label>
             </div>
+            <hr class="mb-2 mt-1" />
+            <div
+              class="text-start"
+              v-if="dataManageTransaction.type == 'deposit'"
+            >
+              <label class="form-label mb-1">
+                สลิปโอนเงิน
+                <span class="small text-muted"> (ถ้ามี) </span>
+              </label>
+              <CRow :xs="{ cols: 'auto' }" class="justify-content-center">
+                <CCol v-if="dataManageTransaction.silp_image">
+                  <div class="clearfix ms-1">
+                    <CImage
+                      align="center"
+                      class="border"
+                      height="150"
+                      rounded
+                      :src="dataManageTransaction.silp_image"
+                      @click="clickshowImage(dataManageTransaction.silp_image)"
+                    />
+                  </div>
+                </CCol>
+                <CCol>
+                  <div class="text-start">
+                    <div class="d-grid gap-2 d-block justify-content-start">
+                      <CButton
+                        color="dark"
+                        size="sm"
+                        shape="rounded-pill"
+                        variant="outline"
+                        @click="$refs.fileInputManageTrans.click()"
+                      >
+                        <CIcon :icon="ic.cilCloudUpload" />
+                        อัพโหลด
+                      </CButton>
+                      <CButton
+                        color="danger"
+                        size="sm"
+                        shape="rounded-pill"
+                        variant="outline"
+                        @click="dataManageTransaction.silp_image = ''"
+                        v-if="dataManageTransaction.silp_image"
+                      >
+                        <CIcon :icon="ic.cilTrash" />
+                        ลบ
+                      </CButton>
+                    </div>
+                    <input
+                      style="display: none"
+                      type="file"
+                      accept=".png, .jpg, jpeg"
+                      class="form-control form-control-sm"
+                      ref="fileInputManageTrans"
+                      @change="pickFile('manage')"
+                    />
+                  </div>
+                </CCol>
+              </CRow>
+            </div>
             <hr />
             <div class="text-center mb-2">
               <div class="d-flex justify-content-between">
@@ -1982,6 +2116,41 @@
       </div>
     </CModalFooter> -->
   </CModal>
+
+  <!-- ----- -->
+  <!-- Showning image -->
+  <!-- ------ -->
+  <CModal
+    :visible="mdShownImage"
+    @close="
+      () => {
+        mdShownImage = false
+      }
+    "
+  >
+    <CModalBody>
+      <div class="d-grid gap-2 d-flex justify-content-end mb-2">
+        <CButton
+          size="sm"
+          color="dark"
+          class="text-light ms-1"
+          @click="
+            () => {
+              mdShownImage = false
+              showImage = ''
+            }
+          "
+        >
+          <CIcon :icon="ic.cilX" />
+          ปิด
+        </CButton>
+      </div>
+
+      <div class="clearfix">
+        <CImage align="center" fluid :src="showImage" />
+      </div>
+    </CModalBody>
+  </CModal>
 </template>
 
 <script>
@@ -2017,6 +2186,9 @@ import {
   cilCog,
   cilSad,
   cilFire,
+  cilTrash,
+  cilCloudUpload,
+  cilImagePlus,
 } from '@coreui/icons'
 
 import { mapActions, mapGetters } from 'vuex'
@@ -2121,6 +2293,9 @@ export default {
       validatedDeposit: false,
       validatedWithdraw: false,
 
+      // shown image
+      mdShownImage: false,
+      imageShowing: '',
       // icons
       ic: {
         cilCash,
@@ -2152,6 +2327,9 @@ export default {
         cilCog,
         cilSad,
         cilFire,
+        cilTrash,
+        cilCloudUpload,
+        cilImagePlus,
       },
     }
   },
@@ -2314,6 +2492,7 @@ export default {
               this.dataDeposit.amount = '0'
               this.dataDeposit.description = ''
               this.dataDeposit.account_withdraw = ''
+              this.dataDeposit.silp_image = ''
               this.isBonusDeposit = false
 
               this.dataDeposit.errorVisible = false
@@ -2702,6 +2881,34 @@ export default {
           this.dataManageTransaction.memb_banking_code =
             this.optMemberList[i].banking_account.bank_code
         }
+      }
+    },
+    clickshowImage(_value) {
+      this.showImage = _value
+      this.mdShownImage = true
+    },
+    pickFile(_type) {
+      let input = null
+      if (_type == 'deposit') {
+        input = this.$refs.fileInputAddDeposit
+      }
+      if (_type == 'manage') {
+        input = this.$refs.fileInputManageTrans
+      }
+      let file = input.files
+      if (file && file[0]) {
+        let reader = new FileReader()
+        reader.onload = (e) => {
+          this.previewImage = e.target.result
+          if (_type == 'deposit') {
+            this.dataDeposit.silp_image = reader.result
+          }
+          if (_type == 'manage') {
+            this.dataManageTransaction.silp_image = reader.result
+          }
+        }
+        reader.readAsDataURL(file[0])
+        this.$emit('input', file[0])
       }
     },
     // convert functions

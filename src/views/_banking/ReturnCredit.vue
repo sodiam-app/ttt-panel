@@ -36,7 +36,7 @@
                 )
               "
             >
-              <CIcon :icon="ic.cilArrowThickToBottom" size="sm" />
+              <CIcon :icon="ic.cilCloudDownload" size="sm" />
               ตัวอย่าง
             </CButton>
             <CButton color="primary" size="sm" @click="$refs.myFile.click()">
@@ -66,7 +66,10 @@
                   <CTableHeaderCell scope="col" rowspan="2">
                     ชื่อไฟล์
                   </CTableHeaderCell>
-                  <CTableHeaderCell scope="col" colspan="4">
+                  <CTableHeaderCell scope="col" rowspan="2">
+                    สถานะไฟล์
+                  </CTableHeaderCell>
+                  <CTableHeaderCell scope="col" colspan="3">
                     สถานะ
                   </CTableHeaderCell>
                   <CTableHeaderCell scope="col" colspan="3">
@@ -85,7 +88,7 @@
                 <CTableRow>
                   <CTableHeaderCell scope="col"> สำเร็จ </CTableHeaderCell>
                   <CTableHeaderCell scope="col"> ไม่สำเร็จ </CTableHeaderCell>
-                  <CTableHeaderCell scope="col"> รอ </CTableHeaderCell>
+                  <!-- <CTableHeaderCell scope="col"> รอ </CTableHeaderCell> -->
                   <CTableHeaderCell scope="col"> ทั้งหมด </CTableHeaderCell>
                   <CTableHeaderCell scope="col"> Cash </CTableHeaderCell>
                   <CTableHeaderCell scope="col"> Bonus </CTableHeaderCell>
@@ -112,6 +115,11 @@
                       style="width: 0.8rem; height: 0.8rem"
                     />
                   </CTableDataCell>
+                  <CTableDataCell class="text-center">
+                    <CBadge :color="convertStatusColor(winloss.status)">
+                      {{ winloss.status }}
+                    </CBadge>
+                  </CTableDataCell>
                   <CTableDataCell
                     class="text-center"
                     :color="winloss.success ? 'success' : 'light'"
@@ -125,12 +133,12 @@
                   >
                     {{ winloss.fail }}
                   </CTableDataCell>
-                  <CTableDataCell
+                  <!-- <CTableDataCell
                     class="text-center"
                     :color="winloss.pending ? 'warning' : 'light'"
                   >
                     {{ winloss.pending }}
-                  </CTableDataCell>
+                  </CTableDataCell> -->
                   <CTableDataCell
                     class="text-center fw-bolder"
                     color="secondary"
@@ -234,43 +242,107 @@
       </CModalTitle>
     </CModalHeader>
     <CModalBody class="small">
-      <div class="text-end mb-1">
-        <CBadge color="primary" class="ms-1">
-          ทั้งหมด : {{ dataWinLossByIDSummary.all }}
-        </CBadge>
-        <CBadge
-          color="warning"
-          class="ms-1"
-          v-show="dataWinLossByIDSummary.pending > 0"
-        >
-          รอดำเนินการ : {{ dataWinLossByIDSummary.pending }}
-        </CBadge>
-        <CBadge color="success" class="ms-1">
-          สำเร็จ : {{ dataWinLossByIDSummary.success }}
-        </CBadge>
-        <CBadge color="danger" class="ms-1">
-          ไม่สำเร็จ : {{ dataWinLossByIDSummary.fail }}
-        </CBadge>
-        <CBadge color="dark" shape="rounded-pill" class="ms-1">
-          Cash : {{ convertAmount2Degit(dataWinLossByIDSummary.amountCash) }}
-        </CBadge>
-        <CBadge color="info" shape="rounded-pill" class="ms-1">
-          Bonus : {{ convertAmount2Degit(dataWinLossByIDSummary.amountBonus) }}
-        </CBadge>
+      <div class="d-flex justify-content-between">
+        <div>
+          <span class="fs-6 fw-bold me-2">กรองสถานะ : </span>
+          <CFormCheck
+            inline
+            label="Processing"
+            v-model="filterProcessing"
+            @change="
+              filterStatusCalculate(
+                $event.target.checked,
+                filterSuccess,
+                filterFail,
+              )
+            "
+          />
+          <CFormCheck
+            inline
+            label="Success"
+            v-model="filterSuccess"
+            @change="
+              filterStatusCalculate(
+                filterProcessing,
+                $event.target.checked,
+                filterFail,
+              )
+            "
+          />
+          <CFormCheck
+            inline
+            label="Fail"
+            v-model="filterFail"
+            @change="
+              filterStatusCalculate(
+                filterProcessing,
+                filterSuccess,
+                $event.target.checked,
+              )
+            "
+          />
+        </div>
+        <div class="text-end mb-1">
+          <CBadge color="primary" class="ms-1">
+            ทั้งหมด : {{ dataWinLossByIDSummary.all }}
+          </CBadge>
+          <CBadge
+            color="warning"
+            class="ms-1"
+            v-show="dataWinLossByIDSummary.pending > 0"
+          >
+            รอดำเนินการ : {{ dataWinLossByIDSummary.pending }}
+          </CBadge>
+          <CBadge color="success" class="ms-1">
+            สำเร็จ : {{ dataWinLossByIDSummary.success }}
+          </CBadge>
+          <CBadge color="danger" class="ms-1">
+            ไม่สำเร็จ : {{ dataWinLossByIDSummary.fail }}
+          </CBadge>
+          <CBadge color="dark" shape="rounded-pill" class="ms-1">
+            Cash : {{ convertAmount2Degit(dataWinLossByIDSummary.amountCash) }}
+          </CBadge>
+          <CBadge color="info" shape="rounded-pill" class="ms-1">
+            Bonus :
+            {{ convertAmount2Degit(dataWinLossByIDSummary.amountBonus) }}
+          </CBadge>
+        </div>
       </div>
       <div class="table-responsive">
         <CTable small hover bordered>
           <CTableHead color="secondary">
             <CTableRow>
               <CTableHeaderCell scope="col" colspan="6" class="text-center">
-                <CIcon :icon="ic.cilDescription" />
-                {{ dataWinLossByIDSummary.file_name }}
-                <span class="small text-muted fw-lighter">
-                  <small>
-                    ({{ convertDate(dataWinLossByIDSummary.cr_date) }}
-                    {{ convertTime(dataWinLossByIDSummary.cr_date) }})
-                  </small>
-                </span>
+                <div class="d-flex justify-content-between">
+                  <div></div>
+                  <div class="align-self-center">
+                    <CIcon :icon="ic.cilDescription" />
+                    {{ dataWinLossByIDSummary.file_name }}
+                    <span
+                      class="small text-muted fw-lighter"
+                      v-show="dataWinLossByIDSummary.cr_date"
+                    >
+                      <small>
+                        ({{ convertDate(dataWinLossByIDSummary.cr_date) }}
+                        {{ convertTime(dataWinLossByIDSummary.cr_date) }})
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <CButton
+                      color="primary"
+                      variant="outline"
+                      shape="rounded-pill"
+                      size="sm"
+                      class="ms-2"
+                      style="padding: 0.09em 0.49em"
+                      @click="viewWinLossByID(transactionID)"
+                    >
+                      <CIcon :icon="ic.cilLoopCircular" />
+                      รีโหลด
+                    </CButton>
+                  </div>
+                </div>
               </CTableHeaderCell>
             </CTableRow>
             <CTableRow>
@@ -294,6 +366,14 @@
             <CTableRow
               v-for="(transac, index) in dataWinLossByIDTransaction"
               :key="transac.id"
+              v-show="
+                (filterProcessing == true &&
+                  transac.transaction_file.status == 'processing') ||
+                (filterSuccess == true &&
+                  transac.transaction_file.status == 'success') ||
+                (filterFail == true &&
+                  transac.transaction_file.status == 'failed')
+              "
             >
               <CTableHeaderCell scope="row" class="text-center">
                 {{ index + 1 }}.
@@ -644,6 +724,7 @@ import {
   cilNoteAdd,
   cilNewspaper,
   cilArrowThickToBottom,
+  cilCloudDownload,
 } from '@coreui/icons'
 import { mapActions } from 'vuex'
 import moment from 'moment'
@@ -656,6 +737,7 @@ export default {
   data() {
     return {
       toasts: [],
+      transactionID: '',
 
       mdDemo: false,
       mdView: false,
@@ -666,7 +748,11 @@ export default {
       dataWinLossByIDSummary: {},
       dataWinLossByIDTransaction: [],
       totalWinLossByID: 0,
+
       listDataWinLoss: [],
+      filterProcessing: true,
+      filterSuccess: true,
+      filterFail: true,
       totalBonusWinLoss: 0,
       totalCashWinLoss: 0,
       totalWinLoss: 0,
@@ -712,6 +798,7 @@ export default {
         cilNoteAdd,
         cilNewspaper,
         cilArrowThickToBottom,
+        cilCloudDownload,
       },
     }
   },
@@ -799,6 +886,7 @@ export default {
         })
     },
     async viewWinLossByID(_id) {
+      this.transactionID = _id
       this.dataWinLossByIDSummary = {}
       this.dataWinLossByIDTransaction = []
       this.totalWinLossByID = 0
@@ -814,7 +902,11 @@ export default {
             this.totalWinLossByID =
               this.dataWinLossByIDSummary.amountBonus +
               this.dataWinLossByIDSummary.amountCash
+            this.filterProcessing = true
+            this.filterSuccess = true
+            this.filterFail = true
             this.mdView = true
+
             console.log(this.dataWinLossByIDSummary)
             console.log(this.dataWinLossByIDTransaction)
           } else if (
@@ -949,6 +1041,17 @@ export default {
         return 'warning'
       }
     },
+    convertStatusColor(_val) {
+      if (_val == 'pending') {
+        return 'info'
+      } else if (_val == 'processing') {
+        return 'warning'
+      } else if (_val == 'success') {
+        return 'success'
+      } else {
+        return 'light'
+      }
+    },
     convertUserNoteColor(value) {
       if (!value) return 'danger'
       const _val = value.toString().toLowerCase()
@@ -986,6 +1089,27 @@ export default {
       } else {
         return 'warning'
       }
+    },
+    filterStatusCalculate(_processing, _success, _fail) {
+      let _total = 0
+      for (let i = 0; i < this.dataWinLossByIDTransaction.length; i++) {
+        console.log(_processing, _success, _fail)
+        if (
+          (_processing &&
+            this.dataWinLossByIDTransaction[i].transaction_file.status ==
+              'processing') ||
+          (_success &&
+            this.dataWinLossByIDTransaction[i].transaction_file.status ==
+              'success') ||
+          (_fail &&
+            this.dataWinLossByIDTransaction[i].transaction_file.status ==
+              'failed')
+        ) {
+          _total += this.dataWinLossByIDTransaction[i].transaction_file.amount
+          console.log(_total)
+        }
+      }
+      this.totalWinLossByID = _total
     },
 
     pickFile(_confirmed) {
