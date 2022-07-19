@@ -893,12 +893,264 @@
           :visible="tabPaneActiveKey === 3"
         >
           <CCardText class="small mb-0">
-            ยังไม่สามารถใช้งานได้ (อยู่ระหว่างการพัฒนาระบบ)
+            <CRow fluid>
+              <CCol>
+                <div class="float-end">
+                  <div class="d-inline-flex align-items-center text-muted">
+                    <span class="me-2 small">
+                      <small><em>อัพเดทอัตโนมัติ</em></small>
+                    </span>
+                    <CFormSwitch id="formSwitchCheckChecked" disabled />
+                  </div>
+                </div>
+              </CCol>
+            </CRow>
+            <div class="table-responsive">
+              <CTable hover class="mb-3">
+                <CTableHead color="dark" class="fw-bold fst-italic">
+                  <CTableRow>
+                    <CTableHeaderCell scope="col">#</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">ช่องทาง</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">ประเภท</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">จำนวนเงิน</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">เวลา</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">
+                      ยูสเซอร์ลูกค้า
+                    </CTableHeaderCell>
+                    <CTableHeaderCell scope="col">ชื่อลูกค้า</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">บัญชีเว็บ</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">สถานะ</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">
+                      ผู้ดำเนินการ
+                    </CTableHeaderCell>
+                    <CTableHeaderCell scope="col">web</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">หมายเหตุ</CTableHeaderCell>
+                  </CTableRow>
+                </CTableHead>
+                <CTableBody>
+                  <CTableRow
+                    v-for="(historyProcessing, index) in dataHistoryProcessing"
+                    :key="historyProcessing.id"
+                    :color="convertTypeRowsColor(historyProcessing.type)"
+                  >
+                    <CTableHeaderCell scope="row">
+                      {{ index + 1 }}
+                    </CTableHeaderCell>
+                    <CTableDataCell>
+                      <div class="text-break"></div>
+                      <div class="d-inline-flex align-items-center">
+                        <CIcon :icon="ic.cilBank" />
+                        <CBadge color="dark" class="ms-1 d-none d-md-block">
+                          {{ historyProcessing.channel }}
+                        </CBadge>
+                      </div>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <CBadge :color="convertTypeColor(historyProcessing.type)">
+                        {{ convertType(historyProcessing.type) }}
+                      </CBadge>
+                      <span class="ms-1" v-show="historyProcessing.silp_image">
+                        <CButton
+                          size="sm"
+                          color="link"
+                          class="p-0 trxt-reset"
+                          @click="clickshowImage(historyProcessing.silp_image)"
+                        >
+                          <CIcon :icon="ic.cilImagePlus" />
+                        </CButton>
+                      </span>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <strong class="fst-italic">
+                        {{ convertAmount2Degit(historyProcessing.amount) }}
+                      </strong>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <CRow>
+                        <p class="m-0">
+                          {{
+                            convertTime(
+                              historyProcessing.approve_by.approve_date,
+                            )
+                          }}
+                        </p>
+                      </CRow>
+                      <CRow>
+                        <small class="fw-lighter m-0">
+                          {{
+                            convertDate(
+                              historyProcessing.approve_by.approve_date,
+                            )
+                          }}
+                        </small>
+                      </CRow>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <div v-if="historyProcessing.memb_username">
+                        <CButton
+                          size="sm"
+                          color="link"
+                          class="p-0"
+                          @click="
+                            navigateToNewTap(
+                              '/member/list/' +
+                                historyProcessing.web_aka +
+                                '/' +
+                                historyProcessing.memb_id,
+                            )
+                          "
+                          >{{ historyProcessing.memb_username }}
+                        </CButton>
+                        <br />
+                        <CBadge
+                          :color="
+                            convertMemberStatusColor(
+                              historyProcessing.memb_status,
+                            )
+                          "
+                          shape="rounded-pill"
+                        >
+                          {{
+                            convertMemberStatus(historyProcessing.memb_status)
+                          }}
+                        </CBadge>
+                      </div>
+                      <div v-else class="text-danger fw-bolder">
+                        <CIcon :icon="ic.cilSad" size="sm" />
+                        ระบุลูกค้าไม่ได้
+                      </div>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <div v-show="historyProcessing.memb_bank">
+                        <CRow :xs="{ cols: 'auto', gutterX: 0, gutterY: 1 }">
+                          <CCol xs>
+                            <CImage
+                              fluid
+                              :src="
+                                getBankIMG(historyProcessing.memb_banking_code)
+                              "
+                              width="20"
+                              class="ms-1 me-1"
+                            />
+                          </CCol>
+                          <CCol>
+                            <div class="fw-bolder">
+                              {{ historyProcessing.memb_bank }}
+                            </div>
+                          </CCol>
+                        </CRow>
+                        <div class="fst-italic small">
+                          {{ historyProcessing.memb_name }}
+                        </div>
+                      </div>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <div v-if="historyProcessing.sub_type != 'bonus'">
+                        <div v-show="historyProcessing.web_account_number">
+                          <CRow :xs="{ cols: 'auto', gutterX: 0, gutterY: 1 }">
+                            <CCol xs>
+                              <CImage
+                                fluid
+                                :src="
+                                  getBankIMG(historyProcessing.web_account_code)
+                                "
+                                width="20"
+                                class="ms-1 me-1"
+                              />
+                            </CCol>
+                            <CCol>
+                              <div class="fw-bolder">
+                                {{ historyProcessing.web_account_number }}
+                              </div>
+                            </CCol>
+                          </CRow>
+                          <div class="fst-italic small">
+                            {{ historyProcessing.web_account_name }}
+                          </div>
+                        </div>
+                      </div>
+                      <div v-else class="d-inline-flex align-items-start">
+                        <CIcon class="text-info" :icon="ic.cibPalantir" />
+                        <CBadge color="info" class="ms-1 d-none d-md-block">
+                          บัญชีโบนัส
+                        </CBadge>
+                      </div>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <CBadge
+                        :color="convertStatusColor(historyProcessing.status)"
+                      >
+                        {{ historyProcessing.status }}
+                      </CBadge>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <div
+                        v-if="historyProcessing.approve_by"
+                        class="align-items-center"
+                      >
+                        <CAvatar
+                          :src="
+                            getImgAvatar(
+                              historyProcessing.approve_by.approve_role,
+                              historyProcessing.approve_by.approve_avatar,
+                            )
+                          "
+                          size="sm"
+                          status="success"
+                          class="mb-1"
+                        />
+                        <CBadge color="dark" shape="rounded-pill">
+                          {{ historyProcessing.approve_by.approve_username }}
+                        </CBadge>
+                      </div>
+                      <div v-else>
+                        <CAvatar
+                          :src="getImgAvatar('system', '01.png')"
+                          size="sm"
+                          status="info"
+                          class="mb-1"
+                        />
+                        <CBadge
+                          color="light"
+                          shape="rounded-pill"
+                          class="text-dark"
+                        >
+                          ระบบออโต้
+                        </CBadge>
+                      </div>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      {{ historyProcessing.web_prefix }}
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <div
+                        v-for="note in historyProcessing.description"
+                        :key="note._id"
+                      >
+                        <CBadge
+                          :color="convertUserNoteColor(note.username)"
+                          shape="rounded-pill"
+                        >
+                          {{ note.username }}
+                        </CBadge>
+                        : {{ note.note }}
+                      </div>
+                    </CTableDataCell>
+                  </CTableRow>
+                </CTableBody>
+                <CTableCaption
+                  class="text-center text-reset"
+                  v-show="dataHistoryProcessing.length == 0"
+                >
+                  ไม่พบข้อมูลลูกค้าในระบบ
+                </CTableCaption>
+              </CTable>
+            </div>
           </CCardText>
           <div class="text-center">
             <CSmartPagination
-              :activePage="activePage2"
-              :pages="totalPage2"
+              :activePage="activePage3"
+              :pages="totalPage3"
               size="sm"
               align="end"
             />
@@ -1175,7 +1427,7 @@
                 </div>
               </div>
               <hr class="mb-2 mt-1" />
-              <div>
+              <div v-if="!isBonusDeposit">
                 <label class="form-label mb-1">
                   สลิปโอนเงิน
                   <span class="small text-muted"> (ถ้ามี) </span>
@@ -2270,6 +2522,8 @@ export default {
       activePage1: 1,
       totalPage2: 1,
       activePage2: 1,
+      totalPage3: 1,
+      activePage3: 1,
 
       // data
       flagAutoHistory: false,
@@ -2277,6 +2531,7 @@ export default {
       updateHistoryAuto: null,
       dataHistory: [],
       dataHistoryLasted: [],
+      dataHistoryProcessing: [],
       dataConfirmApprove: {},
       dataManageTransaction: {},
       dataManageTransactionNote: '',
@@ -2472,6 +2727,7 @@ export default {
           bank_id = this.dataDeposit.account_deposit
         } else {
           this.dataDeposit.account_deposit = ''
+          this.dataDeposit.silp_image = ''
         }
         await this.$http
           .post('panel/deposit', {
@@ -2545,6 +2801,7 @@ export default {
             transaction_date: moment().format(),
             amount: this.dataWithdraw.amount,
             description: this.dataWithdraw.description,
+            silp_image: '',
           })
           .then((response) => {
             if (response.data.status == 200) {
@@ -2645,6 +2902,34 @@ export default {
         })
         .catch((error) => {
           console.log('call api - panel/historylasted : error' + error)
+        })
+    },
+    async getHistoryProcessing() {
+      await this.$http
+        .post('panel/historyprocessing', {})
+        .then((response) => {
+          if (response.data.status == 200) {
+            this.dataHistoryProcessing = response.data.result
+            this.totalPage3 = Math.ceil(this.dataHistoryProcessing.length / 10)
+            console.log(this.dataHistoryProcessing)
+          } else if (
+            response.data.status == 502 ||
+            response.data.status == 503
+          ) {
+            this.tokenExpired().then(() => {
+              this.navigateTo('/pages/login')
+            })
+          } else {
+            console.log(
+              'call api - panel/historyprocessing : status = ' +
+                response.data.status +
+                ', message = ' +
+                response.data.message,
+            )
+          }
+        })
+        .catch((error) => {
+          console.log('call api - panel/historyprocessing : error' + error)
         })
     },
     async submitApprove(_id, _checked, _type, _description) {
@@ -2844,6 +3129,10 @@ export default {
       if (_index == 2) {
         this.getHistoryLasted()
       }
+      if (_index == 3) {
+        this.getHistoryProcessing()
+      }
+      this.navigateTo('/banking/transaction/' + _index)
     },
     checkLockedTransac(_locked) {
       if (!_locked) return true
@@ -3077,11 +3366,11 @@ export default {
     },
   },
   created() {
-    if (this.tabPaneActiveKey == 1) {
-      this.getHistory()
-    }
-    if (this.tabPaneActiveKey == 2) {
-      this.getHistoryLasted()
+    let _tab = this.$route.params.tab
+    if (_tab) {
+      this.onClicktabPaneActive(Number(_tab))
+    } else {
+      this.onClicktabPaneActive(1)
     }
   },
   computed: {

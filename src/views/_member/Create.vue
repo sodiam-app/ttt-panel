@@ -156,7 +156,7 @@
                           <label for="cStatus" class="form-label mb-0">
                             สถานะลูกค้า
                           </label>
-                          <CInputGroup>
+                          <CInputGroup class="has-validation">
                             <CInputGroupText id="basic-cStatus" class="px-2">
                               <CImage
                                 fluid
@@ -227,7 +227,7 @@
                           <label for="cSpecial" class="form-label mb-0">
                             สิทธิพิเศษ
                           </label>
-                          <CInputGroup>
+                          <CInputGroup class="has-validation">
                             <CInputGroupText id="basic-cStatus" class="px-2">
                               <CImage
                                 fluid
@@ -500,7 +500,7 @@
                           </CInputGroupText>
                           <CFormInput
                             id="cBankAcct"
-                            placeholder="011-1-11111-1"
+                            placeholder="0111111xxx"
                             v-model="dataMember.bank_acct"
                             feedbackInvalid="กรุณากรอกข้อมูลเลขที่บัญชีลูกค้า"
                             :invalid="v$.dataMember.bank_acct.$error"
@@ -596,8 +596,6 @@
                           </CInputGroupText>
                           <CFormInput
                             id="cLineID"
-                            placeholder="cus.id.xxx"
-                            aria-label="cus.id.xxx"
                             v-model="dataMember.line_id"
                             feedbackInvalid="กรุณากรอกข้อมูลให้ถูกต้อง"
                             :invalid="v$.dataMember.line_id.$error"

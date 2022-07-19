@@ -33,7 +33,7 @@ const routes = [
         redirect: '/banking/transaction',
         children: [
           {
-            path: '/banking/transaction',
+            path: '/banking/transaction/:tab?',
             name: 'Transaction',
             component: () => import('@/views/_banking/Transaction.vue'),
             meta: { requiresAuth: true },

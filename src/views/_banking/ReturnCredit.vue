@@ -10,20 +10,21 @@
             </strong>
           </div>
           <div class="d-inline-flex">
-            <CFormSelect
-              class="me-1"
-              style="width: 150px"
-              v-if="optWebAgent.length > 1"
-              @change="onchgPrefix($event.target.value)"
-            >
-              <option
-                v-for="option in optWebAgent"
-                :key="option._id"
-                :value="option._id"
+            <div v-show="optWebAgent.length > 1">
+              <CFormSelect
+                class="me-1"
+                style="width: 150px"
+                @change="onchgPrefix($event.target.value)"
               >
-                {{ option.name }}
-              </option>
-            </CFormSelect>
+                <option
+                  v-for="option in optWebAgent"
+                  :key="option._id"
+                  :value="option._id"
+                >
+                  {{ option.name }}
+                </option>
+              </CFormSelect>
+            </div>
             <CButton
               class="me-1"
               color="light"
@@ -65,6 +66,13 @@
                   </CTableHeaderCell>
                   <CTableHeaderCell scope="col" rowspan="2">
                     ชื่อไฟล์
+                  </CTableHeaderCell>
+                  <CTableHeaderCell
+                    scope="col"
+                    rowspan="2"
+                    v-show="optWebAgent.length > 1"
+                  >
+                    เว็บ
                   </CTableHeaderCell>
                   <CTableHeaderCell scope="col" rowspan="2">
                     สถานะไฟล์
@@ -114,6 +122,12 @@
                       size="sm"
                       style="width: 0.8rem; height: 0.8rem"
                     />
+                  </CTableDataCell>
+                  <CTableDataCell
+                    class="text-center"
+                    v-show="optWebAgent.length > 1"
+                  >
+                    {{ winloss.agent_name }}
                   </CTableDataCell>
                   <CTableDataCell class="text-center">
                     <CBadge :color="convertStatusColor(winloss.status)">

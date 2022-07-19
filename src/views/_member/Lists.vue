@@ -92,7 +92,20 @@
                     {{ convertStatus(member.status) }}
                   </CBadge>
                 </CTableDataCell>
-                <CTableDataCell>{{ member.username_provider }}</CTableDataCell>
+                <CTableDataCell>
+                  <CButton
+                    size="sm"
+                    color="link"
+                    class="p-0"
+                    @click="
+                      navigateToNewTab(
+                        '/member/list/' + member.prefix + '/' + member._id,
+                      )
+                    "
+                  >
+                    {{ member.username_provider }}
+                  </CButton>
+                </CTableDataCell>
                 <CTableDataCell>
                   {{ member.profile.name + ' ' + member.profile.surename }}
                 </CTableDataCell>
@@ -370,15 +383,20 @@ export default {
       }
     },
     convertStatusRowColor(status) {
-      const _status = status.toString().toLowerCase()
-      if (_status == 'active') {
-        return 'light'
-      } else if (_status == 'inactive') {
-        return 'warning'
-      } else if (_status == 'blacklist') {
-        return 'dark'
-      } else {
-        return 'secondary'
+      try {
+        const _status = status.toString().toLowerCase()
+        if (_status == 'active') {
+          return 'light'
+        } else if (_status == 'inactive') {
+          return 'warning'
+        } else if (_status == 'blacklist') {
+          return 'dark'
+        } else {
+          return 'secondary'
+        }
+      } catch (err) {
+        // console.log(err)
+        return 'danger'
       }
     },
     onchgPrefix(_id) {

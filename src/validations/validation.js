@@ -3,7 +3,7 @@ export function validateAlphabet(value) {
 }
 
 export function validateLineID(value) {
-  return /^[^\u0E00-\u0E7F\s]+$/.test(value) ? true : false
+  return /^[^\u0E00-\u0E7F\s]+$|^$/.test(value) ? true : false
 }
 
 export function validateAmount(value) {
