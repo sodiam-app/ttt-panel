@@ -710,16 +710,12 @@
                     <CTableDataCell>
                       <CRow>
                         <p class="m-0">
-                          {{
-                            convertTime(historylasted.approve_by.approve_date)
-                          }}
+                          {{ convertTime(historylasted.upd_date) }}
                         </p>
                       </CRow>
                       <CRow>
                         <small class="fw-lighter m-0">
-                          {{
-                            convertDate(historylasted.approve_by.approve_date)
-                          }}
+                          {{ convertDate(historylasted.upd_date) }}
                         </small>
                       </CRow>
                     </CTableDataCell>
@@ -968,20 +964,12 @@
                     <CTableDataCell>
                       <CRow>
                         <p class="m-0">
-                          {{
-                            convertTime(
-                              historyProcessing.approve_by.approve_date,
-                            )
-                          }}
+                          {{ convertTime(historyProcessing.upd_date) }}
                         </p>
                       </CRow>
                       <CRow>
                         <small class="fw-lighter m-0">
-                          {{
-                            convertDate(
-                              historyProcessing.approve_by.approve_date,
-                            )
-                          }}
+                          {{ convertDate(historyProcessing.upd_date) }}
                         </small>
                       </CRow>
                     </CTableDataCell>

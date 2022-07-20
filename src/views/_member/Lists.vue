@@ -213,6 +213,7 @@
           <CSmartPagination
             :activePage="activePage"
             :pages="totalPage"
+            :active-page-change="activePage"
             size="sm"
             align="center"
             v-show="!listOfMember.length == 0"
@@ -295,12 +296,14 @@ export default {
       await this.$http
         .post('panel/getallmember', {
           agent_id: _agent_id,
-          domain_name: '',
+          page: this.activePage,
+          range: '10',
         })
         .then((response) => {
           if (response.data.status == 200) {
             this.listOfMember = response.data.result.Member
-            this.totalPage = Math.ceil(response.data.result.total / 10)
+            // this.totalPage = Math.ceil(response.data.result.total / 10)
+            this.totalPage = response.data.result.page_option.total_match_page
             console.log(this.totalPage)
             console.log(this.listOfMember)
           } else if (
