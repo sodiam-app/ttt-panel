@@ -2877,6 +2877,7 @@ export default {
               this.navigateTo('/pages/login')
             })
           } else {
+            this.dataHistory = []
             console.log(
               'call api - panel/history : status = ' +
                 response.data.status +
@@ -2909,6 +2910,7 @@ export default {
               this.navigateTo('/pages/login')
             })
           } else {
+            this.dataHistoryLasted = []
             console.log(
               'call api - panel/historylasted : status = ' +
                 response.data.status +
@@ -2941,6 +2943,7 @@ export default {
               this.navigateTo('/pages/login')
             })
           } else {
+            this.dataHistoryProcessing = []
             console.log(
               'call api - panel/historyprocessing : status = ' +
                 response.data.status +
