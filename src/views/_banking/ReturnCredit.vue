@@ -1229,13 +1229,13 @@ export default {
                         _valid = false
                       }
                     }
-                    if (j == 3) {
-                      // Description
-                      if (currentline[j] == '') {
-                        _checked = false
-                        _valid = false
-                      }
-                    }
+                    // if (j == 3) {
+                    //   // Description
+                    //   if (currentline[j] == '') {
+                    //     _checked = false
+                    //     _valid = false
+                    //   }
+                    // }
                     // -----
 
                     // final loop
