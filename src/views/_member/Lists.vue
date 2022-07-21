@@ -78,7 +78,9 @@
               >
                 <CTableDataCell scope="row" class="text-center">
                   <CRow>
-                    <p class="m-0">{{ index + 1 }}.</p>
+                    <p class="m-0">
+                      {{ index + 1 + activePage1 * rangePage - rangePage }}.
+                    </p>
                   </CRow>
                   <CRow>
                     <small class="fw-lighter m-0"><small>....</small></small>
@@ -211,9 +213,14 @@
         </div>
         <div class="text-center">
           <CSmartPagination
-            :activePage="activePage"
+            :activePage="activePage1"
             :pages="totalPage"
-            :active-page-change="activePage"
+            @active-page-change="
+              (index) => {
+                activePage1 = index
+                getMemberList(currentWebAgent)
+              }
+            "
             size="sm"
             align="center"
             v-show="!listOfMember.length == 0"
@@ -239,8 +246,8 @@ export default {
 
       listOfMember: [],
       totalPage: 1,
-      activePage: 1,
-      runNumber: 1,
+      activePage1: 1,
+      rangePage: 10,
 
       optWebAgent: [],
     }
@@ -296,8 +303,8 @@ export default {
       await this.$http
         .post('panel/getallmember', {
           agent_id: _agent_id,
-          page: this.activePage,
-          range: '10',
+          page: this.activePage1,
+          range: this.rangePage,
         })
         .then((response) => {
           if (response.data.status == 200) {
@@ -405,6 +412,9 @@ export default {
     onchgPrefix(_id) {
       this.currentWebAgent = _id
       this.getMemberList(_id)
+    },
+    onchgPage() {
+      console.log('----', this.activePage1)
     },
 
     // Search

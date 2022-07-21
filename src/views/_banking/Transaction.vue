@@ -377,7 +377,7 @@
                     class=""
                   >
                     <CTableHeaderCell scope="row">
-                      {{ index + 1 }}.
+                      {{ index + 1 + activePage1 * rangePage1 - rangePage1 }}.
                     </CTableHeaderCell>
                     <CTableDataCell>
                       <div class="d-inline-flex align-items-center">
@@ -623,6 +623,12 @@
             <CSmartPagination
               :activePage="activePage1"
               :pages="totalPage1"
+              @active-page-change="
+                (index) => {
+                  activePage1 = index
+                  getHistory()
+                }
+              "
               size="sm"
               align="end"
             />
@@ -676,7 +682,7 @@
                     :color="convertTypeRowsColor(historylasted.type)"
                   >
                     <CTableHeaderCell scope="row">
-                      {{ index + 1 }}
+                      {{ index + 1 + activePage2 * rangePage2 - rangePage2 }}.
                     </CTableHeaderCell>
                     <CTableDataCell>
                       <div class="text-break"></div>
@@ -877,6 +883,12 @@
             <CSmartPagination
               :activePage="activePage2"
               :pages="totalPage2"
+              @active-page-change="
+                (index) => {
+                  activePage2 = index
+                  getHistoryLasted()
+                }
+              "
               size="sm"
               align="end"
             />
@@ -930,7 +942,7 @@
                     :color="convertTypeRowsColor(historyProcessing.type)"
                   >
                     <CTableHeaderCell scope="row">
-                      {{ index + 1 }}
+                      {{ index + 1 + activePage3 * rangePage3 - rangePage3 }}.
                     </CTableHeaderCell>
                     <CTableDataCell>
                       <div class="text-break"></div>
@@ -1139,6 +1151,12 @@
             <CSmartPagination
               :activePage="activePage3"
               :pages="totalPage3"
+              @active-page-change="
+                (index) => {
+                  activePage3 = index
+                  getHistoryProcessing()
+                }
+              "
               size="sm"
               align="end"
             />
@@ -2508,10 +2526,13 @@ export default {
 
       totalPage1: 1,
       activePage1: 1,
+      rangePage1: 10,
       totalPage2: 1,
       activePage2: 1,
+      rangePage2: 10,
       totalPage3: 1,
       activePage3: 1,
+      rangePage3: 10,
 
       // data
       flagAutoHistory: false,
@@ -2838,11 +2859,15 @@ export default {
     },
     async getHistory() {
       await this.$http
-        .post('panel/history', {})
+        .post('panel/history', {
+          page: this.activePage1,
+          range: this.rangePage1,
+        })
         .then((response) => {
           if (response.data.status == 200) {
             this.dataHistory = response.data.result
-            this.totalPage1 = Math.ceil(this.dataHistory.length / 10)
+            // this.totalPage1 = Math.ceil(this.dataHistory.length / 10)
+            this.totalPage1 = response.data.page_option.total_match_page
             console.log(this.dataHistory)
           } else if (
             response.data.status == 502 ||
@@ -2866,11 +2891,15 @@ export default {
     },
     async getHistoryLasted() {
       await this.$http
-        .post('panel/historylasted', {})
+        .post('panel/historylasted', {
+          page: this.activePage2,
+          range: this.rangePage3,
+        })
         .then((response) => {
           if (response.data.status == 200) {
             this.dataHistoryLasted = response.data.result
-            this.totalPage2 = Math.ceil(this.dataHistoryLasted.length / 10)
+            // this.totalPage2 = Math.ceil(this.dataHistoryLasted.length / 10)
+            this.totalPage2 = response.data.page_option.total_match_page
             console.log(this.dataHistoryLasted)
           } else if (
             response.data.status == 502 ||
@@ -2894,11 +2923,15 @@ export default {
     },
     async getHistoryProcessing() {
       await this.$http
-        .post('panel/historyprocessing', {})
+        .post('panel/historyprocessing', {
+          page: this.activePage3,
+          range: this.rangePage3,
+        })
         .then((response) => {
           if (response.data.status == 200) {
             this.dataHistoryProcessing = response.data.result
-            this.totalPage3 = Math.ceil(this.dataHistoryProcessing.length / 10)
+            // this.totalPage3 = Math.ceil(this.dataHistoryProcessing.length / 10)
+            this.totalPage3 = response.data.page_option.total_match_page
             console.log(this.dataHistoryProcessing)
           } else if (
             response.data.status == 502 ||
